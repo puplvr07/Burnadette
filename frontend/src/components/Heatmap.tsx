@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Meta, Metric, WeekRow } from "../types";
 import { colorFor } from "../colors";
 
@@ -12,6 +12,26 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
   const [hover, setHover] = useState<WeekRow | null>(null);
+  // A tapped or clicked week stays selected. Mouse hover previews other weeks without clearing it.
+  const [picked, setPicked] = useState<WeekRow | null>(null);
+  const shown = hover ?? picked;
+
+  // Sideways scroll position, mirrored by the slider under the calendar.
+  const scroller = useRef<HTMLDivElement>(null);
+  const [scroll, setScroll] = useState({ pos: 0, max: 0 });
+  const syncScroll = () => {
+    const el = scroller.current;
+    if (el) setScroll({ pos: el.scrollLeft, max: Math.max(0, el.scrollWidth - el.clientWidth) });
+  };
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    syncScroll();
+    const ro = new ResizeObserver(syncScroll);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [weeks.length]);
+  useEffect(() => { setPicked(null); setHover(null); }, [weeks]);
 
   const { years, byKey, max } = useMemo(() => {
     const byKey = new Map<string, WeekRow>();
@@ -39,7 +59,7 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
   return (
     <div>
       {allZero && <p className="empty">No fire detected in this area and period.</p>}
-      <div className="heat-scroll">
+      <div className="heat-scroll" ref={scroller} onScroll={syncScroll}>
         <svg className="heat-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMinYMin meet" role="img" aria-label="Calendar heatmap of burning activity, years down, weeks across">
           <defs>
             <pattern id="nodata" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -64,9 +84,11 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
                   const t = v == null ? null : metric === "anomaly" ? v / 100 : v / max;
                   const x = LEFT + col * STEP, yy = TOP + row * STEP;
                   return (
-                    <g key={col} onPointerEnter={() => setHover(w)} onPointerDown={() => setHover(w)} onPointerLeave={() => setHover(null)}>
+                    <g key={col} className="cell" onClick={() => setPicked(w)}
+                      onPointerEnter={(e) => e.pointerType === "mouse" && setHover(w)}
+                      onPointerLeave={(e) => e.pointerType === "mouse" && setHover(null)}>
                       <rect x={x} y={yy} width={CELL} height={CELL} rx={2} fill={t == null ? "url(#nodata)" : colorFor(t)} stroke="#0004" />
-                      {hover === w && <rect x={x - 1} y={yy - 1} width={CELL + 2} height={CELL + 2} rx={3} fill="none" stroke="#fff" strokeWidth={1.5} pointerEvents="none" />}
+                      {shown === w && <rect x={x - 1} y={yy - 1} width={CELL + 2} height={CELL + 2} rx={3} fill="none" stroke="#fff" strokeWidth={1.5} pointerEvents="none" />}
                       {inGap(w) && <rect x={x + 1} y={yy + 1} width={CELL - 2} height={CELL - 2} fill="none" stroke="#1f5fff" strokeWidth={2} />}
                       {w.low_sensitivity_share >= 0.3 && metric === "activity" && w.value != null && (
                         <circle cx={x + CELL - 3.5} cy={yy + 3.5} r={2.2} fill="#fff" stroke="#000" strokeWidth={0.8} />
@@ -80,6 +102,12 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
         </svg>
       </div>
 
+      {scroll.max > 0 && (
+        <input type="range" className="heat-slider" min={0} max={scroll.max} step={1} value={scroll.pos}
+          aria-label="Scroll the calendar sideways"
+          onChange={(e) => { if (scroller.current) scroller.current.scrollLeft = +e.target.value; }} />
+      )}
+
       <div className="legend">
         <span>{metric === "anomaly" ? "Usual (0)" : "Quiet"}</span>
         <span className="ramp">{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ background: colorFor(i / 8) }} />)}</span>
@@ -92,7 +120,7 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
       </div>
 
       <div className="tip" aria-live="polite">
-        {hover ? <Tip w={hover} metric={metric} range={`${start} to ${end}`} gap={inGap(hover)} /> : "Hover or tap a week for details."}
+        <Tip w={shown} gap={shown ? inGap(shown) : false} />
       </div>
     </div>
   );
@@ -102,18 +130,28 @@ function addDays(iso: string, n: number) {
   return new Date(Date.parse(iso) + n * 86400000).toISOString().slice(0, 10);
 }
 
-function Tip({ w, metric, gap }: { w: WeekRow; metric: Metric; range: string; gap: boolean }) {
-  const src = w.harmonized_source === "modis_scaled" ? "MODIS scaled to VIIRS" : w.harmonized_source === "viirs" ? "measured by VIIRS" : w.harmonized_source;
+// Always shows the same fields, so the box keeps the same height whatever is selected.
+// (A height change near the bottom of the page made the browser scroll, moving the calendar.)
+function Tip({ w, gap }: { w: WeekRow | null; gap: boolean }) {
+  const dash = "\u2014";
+  const src = !w ? dash : w.harmonized_source === "modis_scaled" ? "MODIS scaled to VIIRS" : w.harmonized_source === "viirs" ? "VIIRS" : w.harmonized_source || dash;
+  const notes = !w ? "Hover or tap a week for details." : "Notes: " + ([...w.flags, ...(gap ? ["known satellite gap"] : [])].join(", ") || "none");
+  const activity = !w ? dash : w.value == null ? "no data"
+    : w.value.toFixed(2) + (w.uncertainty_low != null ? ` (${w.uncertainty_low.toFixed(2)} to ${w.uncertainty_high!.toFixed(2)})` : "");
+  const items: [string, string][] = [
+    ["Week of", w ? w.week_start : dash],
+    ["Activity", activity],
+    ["Anomaly", w?.anomaly != null ? `${w.anomaly.toFixed(0)}/100` : dash],
+    ["Active cells", w ? String(w.active_cells) : dash],
+    ["Low-sensitivity", w ? `${Math.round(w.low_sensitivity_share * 100)}%` : dash],
+    ["Source", src],
+  ];
   return (
     <>
-      <strong>Week of {w.week_start}</strong>{" "}
-      {w.value == null ? "No data for this source." : <>Activity {w.value.toFixed(2)}
-        {w.uncertainty_low != null && <> (range {w.uncertainty_low.toFixed(2)} to {w.uncertainty_high!.toFixed(2)})</>}</>}
-      {" "}| Anomaly {w.anomaly?.toFixed(0) ?? "n/a"}/100 | {w.active_cells} active cell{w.active_cells === 1 ? "" : "s"}
-      {w.low_sensitivity_share > 0 && <> | {Math.round(w.low_sensitivity_share * 100)}% low-sensitivity cells</>}
-      {src && metric !== undefined && <> | {src}</>}
-      {w.flags.length > 0 && <> | flags: {w.flags.join(", ")}</>}
-      {gap && <> | known satellite gap</>}
+      <dl className="tip-grid">
+        {items.map(([k, v]) => <div key={k}><dt>{k}</dt><dd title={v}>{v}</dd></div>)}
+      </dl>
+      <p className="tip-notes" title={notes}>{notes}</p>
     </>
   );
 }
