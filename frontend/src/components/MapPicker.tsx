@@ -16,6 +16,8 @@ const STYLE: L.PathOptions = { color: "#ffa63d", weight: 2, fillColor: "#ffa63d"
 const TEMP: L.PathOptions = { ...STYLE, dashArray: "5" };
 
 const toBounds = (b: Bbox) => L.latLngBounds([b[1], b[0]], [b[3], b[2]]);
+// The square web-map world (Web Mercator stops at about 85 degrees north and south).
+const WORLD = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
 
 export default function MapPicker({ bbox, onChange }: Props) {
   const el = useRef<HTMLDivElement>(null);
@@ -31,15 +33,34 @@ export default function MapPicker({ bbox, onChange }: Props) {
   modeRef.current = mode;
 
   useEffect(() => {
-    const m = L.map(el.current!, { zoomControl: true }).setView([12, 121.5], 7);
+    const m = L.map(el.current!, {
+      zoomControl: true,
+      maxBounds: WORLD,
+      maxBoundsViscosity: 1, // hard edge: can't drag past the world
+      worldCopyJump: false,
+      zoomSnap: 0.25,
+    }).setView([12, 121.5], 7);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 17,
+      noWrap: true,
+      bounds: WORLD,
       attribution: "Tiles &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community",
     }).addTo(m);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
-      maxZoom: 17,
+      maxZoom: 17, noWrap: true, bounds: WORLD,
     }).addTo(m);
     map.current = m;
+
+    // Lowest zoom = the zoom where one world still covers the whole map box,
+    // so zooming out never shows repeats or empty space. Recomputed on resize.
+    const fitMinZoom = () => {
+      const z = Math.ceil(m.getBoundsZoom(WORLD, true) * 4) / 4;
+      m.setMinZoom(z);
+      if (m.getZoom() < z) m.setZoom(z);
+    };
+    fitMinZoom();
+    const ro = new ResizeObserver(() => { m.invalidateSize(); fitMinZoom(); });
+    ro.observe(el.current!);
 
     let start: L.LatLng | null = null;
     let temp: L.Rectangle | L.Circle | null = null;
@@ -110,7 +131,7 @@ export default function MapPicker({ bbox, onChange }: Props) {
 
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMode(null); };
     document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("keydown", onKey); m.remove(); };
+    return () => { ro.disconnect(); document.removeEventListener("keydown", onKey); m.remove(); };
   }, []);
 
   useEffect(() => {
