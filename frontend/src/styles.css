@@ -130,6 +130,8 @@ legend { font-family: var(--f-mono); font-size: 13px; padding: 0; margin-bottom:
 .key i { display: inline-block; width: 12px; height: 12px; vertical-align: -2px; margin-right: 4px; }
 .k-gap { border: 2px solid #1f5fff; }
 .k-dot { border: 1px solid #000; border-radius: 50%; background: #fff; }
+.cell-empty { fill: #ffffff08; stroke: #ffffff14; stroke-width: 1; }
+.k-empty { background: #ffffff08; border: 1px solid #ffffff24; border-radius: 2px; }
 .k-nodata { background: repeating-linear-gradient(45deg, #eee 0 2px, #aaa 2px 3px); }
 .tip { min-height: 3.2em; margin-top: 10px; padding: 10px 12px; background: #ffffff0f; border-radius: 12px; font-family: var(--f-mono); font-size: 13px; }
 .caveats { margin-top: 24px; background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 18px 26px; }

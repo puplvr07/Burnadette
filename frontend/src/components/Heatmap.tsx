@@ -57,7 +57,9 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
                 {scaled && <text x={4} y={TOP + row * STEP + CELL - 3} className="axis scaled">scaled</text>}
                 {Array.from({ length: COLS }, (_, col) => {
                   const w = byKey.get(`${y}-${col}`);
-                  if (!w) return null;
+                  // Empty slot (outside the date range, or no 53rd week this year):
+                  // a faint cell keeps the grid a full rectangle.
+                  if (!w) return <rect key={col} x={LEFT + col * STEP} y={TOP + row * STEP} width={CELL} height={CELL} rx={2} className="cell-empty" />;
                   const v = metric === "anomaly" ? w.anomaly : w.value;
                   const t = v == null ? null : metric === "anomaly" ? v / 100 : v / max;
                   const x = LEFT + col * STEP, yy = TOP + row * STEP;
@@ -85,6 +87,7 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
         <span className="key"><i className="k-gap" /> known gap</span>
         <span className="key"><i className="k-dot" /> low-confidence share high</span>
         <span className="key"><i className="k-nodata" /> no data</span>
+        <span className="key"><i className="k-empty" /> no week (outside range, or year has no 53rd week)</span>
         <span className="key">"scaled" rows: MODIS scaled to VIIRS</span>
       </div>
 
