@@ -4,7 +4,7 @@ import type { Bbox, CalendarResponse, Meta, Metric, Region, Source } from "../ty
 import MapPicker from "./MapPicker";
 import Heatmap from "./Heatmap";
 import Caveats from "./Caveats";
-import { Embers } from "./Fire";
+import { FireBackdrop } from "./Fire";
 
 export default function CalendarPage() {
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -47,9 +47,8 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="page page-wide page-fire">
-      <div className="lava" aria-hidden="true" />
-      <Embers />
+    <div className="page page-wide">
+      <FireBackdrop />
       <header className="hero">
         <div className="terminal-dots"><i className="dot red" /><i className="dot yellow" /><i className="dot green" /></div>
         <h1>Burning Activity Calendar<span className="cursor" /></h1>
