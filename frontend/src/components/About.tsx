@@ -10,7 +10,7 @@ const MEMBERS = [
 
 export default function About() {
   return (
-    <div className="page">
+    <div className="page page-fill">
       <section className="intro">
         <p className="eyebrow">// about us</p>
         <h2>The team behind Burnadette</h2>

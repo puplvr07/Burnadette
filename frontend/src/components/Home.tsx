@@ -2,7 +2,7 @@ import { FireBackdrop } from "./Fire";
 
 export default function Home() {
   return (
-    <div className="page">
+    <div className="page page-fill">
       <FireBackdrop />
       <section className="hero-split">
         <div className="hero-text">
