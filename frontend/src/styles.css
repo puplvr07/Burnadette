@@ -347,7 +347,9 @@ legend { font-family: var(--f-mono); font-size: 13px; padding: 0; margin-bottom:
   text-transform: uppercase;
 }
 
-body:has(.page-wide) {
+body:has(.page-wide),
+body:has(.hero-split) {
+
   background-image:
     linear-gradient(
       90deg,
