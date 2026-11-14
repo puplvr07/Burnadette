@@ -133,7 +133,7 @@ legend { font-family: var(--f-mono); font-size: 13px; padding: 0; margin-bottom:
 .cell-empty { fill: #ffffff08; stroke: #ffffff14; stroke-width: 1; }
 .k-empty { background: #ffffff08; border: 1px solid #ffffff24; border-radius: 2px; }
 .k-nodata { background: repeating-linear-gradient(45deg, #eee 0 2px, #aaa 2px 3px); }
-.tip { min-height: 3.2em; margin-top: 10px; padding: 10px 12px; background: #ffffff0f; border-radius: 12px; font-family: var(--f-mono); font-size: 13px; }
+.tip { margin-top: 10px; padding: 10px 12px; background: #ffffff0f; border-radius: 12px; font-family: var(--f-mono); font-size: 13px; }
 .caveats { margin-top: 24px; background: var(--card); border: 1px solid var(--border); border-radius: 22px; padding: 18px 26px; }
 .caveats summary { cursor: pointer; font-family: var(--f-head); font-weight: 700; }
 .caveats li { margin: 6px 0; line-height: 1.5; font-size: 14px; color: var(--sub); }
@@ -183,4 +183,28 @@ legend { font-family: var(--f-mono); font-size: 13px; padding: 0; margin-bottom:
   .controls .seg button { font-size: 12px; }
   .controls input[type=date] { width: 100%; }
   .map { height: 360px; }
+}
+/* Week details: fixed rows so the box never changes height */
+.tip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 16px; margin: 0; }
+.tip-grid div { min-width: 0; }
+.tip-grid dt { font-size: 11px; color: var(--sub); }
+.tip-grid dd { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tip-notes { margin: 8px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--sub); }
+.heat-svg .cell { cursor: pointer; }
+.heat-svg { -webkit-tap-highlight-color: transparent; }
+
+/* Sideways slider under the calendar (shown only when the calendar is wider than the screen) */
+.heat-slider { -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 24px; margin: 10px 0 0; background: transparent; cursor: pointer; touch-action: none; }
+.heat-slider::-webkit-slider-runnable-track { height: 10px; border-radius: 10px; background: #ffffff1a; }
+.heat-slider::-moz-range-track { height: 10px; border-radius: 10px; background: #ffffff1a; }
+.heat-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 56px; height: 22px; margin-top: -6px; border-radius: 11px; background: var(--teal); box-shadow: 0 0 10px #ff7a1a88; border: 0; }
+.heat-slider::-moz-range-thumb { width: 56px; height: 22px; border-radius: 11px; background: var(--teal); box-shadow: 0 0 10px #ff7a1a88; border: 0; }
+.heat-slider:focus-visible { outline: 2px solid var(--teal); outline-offset: 4px; border-radius: 10px; }
+
+@media (max-width: 600px) {
+  /* The slider replaces the thin native scrollbar on phones */
+  .heat-scroll { scrollbar-width: none; padding-bottom: 0; }
+  .heat-scroll::-webkit-scrollbar { display: none; }
+  .tip-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: row dense; }
+  .tip-grid div:nth-child(2), .tip-grid div:nth-child(6) { grid-column: span 2; }
 }
