@@ -338,3 +338,11 @@ legend { font-family: var(--f-mono); font-size: 13px; padding: 0; margin-bottom:
   );
 }
 
+.page-wide .hero h1 {
+  font-family: "Orbitron", "Space Grotesk", sans-serif;
+  font-size: clamp(28px, 3.5vw, 48px);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
