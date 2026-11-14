@@ -1,0 +1,4 @@
+node_modules/
+dist/
+public/fake_cell_week.csv
+*.tsbuildinfo
