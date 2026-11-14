@@ -4,6 +4,7 @@ import type { Bbox, CalendarResponse, Meta, Metric, Region, Source } from "../ty
 import MapPicker from "./MapPicker";
 import Heatmap from "./Heatmap";
 import Caveats from "./Caveats";
+import { Embers } from "./Fire";
 
 export default function CalendarPage() {
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -46,7 +47,9 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="page page-wide">
+    <div className="page page-wide page-fire">
+      <div className="lava" aria-hidden="true" />
+      <Embers />
       <header className="hero">
         <div className="terminal-dots"><i className="dot red" /><i className="dot yellow" /><i className="dot green" /></div>
         <h1>Burning Activity Calendar<span className="cursor" /></h1>
@@ -57,7 +60,7 @@ export default function CalendarPage() {
 
       <div className="layout">
         <section className="panel">
-          <h2>1. Choose an area</h2>
+          <h2 className="step"><span className="step-num">1</span>Choose an area</h2>
           <label>Pilot region
             <select value={regionId} onChange={(e) => pickRegion(e.target.value)}>
               <option value="">Custom box</option>
@@ -68,8 +71,8 @@ export default function CalendarPage() {
           {bbox && <p className="small">Bounding box: {bbox.map((n) => n.toFixed(2)).join(", ")} (W, S, E, N){data && ` | ${data.cells_in_area} cells`}</p>}
         </section>
 
-        <section className="panel">
-          <h2>2. Read the calendar</h2>
+        <section className="panel panel-fire">
+          <h2 className="step"><span className="step-num">2</span>Read the calendar</h2>
           <div className="controls">
             <fieldset><legend>Source</legend>
               <Seg value={source} onChange={setSource} options={[["harmonized", "Harmonized"], ["modis", "MODIS only"], ["viirs", "VIIRS only"]]} />

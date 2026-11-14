@@ -31,8 +31,8 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
 
   const allZero = weeks.length > 0 && weeks.every((w) => (w.value ?? 0) === 0);
   const inGap = (w: WeekRow) => meta.gaps.some((g) => w.week_start <= g.end && addDays(w.week_start, 6) >= g.start);
-  const width = LEFT + COLS * STEP + 8;
-  const height = TOP + years.length * STEP + 4;
+  const width = LEFT + COLS * STEP - GAP;
+  const height = TOP + years.length * STEP - GAP;
 
   if (!weeks.length) return <p className="empty">No data in this area and date range.</p>;
 
@@ -40,7 +40,7 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
     <div>
       {allZero && <p className="empty">No fire detected in this area and period.</p>}
       <div className="heat-scroll">
-        <svg width={width} height={height} role="img" aria-label="Calendar heatmap of burning activity, years down, weeks across">
+        <svg className="heat-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMinYMin meet" role="img" aria-label="Calendar heatmap of burning activity, years down, weeks across">
           <defs>
             <pattern id="nodata" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
               <rect width="4" height="4" fill="#eee" /><line x1="0" y1="0" x2="0" y2="4" stroke="#aaa" strokeWidth="1.5" />
@@ -63,7 +63,8 @@ export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
                   const x = LEFT + col * STEP, yy = TOP + row * STEP;
                   return (
                     <g key={col} onPointerEnter={() => setHover(w)} onPointerDown={() => setHover(w)} onPointerLeave={() => setHover(null)}>
-                      <rect x={x} y={yy} width={CELL} height={CELL} rx={2} fill={t == null ? "url(#nodata)" : colorFor(t)} stroke="#0002" />
+                      <rect x={x} y={yy} width={CELL} height={CELL} rx={2} fill={t == null ? "url(#nodata)" : colorFor(t)} stroke="#0004" />
+                      {hover === w && <rect x={x - 1} y={yy - 1} width={CELL + 2} height={CELL + 2} rx={3} fill="none" stroke="#fff" strokeWidth={1.5} pointerEvents="none" />}
                       {inGap(w) && <rect x={x + 1} y={yy + 1} width={CELL - 2} height={CELL - 2} fill="none" stroke="#1f5fff" strokeWidth={2} />}
                       {w.low_sensitivity_share >= 0.3 && metric === "activity" && w.value != null && (
                         <circle cx={x + CELL - 3.5} cy={yy + 3.5} r={2.2} fill="#fff" stroke="#000" strokeWidth={0.8} />

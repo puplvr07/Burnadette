@@ -1,7 +1,10 @@
+import { Embers } from "./Fire";
+
 export default function Home() {
   return (
     <div className="page">
-      <section className="hero-split">
+      <section className="hero-split hero-fire">
+        <Embers />
         <div className="hero-text">
           <p className="kicker">NASA FIRE DATA, 2000 TO NOW</p>
           <h1 className="display">What does a year of <em>fire</em> look like?</h1>
