@@ -1,0 +1,15 @@
+# Large fire datasets (never push raw CSVs or big Parquets to GitHub)
+raw_data/
+*.csv
+*.parquet
+
+# Python environment & cache
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets & OS files
+.env
+.DS_Store
+Thumbs.db
