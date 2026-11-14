@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { MapPin, CalendarDays } from "lucide-react";
 import { getCalendar, getMeta, getRegions, usingFakeData } from "../api";
 import type { Bbox, CalendarResponse, Meta, Metric, Region, Source } from "../types";
 import MapPicker from "./MapPicker";
@@ -59,7 +60,10 @@ export default function CalendarPage() {
 
       <div className="layout">
         <section className="panel">
-          <h2 className="step"><span className="step-num">1</span>Choose an area</h2>
+          <h2 className="step">
+            <MapPin size={22} strokeWidth={1.8} color="#fb923c" />
+             Choose an area
+          </h2>
           <label>Pilot region
             <select value={regionId} onChange={(e) => pickRegion(e.target.value)}>
               <option value="">Custom box</option>
@@ -71,7 +75,10 @@ export default function CalendarPage() {
         </section>
 
         <section className="panel panel-fire">
-          <h2 className="step"><span className="step-num">2</span>Read the calendar</h2>
+          <h2 className="step">
+            <CalendarDays size={22} strokeWidth={1.8} color="#fb923c" />
+              Read the calendar
+          </h2>
           <div className="controls">
             <fieldset><legend>Source</legend>
               <Seg value={source} onChange={setSource} options={[["harmonized", "Harmonized"], ["modis", "MODIS only"], ["viirs", "VIIRS only"]]} />
