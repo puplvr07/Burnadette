@@ -1,0 +1,65 @@
+.about-page .member-photo {
+  display: block;
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  object-position: center 30%;
+  border-radius: 50%;
+  border: 2px solid var(--sub);
+  background: #fff;
+  margin-bottom: 14px;
+}
+
+.about-page .member-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.about-page .member-social {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-top: 4px;
+  border: 1px solid currentColor;
+  border-radius: 10px;
+  color: var(--text);
+}
+
+.about-page .member-social:hover,
+.about-page .member-social:focus-visible {
+  color: var(--teal);
+}
+
+.about-page .member-social:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.about-page .member-social-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 2;
+  width: max-content;
+  max-width: min(18rem, calc(100vw - 6rem));
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #122238;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.about-page .member-social:hover .member-social-tooltip,
+.about-page .member-social:focus-visible .member-social-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
