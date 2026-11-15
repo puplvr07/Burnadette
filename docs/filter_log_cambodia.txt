@@ -1,0 +1,49 @@
+===== 2026-11-15 11:07 =====
+--- MODIS 2015 cambodia ---
+  input rows                                                                44023
+  type == 0 (vegetation fire)                                               41086   (removed 2937)
+  drop low confidence                                                       39143   (removed 1943)
+  drop persistent spots (>= 5 dates/year)                                   35797   (removed 3346)
+  outside the region grid (other territories)                               35797   (removed 0)
+--- MODIS 2016 cambodia ---
+  input rows                                                                37153
+  type == 0 (vegetation fire)                                               36726   (removed 427)
+  drop low confidence                                                       34783   (removed 1943)
+  drop persistent spots (>= 5 dates/year)                                   31572   (removed 3211)
+  outside the region grid (other territories)                               31572   (removed 0)
+--- MODIS 2017 cambodia ---
+  input rows                                                                22426
+  type == 0 (vegetation fire)                                               22353   (removed 73)
+  drop low confidence                                                       21287   (removed 1066)
+  drop persistent spots (>= 5 dates/year)                                   20234   (removed 1053)
+  outside the region grid (other territories)                               20234   (removed 0)
+--- MODIS 2018 cambodia ---
+  input rows                                                                28815
+  type == 0 (vegetation fire)                                               28249   (removed 566)
+  drop low confidence                                                       26953   (removed 1296)
+  drop persistent spots (>= 5 dates/year)                                   26226   (removed 727)
+  outside the region grid (other territories)                               26226   (removed 0)
+--- SNPP 2015 cambodia ---
+  input rows                                                               234705
+  type == 0 (vegetation fire)                                              234613   (removed 92)
+  drop low confidence                                                      208478   (removed 26135)
+  drop persistent spots (>= 5 dates/year)                                  139417   (removed 69061)
+  outside the region grid (other territories)                              139417   (removed 0)
+--- SNPP 2016 cambodia ---
+  input rows                                                               236923
+  type == 0 (vegetation fire)                                              236628   (removed 295)
+  drop low confidence                                                      212675   (removed 23953)
+  drop persistent spots (>= 5 dates/year)                                  144127   (removed 68548)
+  outside the region grid (other territories)                              144127   (removed 0)
+--- SNPP 2017 cambodia ---
+  input rows                                                               127110
+  type == 0 (vegetation fire)                                              126904   (removed 206)
+  drop low confidence                                                      112642   (removed 14262)
+  drop persistent spots (>= 5 dates/year)                                   95848   (removed 16794)
+  outside the region grid (other territories)                               95848   (removed 0)
+--- SNPP 2018 cambodia ---
+  input rows                                                               151443
+  type == 0 (vegetation fire)                                              151346   (removed 97)
+  drop low confidence                                                      137714   (removed 13632)
+  drop persistent spots (>= 5 dates/year)                                  109450   (removed 28264)
+  outside the region grid (other territories)                              109450   (removed 0)
