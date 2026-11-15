@@ -49,6 +49,10 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
   onBrowseRef.current = onBrowse;
   const [drawingOpen, setDrawingOpen] = useState(false);
   const [toolGroup, setToolGroup] = useState<"draw" | "measure" | "location">("draw");
+  // Minimized Map tools: a small bar beside the tools button so the panel doesn't cover the map while drawing.
+  // Activating a shape on a phone minimizes it automatically; tapping the bar expands it again.
+  const [toolsCollapsed, setToolsCollapsed] = useState(false);
+  useEffect(() => { if (!drawingOpen) setToolsCollapsed(false); }, [drawingOpen]);
   const drawingOpenRef = useRef(false);
   drawingOpenRef.current = drawingOpen;
   const [coordinate, setCoordinate] = useState({lat: 12, lng: 121.5, source: "center" as "center" | "pointer"});
@@ -314,8 +318,24 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
           onClick={() => { if (!drawingOpen) onBrowseRef.current?.(); modeRef.current = null; cancel.current(); setDrawingOpen((open) => !open); setMode(null); }}>
           {drawingOpen ? <span className="close-symbol" aria-hidden="true">×</span> : <MapControlIcon name="tools" />}
         </button>
-      <div className="shape-bar" id="map-drawing-tools" hidden={!drawingOpen}>
-        <div className="unified-tools-heading"><h2>Map tools</h2><button type="button" className="map-tool-settings-link" title="Region & dates" aria-label="Open region and date settings" aria-controls="map-settings" onClick={()=>{cancel.current();setMode(null);setDrawingOpen(false);onOpenSettings?.();}}><MapControlIcon name="tools" /><span>Region & dates</span></button></div>
+      {drawingOpen && toolsCollapsed && (
+        <div className="tools-peek" role="group" aria-label="Map tools, minimized">
+          <button type="button" className="tools-peek-expand" aria-expanded="false" aria-controls="map-drawing-tools" title="Show map tools" onClick={() => setToolsCollapsed(false)}>
+            <span className="tools-peek-text">
+              <strong>{mode && !measuring(mode) ? SHAPES.find(([s]) => s === mode)?.[1] ?? "Map tools" : "Map tools"}</strong>
+              <small>{mode === "polygon" ? "Tap to add corners" : mode === "rectangle" ? "Drag on the map" : mode === "point" ? "Tap the center point" : "Tap to show tools"}</small>
+            </span>
+            <span className="tools-peek-chevron" aria-hidden="true">›</span>
+          </button>
+          {mode === "polygon" && <button type="button" className="finish-btn" onClick={() => finishPoly.current()}>Finish</button>}
+          {mode === "point" && <button type="button" className="finish-btn" onClick={() => {
+            const center = map.current!.getCenter();
+            if (onRadiusSelectRef.current({ lat: center.lat, lon: center.lng, radiusKm: radiusRef.current?.radiusKm ?? DEFAULT_RADIUS_KM })) setMode(null);
+          }}>Use center</button>}
+        </div>
+      )}
+      <div className="shape-bar" id="map-drawing-tools" hidden={!drawingOpen || toolsCollapsed}>
+        <div className="unified-tools-heading"><h2>Map tools</h2><button type="button" className="tools-minimize" aria-label="Minimize map tools" title="Minimize to the side" onClick={() => setToolsCollapsed(true)}><span aria-hidden="true">‹</span> Minimize</button><button type="button" className="map-tool-settings-link" title="Region & dates" aria-label="Open region and date settings" aria-controls="map-settings" onClick={()=>{cancel.current();setMode(null);setDrawingOpen(false);onOpenSettings?.();}}><MapControlIcon name="tools" /><span>Region & dates</span></button></div>
         <div className="map-tool-groups" role="group" aria-label="Map tool categories">
           {([['draw','Draw area'],['measure','Measure'],['location','Location']] as const).map(([group,label])=><button key={group} type="button" aria-pressed={toolGroup===group} onClick={()=>{modeRef.current=null;cancel.current();utilities.cancel();setMode(null);setToolGroup(group);}}>{label}</button>)}
         </div>
@@ -323,7 +343,12 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
         <p className="small" role={selectionCleared ? "status" : undefined}>{selectionCleared ? "Map cleared. No analysis region selected. " : ""}Select an analysis region. Activate a shape, then draw on the map.</p>
         <div className="seg" role="group" aria-label="Selection shape">
           {SHAPES.map(([s, label]) => (
-            <button key={s} aria-pressed={mode === s} onClick={() => { onBrowseRef.current?.(); setMode(mode === s ? null : s); }}>{label}</button>
+            <button key={s} aria-pressed={mode === s} onClick={() => {
+              onBrowseRef.current?.();
+              const next = mode === s ? null : s;
+              setMode(next);
+              if (next && window.matchMedia("(max-width: 700px)").matches) setToolsCollapsed(true);
+            }}>{label}</button>
           ))}
         </div>
         {mode === "point" && <button type="button" className="finish-btn" onClick={() => {

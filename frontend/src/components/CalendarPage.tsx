@@ -35,6 +35,13 @@ export default function CalendarPage({ view, hidden }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const toolsHeading = useRef<HTMLHeadingElement>(null);
+  // "More below" cue for the Region & dates panel, shown while it can still scroll down.
+  const settingsPanel = useRef<HTMLElement>(null);
+  const [settingsMoreBelow, setSettingsMoreBelow] = useState(false);
+  const checkSettingsScroll = () => {
+    const el = settingsPanel.current;
+    setSettingsMoreBelow(!!el && el.scrollTop + el.clientHeight < el.scrollHeight - 8);
+  };
 
   useEffect(() => {
     let stale = false;
@@ -66,6 +73,12 @@ export default function CalendarPage({ view, hidden }: Props) {
   useEffect(() => {
     if (toolsOpen && view === "map" && !hidden) toolsHeading.current?.focus();
   }, [toolsOpen, view, hidden]);
+  // Re-check the cue when the panel opens, its content changes, or the window resizes.
+  useEffect(() => {
+    const id = requestAnimationFrame(checkSettingsScroll);
+    window.addEventListener("resize", checkSettingsScroll);
+    return () => { cancelAnimationFrame(id); window.removeEventListener("resize", checkSettingsScroll); };
+  }, [toolsOpen, view, hidden, draft, areaCleared, pointFeedback, pointInputError]);
 
   const regionName = (s: Selection | null) => !s ? "Choose an area" : s.radius ? `Point ${s.radius.lat.toFixed(4)}, ${s.radius.lon.toFixed(4)} · ${s.radius.radiusKm} km radius` : regions.find((r) => r.id === s.regionId)?.name ?? "Custom area";
   const updateRadius = (point: RadiusSelection) => {
@@ -132,7 +145,7 @@ export default function CalendarPage({ view, hidden }: Props) {
           {usingFakeData && <span className="map-sample-badge">SAMPLE DATA · Random values</span>}
           <button type="button" aria-expanded={caveatsOpen} aria-controls="map-caveats" onClick={() => { setCaveatsOpen((open) => !open); setToolsOpen(false); setSearchDismiss((n) => n + 1); }}>Data limitations</button>
         </div>
-        <aside className="map-settings" id="map-settings" aria-labelledby="map-settings-heading" hidden={!toolsOpen}
+        <aside ref={settingsPanel} onScroll={checkSettingsScroll} className="map-settings" id="map-settings" aria-labelledby="map-settings-heading" hidden={!toolsOpen}
           onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); closeTools(); } }}>
           <div className="map-settings-header">
             <div><p className="eyebrow">YOUR SELECTION</p><h2 ref={toolsHeading} tabIndex={-1} id="map-settings-heading">Region & dates</h2></div>
@@ -162,6 +175,10 @@ export default function CalendarPage({ view, hidden }: Props) {
           {draft && !validDraft && <p className="small" role="status">{areaCleared ? "Choose an analysis region first." : pointInputError || "Choose valid dates within the available coverage."}</p>}
           <button className="apply-map-selection" type="button" disabled={!validDraft} onClick={applySelection}>Apply & view {resultView === "heatmap" ? "Heatmap" : "Calendar"} →</button>
           {selection && <button type="button" className="reset-map-draft" onClick={() => { setAreaCleared(false); setDraft(selection); setPointInputError(""); setPointFeedback(""); setRadiusEditorKey((n) => n + 1); }}>Reset to applied selection</button>}
+          <button type="button" className="scroll-cue" hidden={!settingsMoreBelow} aria-label="Scroll down for more settings"
+            onClick={() => settingsPanel.current?.scrollBy({ top: settingsPanel.current.clientHeight * 0.7, behavior: "smooth" })}>
+            More below <span aria-hidden="true">↓</span>
+          </button>
         </aside>
         <aside className="map-caveats" id="map-caveats" hidden={!caveatsOpen}>
           <button type="button" className="close-map-tools map-icon-button" aria-label="Close data limitations" title="Close data limitations" onClick={() => setCaveatsOpen(false)}><span className="close-symbol" aria-hidden="true">×</span></button>

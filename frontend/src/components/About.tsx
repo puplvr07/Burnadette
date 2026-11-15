@@ -2,12 +2,13 @@
 // TODO: replace each "from" and "bio" placeholder with the real details.
 // No photos: Space Apps rules forbid likenesses of anyone under 18, and initials avoid the question.
 const MEMBERS: { name: string; role: string; from: string; bio: string }[] = [
-  { name: "Joemar Bayabas", role: "Backend", from: "Hometown, Country", bio: "A sentence about this person." },
-  { name: "Hans Xavier A. Lao", role: "Machine learning", from: "Hometown, Country", bio: "A sentence about this person." },
-  { name: "Sean Chester Dy", role: "Frontend", from: "Hometown, Country", bio: "A sentence about this person." },
-  { name: "Alkhaidir Radjail", role: "Frontend", from: "Hometown, Country", bio: "A sentence about this person." },
-  { name: "Ram Rohen Arcenas", role: "Backend", from: "Hometown, Country", bio: "A sentence about this person." },
-  { name: "Yllakhem M. Aleria", role: "Frontend", from: "Hometown, Country", bio: "A sentence about this person." },
+  // Frontend (A to Z by first name), then Backend, then Machine learning. On desktop each team fills its own row.
+  { name: "Alkhaidir Radjail", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student", bio: "A sentence about this person." },
+  { name: "Sean Chester Dy", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student", bio: "A sentence about this person." },
+  { name: "Yllakhem M. Aleria", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student", bio: "A sentence about this person." },
+  { name: "Joemar Bayabas", role: "Backend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student", bio: "A sentence about this person." },
+  { name: "Ram Rohen Arcenas", role: "Backend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student", bio: "A sentence about this person." },
+  { name: "Hans Xavier A. Lao", role: "Machine learning", from: "University of The Philippines Manila, 2nd Year CS Student", bio: "A sentence about this person." },
 ];
 
 // Space Apps asks teams to credit all borrowed data, code, images and tools.
