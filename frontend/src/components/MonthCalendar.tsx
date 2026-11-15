@@ -96,8 +96,8 @@ export default function MonthCalendar({ weeks, start, end, metric, source, meta,
               {selected && <><h4>{rangeText(selected)}</h4><p className="calendar-detail-status">{rowStatus(selected)}</p>
                 {observation ? <>
                   <dl className="calendar-detail-values">
-                    <div><dt>Activity</dt><dd>{formatCalendarValue(observation.value)}</dd></div>
-                    <div><dt>Anomaly percentile</dt><dd>{formatCalendarValue(observation.anomaly)}{observation.anomaly != null && Number.isFinite(observation.anomaly) ? " / 100" : ""}</dd></div>
+                    <div className="calendar-primary-metric"><dt>Activity</dt><dd>{formatCalendarValue(observation.value)}</dd></div>
+                    <div className="calendar-primary-metric"><dt>Anomaly percentile</dt><dd>{formatCalendarValue(observation.anomaly)}{observation.anomaly != null && Number.isFinite(observation.anomaly) ? " / 100" : ""}</dd></div>
                     <div><dt>Source view</dt><dd>{sourceTitle(source)}</dd></div>
                     <div><dt>Observation provenance</dt><dd>{source === "harmonized" ? provenance(observation.harmonized_source) : sourceTitle(source)}</dd></div>
                     <div><dt>Active cells (reported)</dt><dd>{observation.active_cells}</dd></div>

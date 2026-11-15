@@ -46,8 +46,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className={`shell${page === "map" ? " map-shell" : ""}${navVisible ? " navigation-visible" : ""}`}
-      onWheelCapture={(event) => { if (page === "map" && event.deltaY > 0) revealNav(); }}>
+    <div className={`shell${page === "map" ? " map-shell" : ""}${navVisible ? " navigation-visible" : ""}`}>
       {page === "map" && <button className="map-nav-handle" type="button" aria-controls="main-navigation" aria-expanded={navVisible}
         onPointerEnter={revealNav} onFocus={revealNav} onClick={revealNav}>
         <span aria-hidden="true">⌃</span> Navigation

@@ -59,12 +59,19 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
   }, [settingsOpen]);
 
   useEffect(() => {
+    const reducedMotion = typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const m = L.map(el.current!, {
       zoomControl: true,
       maxBounds: WORLD,
       maxBoundsViscosity: 1, // hard edge: can't drag past the world
       worldCopyJump: false,
-      zoomSnap: 0.25,
+      zoomSnap: 0.125,
+      zoomDelta: 0.5,
+      wheelPxPerZoomLevel: 120,
+      wheelDebounceTime: 32,
+      zoomAnimation: !reducedMotion,
+      fadeAnimation: !reducedMotion,
+      markerZoomAnimation: !reducedMotion,
     }).setView([12, 121.5], 7);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
       maxZoom: 17,

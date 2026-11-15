@@ -126,3 +126,17 @@ These notes describe the final accumulated frontend changes. Earlier design expe
 - Validation scripts and local snapshots are outside the repository and are not part of this commit.
 - Leaflet fixture checks are not browser visual verification. Responsive layouts, actual touch interaction, map-tile loading, browser full screen, and location permission dialogs still need team review in a real browser.
 - All published application changes and these notes are confined to `frontend/`.
+
+## Follow-up visual and navigation refinements
+
+- Made the Home hero backdrop full width, with the same responsive content geometry in both themes.
+- Attached the heading underline directly to “fire” and retained emphasis in light mode.
+- Added deep-blue light-mode metric cards with readable neon values; dark-mode values remain orange.
+- Matched the dark-mode Explore button to the orange accent, with restrained theme-matched button glows.
+- Added the orange dark-header top line to mirror the light-theme accent line.
+- Added the six team member names in the requested order and capitalization, retaining the other profile details.
+- Added member-card hover/focus lift and theme-appropriate glow, with reduced-motion support.
+- Added independent moon rotation and decorative hotspot artwork synchronized with Earth's animation. The globe is decorative and does not represent live detections.
+- Included the current smoother map zoom settings and reduced-motion animation handling.
+- Removed wheel/scroll-triggered navigation reveal on Map. Hover, keyboard focus, and touch activation remain available.
+- Follow-up validation: production build, navigation/theme/calendar checks, and map interaction regression checks. Browser visual verification remains a team-review step.
