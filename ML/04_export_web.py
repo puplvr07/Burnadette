@@ -6,10 +6,10 @@ No server needed: the front end just fetch()es these files.
     python ML/04_export_web.py core --out frontend/public/data
 
 (Run it any time: before 03_calibrate.py you get the raw MODIS/VIIRS layers, after it you also get the harmonized ones.)
-Per region:  <out>/<slug>/cells.json     cell centers; a cell's index in this list is its ID everywhere else
-             <out>/<slug>/calendar.json  weekly totals for the whole region (feeds the calendar heatmap)
-             <out>/<slug>/<year>.json    per week: which cells are active (only active ones are stored)
-             <out>/<slug>/info.json
+Per region: <out>/<slug>/cells.json     cell centers; a cell's index in this list is its ID everywhere else
+            <out>/<slug>/calendar.json  weekly totals for the whole region (feeds the calendar heatmap)
+            <out>/<slug>/<year>.json    per week: which cells are active (only active ones are stored)
+            <out>/<slug>/info.json
 Shared:      <out>/regions.json (dropdown + bbox)   <out>/meta.json (gaps, caveats, how to read nulls)
 In the files:  null = no data for that sensor that week.  An empty list [] = data exists, no fire.
 """
@@ -57,8 +57,7 @@ def export_region(slug, out_dir):
     has_a = 'anomaly' in t.columns
     d = os.path.join(out_dir, slug)
 
-    dump({'region': slug, 'cell_size_deg': config.RES,
-          'cells': [[float(a), float(b)] for a, b in zip(cells.lat, cells.lon)]}, os.path.join(d, 'cells.json'))
+    dump({'region': slug, 'cell_size_deg': config.RES, 'cells': [[float(a), float(b)] for a, b in zip(cells.lat, cells.lon)]}, os.path.join(d, 'cells.json'))
 
     # calendar.json: weekly totals for the whole region
     g = t.groupby('week_start')
@@ -67,17 +66,16 @@ def export_region(slug, out_dir):
     rw_base = os.path.join(config.OUT_DIR, f'region_week_{slug}')
     if has_h and store.exists(rw_base):                    # whole-region series made by 03_calibrate.py
         rw = store.read(rw_base).set_index('week_start').reindex(cal.index)
-        for name, col in (('harmonized_cells', 'harmonized_cells'), ('harmonized_low', 'harmonized_low'),
-                          ('harmonized_high', 'harmonized_high')):
+        for name, col in (('harmonized_cells', 'harmonized_cells'), ('harmonized_low', 'harmonized_low'), ('harmonized_high', 'harmonized_high')):
             extra[name] = [clean_num(x, 2) for x in rw[col]]
         for name in ('anomaly_region', 'anomaly_modis_only', 'anomaly_viirs_only'):
             extra[name] = [clean_num(x, 1) for x in rw[name]]
         extra['source'] = [None if pd.isna(x) else x for x in rw['source']]
         extra['flags'] = [[] if (pd.isna(x) or x == '') else str(x).split(';') for x in rw['flags']]
     dump({'region': slug, 'cells_total': int(len(cells)), 'week_start': cal.index.tolist(),
-          'modis_active_cells': [clean_count(x) for x in cal.modis],
-          'viirs_active_cells': [clean_count(x) for x in cal.viirs], **extra},
-         os.path.join(d, 'calendar.json'))
+            'modis_active_cells': [clean_count(x) for x in cal.modis],
+            'viirs_active_cells': [clean_count(x) for x in cal.viirs], **extra},
+            os.path.join(d, 'calendar.json'))
 
     # one file per year: which cells are active each week
     for year, gy in t.groupby('year'):
@@ -110,17 +108,17 @@ def export_region(slug, out_dir):
         v = (c.get('validation') or {}).get('leave_one_year_out')
         keys = ('r_calibrated', 'r_raw_modis', 'bias_pct_calibrated', 'bias_pct_raw_modis', 'mae_calibrated', 'mae_raw_modis')
         calsum = {'overlap_years': [c['overlap_years'][0], c['overlap_years'][-1]], 'validated': bool(c['validated']),
-                  'low_sensitivity_months': c['low_sensitivity_months'],
-                  'modis_sensitivity_by_month': c['modis_sensitivity_by_month'],
-                  'validation': None if v is None else {k: clean_num(v[k], 2) for k in keys}}
+                    'low_sensitivity_months': c['low_sensitivity_months'],
+                    'modis_sensitivity_by_month': c['modis_sensitivity_by_month'],
+                    'validation': None if v is None else {k: clean_num(v[k], 2) for k in keys}}
     min_lat, max_lat, min_lon, max_lon = r['bbox']
     dump({'slug': slug, 'name': r['name'], 'country': r['country'], 'tier': r['tier'], 'regime': r['regime'],
-          'bbox': {'min_lat': min_lat, 'max_lat': max_lat, 'min_lon': min_lon, 'max_lon': max_lon},
-          'cell_size_deg': config.RES, 'n_cells': int(len(cells)),
-          'first_week': t.week_start.min(), 'last_week': t.week_start.max(),
-          'years': [int(t.year.min()), int(t.year.max())], 'has_harmonized': bool(has_h), 'calibration': calsum,
-          'files': {'cells': f'{slug}/cells.json', 'calendar': f'{slug}/calendar.json', 'year': f'{slug}/{{year}}.json'}},
-         os.path.join(d, 'info.json'))
+            'bbox': {'min_lat': min_lat, 'max_lat': max_lat, 'min_lon': min_lon, 'max_lon': max_lon},
+            'cell_size_deg': config.RES, 'n_cells': int(len(cells)),
+            'first_week': t.week_start.min(), 'last_week': t.week_start.max(),
+            'years': [int(t.year.min()), int(t.year.max())], 'has_harmonized': bool(has_h), 'calibration': calsum,
+            'files': {'cells': f'{slug}/cells.json', 'calendar': f'{slug}/calendar.json', 'year': f'{slug}/{{year}}.json'}},
+            os.path.join(d, 'info.json'))
     print(f'{slug}: exported {len(cells)} cells, {t.week_start.nunique()} weeks, years {t.year.min()}-{t.year.max()}')
     return True
 
