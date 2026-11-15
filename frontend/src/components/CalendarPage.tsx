@@ -13,12 +13,14 @@ import AvailabilityNotice from "./AvailabilityNotice";
 import Analytics from "./Analytics";
 import DataNotes from "./DataNotes";
 import { sourceDateRange } from "../availability";
-import { FireBackdrop } from "./Fire";
+import HomeCalendarPreview from "./HomeCalendarPreview";
+import HistoricalInsights from "./HistoricalInsights";
 
 interface Props { view: "map" | "heatmap" | "calendar"; hidden: boolean }
 interface Selection { radius?: RadiusSelection; bbox: Bbox; regionId: string; source: Source; metric: Metric; start: string; end: string }
 
 export default function CalendarPage({ view, hidden }: Props) {
+  const [showSample, setShowSample] = useState(false);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [regions, setRegions] = useState<Region[]>([]);
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -102,31 +104,27 @@ export default function CalendarPage({ view, hidden }: Props) {
   };
 
   return (
-    <div className={`page page-wide explore-page${view === "map" ? " immersive-map-page" : view === "heatmap" ? " heatmap-view" : ""}`} hidden={hidden}>
-      {view !== "map" && <FireBackdrop />}
-      <div className="results-intro" hidden={view === "map"}>
+    <div className={`page page-wide explore-page${view === "map" ? " immersive-map-page" : view === "heatmap" ? " heatmap-view" : ""}${view !== "map" && !selection ? " heatmap-empty" : ""}${showSample ? " sample-expanded" : ""}`} hidden={hidden}>
+      <div className="results-intro compact-results-intro" hidden={view === "map"}>
         <header className="hero">
-          <p className="eyebrow">BURNING ACTIVITY EXPLORER</p>
-          <h1>{view === "heatmap" ? "The bigger picture" : "One month, week by week"}</h1>
-          <p>{view === "heatmap" ? "Compare weekly burning patterns across years." : "Inspect weekly observations in a selected month."}</p>
-          {meta && !usingFakeData && <p className="data-scope">Weekly fire activity, {monthYear(meta.date_start)} to {monthYear(meta.date_end)}. Each square is about 55 km wide.</p>}
+          <h1>{view === "heatmap" ? "Heatmap" : "Calendar"}</h1>
+          <p>{view === "heatmap" ? "Weekly patterns, across the years." : "A month at a time, one observation per week."}</p>
         </header>
-        {usingFakeData && <div className="fake-banner" role="status">SAMPLE DATA · Random development values, not satellite findings.</div>}
-        <div className="selection-summary">
+        {usingFakeData && <span className="sample-tag">SAMPLE DATA · Not satellite findings</span>}
+        <div className="selection-summary" hidden={!selection}>
           <span><strong>Selected area:</strong> {regionName(selection)}</span>
           {selection && <><span><strong>Source:</strong> {selection.source === "harmonized" ? "Harmonized" : selection.source.toUpperCase()}</span><span><strong>Metric:</strong> {selection.metric === "activity" ? "Activity" : "Anomaly percentile"}</span></>}
-          <span><strong>Date range:</strong> {start && end ? `${start} to ${end}` : "Loading dates…"}</span>
+          <span><strong>Date range:</strong> {start && end ? `${start} to ${end}` : "Choose a date range after selecting an area"}</span>
           <a className="change-area-link" href="#map">Change area on Map</a>
           {selection?.radius && <span className="selection-radius-note">Results use the circle's bounding box, not an exact circular filter.</span>}
         </div>
         {selection && meta && <FilterControls value={selection} meta={meta} onChange={(patch) => { const next = { ...selection, ...patch }; setSelection(next); setDraft(next); setPointInputError(""); setRadiusEditorKey((n) => n + 1); }} />}
       </div>
       {view !== "map" && selection && data && !loading && !error && <DataNotes data={data} source={selection.source} region={regions.find((r) => r.id === (data.region ?? selection.regionId))} />}
-      {view === "calendar" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
       {error && (view === "map" || !meta || !selection) && <div className={`error${view === "map" ? " map-error" : ""}`} role="alert">{error}</div>}
 
       <section className={`immersive-map${toolsOpen ? " settings-open" : ""}`} aria-label="Map" hidden={view !== "map"}>
-        {draft ? <MapPicker selectionCleared={areaCleared} onClearSelection={() => {
+        {draft ? <MapPicker sample={usingFakeData || !!meta?.is_fake} exportContext={selection ? {bbox:selection.bbox,region:regionName(selection),start:selection.start,end:selection.end,source:selection.source,sample:usingFakeData || !!meta?.is_fake} : null} selectionCleared={areaCleared} onClearSelection={() => {
           setAreaCleared(true); setSelection(null); setData(null); setLoading(false); setError("");
           setDraft(d => d ? {...d, regionId: "", radius: undefined} : d);
           setPointInputError(""); setPointFeedback(""); setRadiusEditorKey(n=>n+1); setToolsOpen(false);
@@ -146,7 +144,6 @@ export default function CalendarPage({ view, hidden }: Props) {
           }} />
         </div>
         <div className="map-bottom-bar">
-          {usingFakeData && <span className="map-sample-badge">SAMPLE DATA · Random values</span>}
           <button type="button" aria-expanded={caveatsOpen} aria-controls="map-caveats" onClick={() => { setCaveatsOpen((open) => !open); setToolsOpen(false); setSearchDismiss((n) => n + 1); }}>Data limitations</button>
         </div>
         <aside ref={settingsPanel} onScroll={checkSettingsScroll} className="map-settings" id="map-settings" aria-labelledby="map-settings-heading" hidden={!toolsOpen}
@@ -190,10 +187,9 @@ export default function CalendarPage({ view, hidden }: Props) {
         </aside>
       </section>
 
-      {areaCleared && !selection && view !== "map" && <div className="calendar-state" role="status"><h3>No analysis region selected</h3><p>Choose a region on the map and apply it to see results.</p><a className="view-calendar-btn" href="#map">Choose a region on Map</a></div>}
-      <section className="panel panel-fire explore-panel" aria-label="Heatmap" hidden={view !== "heatmap"}>
-        {meta && selection && <Heatmap weeks={data?.weeks ?? []} source={selection.source} metric={selection.metric} meta={meta} start={selection.start} end={selection.end} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
-        {meta && meta.gaps.length > 0 && <p className="small">Known gaps: {meta.gaps.map((g) => `${g.label} (${g.start} to ${g.end})`).join("; ")}</p>}
+      {!selection && view !== "map" && <div className="calendar-state" role="status"><h3>No analysis region selected</h3><p>Choose a region on the map and apply it to see results.</p><div className="hero-actions"><a className="primary-action" href="#map">Choose a region on Map →</a><button type="button" className="outline-action" aria-expanded={showSample} onClick={()=>setShowSample(value=>!value)}>{showSample?"Close local sample":"Explore a local sample"}</button></div><p className="small">No analysis runs until a region is chosen and applied.</p>{showSample&&<HomeCalendarPreview/>}</div>}
+      <section className="panel panel-fire explore-panel" aria-label="Heatmap" hidden={view !== "heatmap" || !selection}>
+        {meta && selection && <Heatmap regionLabel={regionName(selection)} bbox={selection.bbox} weeks={data?.weeks ?? []} source={selection.source} metric={selection.metric} meta={meta} start={selection.start} end={selection.end} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
       </section>
       {meta && selection && data && !loading && !error && (
         <section className="panel explore-panel compare-panel" aria-label="Compare and download" hidden={view !== "heatmap"}>
@@ -202,11 +198,13 @@ export default function CalendarPage({ view, hidden }: Props) {
         </section>
       )}
       {view === "heatmap" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
-      <section className="panel explore-panel" aria-label="Calendar" hidden={view !== "calendar"}>
+      <section className="panel explore-panel" aria-label="Calendar" hidden={view !== "calendar" || !selection}>
         {meta && selection && <MonthCalendar weeks={data?.weeks ?? []} start={selection.start} end={selection.end} metric={selection.metric} source={selection.source} meta={meta} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
         <a className="view-calendar-btn" href="#heatmap">Compare years in Heatmap</a>
       </section>
-      <div hidden={view === "map"}><Caveats /></div>
+      {view === "calendar" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
+      {view !== "map" && selection && meta && <HistoricalInsights weeks={data?.weeks ?? []} start={selection.start} end={selection.end} source={selection.source} region={regionName(selection)} meta={meta} sample={usingFakeData || !!meta.is_fake} loading={loading || (!data && !error)} error={error} />}
+      <div className="explore-caveats" hidden={view === "map"}><Caveats /></div>
     </div>
   );
 }
