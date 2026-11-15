@@ -1,0 +1,11 @@
+[project]
+name = "burnadette-api"
+version = "0.2.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi==0.121.3",
+    "uvicorn==0.38.0",
+]
+
+[tool.vercel]
+entrypoint = "api.main:app"

@@ -1,10 +1,10 @@
 # Burnadette five-region JSON API
 
-Run from the repository root in PowerShell (Python 3.12+; verified here on 3.14):
+Run from the repository root in PowerShell using Python 3.12 (the pinned deployment runtime):
 
 ```powershell
-python -m venv api/.venv
-api/.venv/Scripts/python -m pip install -r api/requirements.txt
+py -3.12 -m venv api/.venv
+api/.venv/Scripts/python -m pip install -r api/requirements-dev.txt
 api/.venv/Scripts/python -m uvicorn api.main:app --host 127.0.0.1 --port 8000
 ```
 
@@ -16,6 +16,10 @@ Invoke-RestMethod http://127.0.0.1:8000/regions
 Invoke-RestMethod 'http://127.0.0.1:8000/calendar?bbox=102,10,108,15&start=2000-10-30&end=2025-12-22&source=harmonized&region=cambodia'
 api/.venv/Scripts/python -m pytest api/tests -q
 ```
+
+`api/requirements.txt` contains runtime dependencies only. The development file
+adds the HTTP test client and pytest. See [Vercel deployment](../docs/vercel-deployment.md)
+for the separate frontend/backend project configuration and offline packaging check.
 
 The normal server uses the final JSON for Belgium, Cambodia, Philippines, Zambia
 and Indonesia, pinned to ML commit 0e6e66965e4782c369210a8d88dc62a538a0fcbf.
