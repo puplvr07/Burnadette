@@ -14,7 +14,10 @@ def calendar(dataset, bbox, start, end, source):
                            'dataset_mode': dataset.manifest['mode']}}
     if not cells:
         return result
-    monday = start + timedelta(days=(-start.weekday()) % 7)
+    offset = (-start.weekday()) % 7
+    if (end-start).days < offset:
+        return result
+    monday = start + timedelta(days=offset)
     while monday <= end:
         wk = monday.isoformat()
         rows = [dataset.by_key.get((c, wk)) for c in cells]
@@ -30,16 +33,11 @@ def calendar(dataset, bbox, start, end, source):
             flags.add('outside_date_coverage' if wk < dataset.dates[0] or wk > dataset.dates[-1] else 'missing_cell_week')
         if not complete:
             flags.add('source_unavailable')
-        active = []
-        for r in present:
-            s = source if source != 'harmonized' else ('viirs' if r['harmonized_source'] == 'viirs' else 'modis')
-            if r[s+'_active'] is not None:
-                active.append(r[s+'_active'])
         provenance = {r['harmonized_source'] for r in present if r['harmonized_value'] is not None}
         lo = mean_column('uncertainty_low') if complete and source == 'harmonized' else None
         hi = mean_column('uncertainty_high') if complete and source == 'harmonized' else None
         row = {'week_start': wk, 'value': sum(values)/len(cells) if complete else None,
-               'active_cells': int(sum(active)) if len(active) == len(cells) and complete else None,
+               'active_cells': sum(values) if complete else None,
                'valid_cells': len(values), 'anomaly': None,
                'uncertainty_low': lo if hi is not None else None,
                'uncertainty_high': hi if lo is not None else None,

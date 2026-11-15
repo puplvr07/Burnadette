@@ -1,4 +1,8 @@
-# Local API contract 0.2 — provisional
+# Historical local API contract 0.2 — provisional
+
+The published-data integration and corrected harmonized count semantics now follow
+`json-integration.md`. This document retains the original sample investigation;
+its contributing-sensor definition of harmonized active_cells is superseded.
 
 User-authorized scope: P0 documentation and P1 local backend only. No frontend/ML changes,
 branch merges, deployment, commits, or pushes are included.

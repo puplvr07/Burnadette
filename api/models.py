@@ -7,7 +7,7 @@ Source = Literal['harmonized', 'modis', 'viirs']
 class Week(BaseModel):
     week_start: str
     value: float | None
-    active_cells: int | None
+    active_cells: float | None
     valid_cells: int
     anomaly: float | None
     uncertainty_low: float | None
@@ -22,6 +22,8 @@ class Coverage(BaseModel):
     nominal_cells: int
     available_cells: int
     dataset_mode: str
+    region: str | None = None
+    clipped_to_region: bool = False
 
 
 class CalendarResponse(BaseModel):
@@ -30,12 +32,14 @@ class CalendarResponse(BaseModel):
     cells_in_area: int
     weeks: list[Week]
     coverage: Coverage
+    region: str | None = None
 
 
 class Region(BaseModel):
     id: str
     name: str
     bbox: tuple[float, float, float, float]
+    calibration: dict | None = None
 
 
 class Meta(BaseModel):
