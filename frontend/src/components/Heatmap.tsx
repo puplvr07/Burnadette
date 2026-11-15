@@ -1,119 +1,194 @@
-import { useMemo, useState } from "react";
-import type { Meta, Metric, WeekRow } from "../types";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
+import type { Meta, Metric, Source, WeekRow } from "../types";
 import { colorFor } from "../colors";
+import { formatCalendarDate, formatCalendarValue } from "../calendarModel";
+import { heatmapLayout, heatmapScale } from "../heatmapModel";
+import type { HeatmapSlot } from "../heatmapModel";
 
-interface Props { weeks: WeekRow[]; metric: Metric; meta: Meta; start: string; end: string }
-
-const CELL = 14, GAP = 2, LEFT = 74, TOP = 22, COLS = 53;
-const STEP = CELL + GAP;
-const doy = (iso: string) => Math.floor((Date.parse(iso) - Date.UTC(+iso.slice(0, 4), 0, 0)) / 86400000);
-const colOf = (iso: string) => Math.min(COLS - 1, Math.floor((doy(iso) - 1) / 7));
+interface Props { source?: Source; weeks: WeekRow[]; metric: Metric; meta: Meta; start: string; end: string; loading?: boolean; error?: string; onRetry?: () => void }
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_COLUMNS = [0, 4, 8, 12, 17, 21, 25, 30, 34, 39, 43, 47];
+const isSelectable = (slot: HeatmapSlot) => slot.kind === "record" || slot.kind === "missing";
+const rangeText = (slot: HeatmapSlot) => `${formatCalendarDate(slot.start)} – ${formatCalendarDate(slot.end)}`;
 
-export default function Heatmap({ weeks, metric, meta, start, end }: Props) {
-  const [hover, setHover] = useState<WeekRow | null>(null);
-
-  const { years, byKey, max } = useMemo(() => {
-    const byKey = new Map<string, WeekRow>();
-    const ys = new Set<number>();
-    let vals: number[] = [];
-    for (const w of weeks) {
-      const y = +w.week_start.slice(0, 4);
-      ys.add(y);
-      byKey.set(`${y}-${colOf(w.week_start)}`, w);
-      if (w.value != null) vals.push(w.value);
+export default function Heatmap({ weeks, metric, meta, start, end, source = "harmonized", loading = false, error = "", onRetry }: Props) {
+  const [expanded, setExpanded] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
+  const [fitAll, setFitAll] = useState(true);
+  const workspace = useRef<HTMLDivElement>(null);
+  const expandTrigger = useRef<HTMLButtonElement>(null);
+  const closeTrigger = useRef<HTMLButtonElement>(null);
+  const closeExpanded = () => {
+    setExpanded(false);
+    if (document.fullscreenElement && document.fullscreenElement === workspace.current) void document.exitFullscreen().catch(() => {});
+  };
+  const openExpanded = () => {
+    setExpanded(true);
+    setDetailsOpen(false); setLegendOpen(false); setFitAll(true);
+    // A viewport-filling fallback also works where the Fullscreen API is unavailable.
+    if (workspace.current?.requestFullscreen) void workspace.current.requestFullscreen().catch(() => {});
+  };
+  useEffect(() => {
+    if (!expanded) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeTrigger.current?.focus();
+    const onFullscreenChange = () => { if (!document.fullscreenElement) setExpanded(false); };
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+      expandTrigger.current?.focus();
+    };
+  }, [expanded]);
+  const [picked, setPicked] = useState("");
+  const [hovered, setHovered] = useState("");
+  const [focused, setFocused] = useState("");
+  const scroller = useRef<HTMLDivElement>(null);
+  const [scroll, setScroll] = useState({ pos: 0, max: 0 });
+  const prefix = useId();
+  const layout = useMemo(() => heatmapLayout(weeks, start, end, meta, source), [weeks, start, end, meta, source]);
+  const scale = useMemo(() => heatmapScale(weeks, metric), [weeks, metric]);
+  const slots = layout.rows.flat();
+  const available = slots.filter(isSelectable);
+  const selected = available.find((slot) => slot.key === picked) ?? available.find((slot) => slot.record) ?? available[0];
+  const shown = available.find((slot) => slot.key === hovered) ?? selected;
+  const focusKey = available.some((slot) => slot.key === focused) ? focused : selected?.key;
+  const metricName = metric === "anomaly" ? "Anomaly percentile" : "Activity";
+  const sourceName = source === "harmonized" ? "Harmonized" : source.toUpperCase();
+  const syncScroll = () => {
+    const el = scroller.current;
+    if (el) setScroll({ pos: el.scrollLeft, max: Math.max(0, el.scrollWidth - el.clientWidth) });
+  };
+  useEffect(() => {
+    const el = scroller.current;
+    if (!el) return;
+    syncScroll();
+    const observer = new ResizeObserver(syncScroll);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loading, error, layout.years.length, weeks.length, expanded, fitAll]);
+  useEffect(() => setHovered(""), [weeks, metric]);
+  const gaps = (slot: HeatmapSlot) => meta.gaps.filter((gap) => slot.start <= gap.end && slot.end >= gap.start).map((gap) => gap.label);
+  const valueFor = (slot: HeatmapSlot) => slot.record ? metric === "activity" ? slot.record.value : slot.record.anomaly : null;
+  const stateFor = (slot: HeatmapSlot) => {
+    if (slot.kind !== "record") return slot.kind;
+    const value = valueFor(slot);
+    return value == null || !Number.isFinite(value) ? "unavailable" : value === 0 ? "zero" : "observed";
+  };
+  const describe = (slot: HeatmapSlot) => {
+    const state = stateFor(slot);
+    if (state === "no-week") return "No Monday starts in this final calendar-year position";
+    if (state === "outside") return "Outside selected dates or reported source coverage";
+    if (state === "missing") return "No weekly record returned; activity is unknown";
+    if (state === "unavailable") return `${metricName} unavailable in returned record`;
+    return `${metricName}: ${formatCalendarValue(valueFor(slot))}${metric === "anomaly" ? " / 100" : ""}`;
+  };
+  const moveFocus = (slot: HeatmapSlot, key: string) => {
+    const rowIndex = layout.years.indexOf(slot.year);
+    let target: HeatmapSlot | undefined;
+    if (key === "ArrowLeft" || key === "ArrowRight") {
+      const offset = key === "ArrowLeft" ? -1 : 1;
+      const row = layout.rows[rowIndex];
+      for (let col = slot.col + offset; col >= 0 && col < 53; col += offset) if (isSelectable(row[col])) { target = row[col]; break; }
+    } else if (key === "ArrowUp" || key === "ArrowDown") {
+      const offset = key === "ArrowUp" ? -1 : 1;
+      for (let i = rowIndex + offset; i >= 0 && i < layout.rows.length; i += offset) if (isSelectable(layout.rows[i][slot.col])) { target = layout.rows[i][slot.col]; break; }
+    } else if (key === "Home" || key === "End") {
+      const row = layout.rows[rowIndex].filter(isSelectable);
+      target = key === "Home" ? row[0] : row[row.length - 1];
     }
-    vals.sort((a, b) => a - b);
-    // 98th percentile so a single spike does not wash out the rest
-    const max = vals.length ? Math.max(vals[Math.floor(vals.length * 0.98)] ?? 0, 1e-6) : 1;
-    return { years: [...ys].sort((a, b) => a - b), byKey, max };
-  }, [weeks]);
+    if (target) {
+      setFocused(target.key); setPicked(target.key); setHovered("");
+      const el = document.getElementById(`${prefix}-${target.year}-${target.col}`);
+      el?.focus(); el?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+  };
 
-  const allZero = weeks.length > 0 && weeks.every((w) => (w.value ?? 0) === 0);
-  const inGap = (w: WeekRow) => meta.gaps.some((g) => w.week_start <= g.end && addDays(w.week_start, 6) >= g.start);
-  const width = LEFT + COLS * STEP - GAP;
-  const height = TOP + years.length * STEP - GAP;
-
-  if (!weeks.length) return <p className="empty">No data in this area and date range.</p>;
+  if (loading) return <div className="calendar-state" role="status"><h3>Loading weekly observations…</h3><p>Your filters and selected week are preserved while the request completes.</p></div>;
+  if (error) return <div className="calendar-state calendar-request-error" role="alert"><h3>Could not load observations</h3><p>{error}</p><p>A request error is not a zero-activity result.</p>{onRetry && <button type="button" className="view-calendar-btn" onClick={onRetry}>Retry request</button>}</div>;
 
   return (
-    <div>
-      {allZero && <p className="empty">No fire detected in this area and period.</p>}
-      <div className="heat-scroll">
-        <svg className="heat-svg" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMinYMin meet" role="img" aria-label="Calendar heatmap of burning activity, years down, weeks across">
-          <defs>
-            <pattern id="nodata" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-              <rect width="4" height="4" fill="#eee" /><line x1="0" y1="0" x2="0" y2="4" stroke="#aaa" strokeWidth="1.5" />
-            </pattern>
-          </defs>
-          {MONTHS.map((m, i) => (
-            <text key={m} x={LEFT + Math.floor((i * 365.25) / 12 / 7) * STEP} y={14} className="axis">{m}</text>
-          ))}
-          {years.map((y, row) => {
-            const scaled = `${y}-12-31` < meta.viirs_start;
-            return (
-              <g key={y}>
-                <text x={LEFT - 6} y={TOP + row * STEP + CELL - 3} textAnchor="end" className="axis">{y}</text>
-                {scaled && <text x={4} y={TOP + row * STEP + CELL - 3} className="axis scaled">scaled</text>}
-                {Array.from({ length: COLS }, (_, col) => {
-                  const w = byKey.get(`${y}-${col}`);
-                  // Empty slot (outside the date range, or no 53rd week this year):
-                  // a faint cell keeps the grid a full rectangle.
-                  if (!w) return <rect key={col} x={LEFT + col * STEP} y={TOP + row * STEP} width={CELL} height={CELL} rx={2} className="cell-empty" />;
-                  const v = metric === "anomaly" ? w.anomaly : w.value;
-                  const t = v == null ? null : metric === "anomaly" ? v / 100 : v / max;
-                  const x = LEFT + col * STEP, yy = TOP + row * STEP;
-                  return (
-                    <g key={col} onPointerEnter={() => setHover(w)} onPointerDown={() => setHover(w)} onPointerLeave={() => setHover(null)}>
-                      <rect x={x} y={yy} width={CELL} height={CELL} rx={2} fill={t == null ? "url(#nodata)" : colorFor(t)} stroke="#0004" />
-                      {hover === w && <rect x={x - 1} y={yy - 1} width={CELL + 2} height={CELL + 2} rx={3} fill="none" stroke="#fff" strokeWidth={1.5} pointerEvents="none" />}
-                      {inGap(w) && <rect x={x + 1} y={yy + 1} width={CELL - 2} height={CELL - 2} fill="none" stroke="#1f5fff" strokeWidth={2} />}
-                      {w.low_sensitivity_share >= 0.3 && metric === "activity" && w.value != null && (
-                        <circle cx={x + CELL - 3.5} cy={yy + 3.5} r={2.2} fill="#fff" stroke="#000" strokeWidth={0.8} />
-                      )}
-                    </g>
-                  );
+    <div ref={workspace} className={`refined-heatmap${expanded ? `${fitAll ? " heatmap-expanded heatmap-fit-all" : " heatmap-expanded"}` : ""}`}
+      role={expanded ? "dialog" : undefined} aria-modal={expanded ? true : undefined} aria-label={expanded ? "Full-screen heatmap" : undefined}
+      onKeyDown={(event) => {
+        if (!expanded) return;
+        if (event.key === "Escape") { event.preventDefault(); closeExpanded(); }
+        if (event.key === "Tab") {
+          const controls = Array.from(workspace.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), a[href], [tabindex="0"]') ?? []).filter((el) => el.tabIndex >= 0 && !el.closest("[hidden]"));
+          const first = controls[0], last = controls[controls.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+        }
+      }}>
+      <div className="heatmap-expand-bar">
+        <span>{expanded ? "Full-screen heatmap · Escape to exit" : "Explore the weekly overview"}</span>
+        {expanded ? <button ref={closeTrigger} type="button" className="heatmap-expand-button" onClick={closeExpanded} aria-label="Exit full-screen heatmap" title="Exit full screen (Escape)"><span aria-hidden="true">×</span> Exit full screen</button>
+          : <button ref={expandTrigger} type="button" className="heatmap-expand-button" onClick={openExpanded} aria-label="Expand heatmap to full screen" title="Expand heatmap to full screen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" /></svg> Full screen</button>}
+      </div>
+      {expanded && <div className="heatmap-fullscreen-toolbar">
+        <span>{selected ? rangeText(selected) : "No week selected"} · {sourceName} · {metricName}</span>
+        <div>
+          <button type="button" className="heatmap-expand-button" aria-pressed={fitAll} onClick={() => setFitAll((value) => !value)}>{fitAll ? "Larger cells" : "Fit entire heatmap"}</button>
+          <button type="button" className="heatmap-expand-button" aria-expanded={detailsOpen} aria-controls={`${prefix}-details`} onClick={() => { setDetailsOpen((value) => !value); setLegendOpen(false); }}>Week details</button>
+          <button type="button" className="heatmap-expand-button" aria-expanded={legendOpen} aria-controls={`${prefix}-legend`} onClick={() => { setLegendOpen((value) => !value); setDetailsOpen(false); }}>Legend</button>
+        </div>
+      </div>}
+      {!weeks.length && <p className="availability-inline" role="status">No weekly records returned for this area and date range. This does not establish zero burning activity.</p>}
+      {!!weeks.length && !scale.values.length && <p className="availability-inline" role="status">Weekly records were returned, but {metric === "activity" ? "activity" : "anomaly"} values are unavailable. Missing values are not zero.</p>}
+      {!!scale.values.length && scale.values.every((value) => value === 0) && <p className="availability-inline" role="status">Available {metric === "activity" ? "activity" : "anomaly"} values are all recorded as zero ({scale.values.length} numeric {scale.values.length === 1 ? "record" : "records"}).{scale.values.length < weeks.length ? ` ${weeks.length - scale.values.length} other ${weeks.length - scale.values.length === 1 ? "value is" : "values are"} unavailable.` : ""} A recorded zero does not prove no burning occurred.</p>}
+      <div className="heatmap-workspace">
+        <div className="heatmap-visual">
+          <div className="heatmap-chart-heading"><div><h3>Year-by-week overview</h3><p>Years down · weekly positions across</p></div><span>{sourceName} · {metricName}</span></div>
+          <div className="heat-scroll heatmap-matrix-scroll" ref={scroller} onScroll={syncScroll} role="region" aria-label="Scrollable weekly heatmap">
+            <div className="heatmap-matrix" role="table" aria-label="Burning activity by calendar year and weekly position" aria-colcount={54} aria-rowcount={layout.years.length + 1}>
+              <div className="heatmap-grid-head" role="row"><div className="heatmap-year" role="columnheader">Year</div>{MONTHS.map((month, i) => <div className="heatmap-month-label" role="columnheader" key={month} style={{ gridColumn: `${MONTH_COLUMNS[i] + 2} / span ${i === 11 ? 6 : MONTH_COLUMNS[i + 1] - MONTH_COLUMNS[i]}` }}>{month}</div>)}</div>
+              {layout.rows.map((row, index) => <div className="heatmap-grid-row" role="row" key={layout.years[index]}>
+                <div className="heatmap-year" role="rowheader">{layout.years[index]}</div>
+                {row.map((slot) => {
+                  const state = stateFor(slot), value = valueFor(slot);
+                  const numeric = value != null && Number.isFinite(value) && slot.kind === "record";
+                  return <div className="heatmap-slot" role="cell" key={slot.col}>
+                    <button type="button" id={`${prefix}-${slot.year}-${slot.col}`} className={`heatmap-week state-${state}${selected?.key === slot.key && isSelectable(slot) ? " is-selected" : ""}${hovered === slot.key ? " is-preview" : ""}${gaps(slot).length ? " has-gap" : ""}`}
+                      disabled={!isSelectable(slot)} tabIndex={slot.key === focusKey && isSelectable(slot) ? 0 : -1} aria-pressed={selected?.key === slot.key && isSelectable(slot)}
+                      title={`${rangeText(slot)} · ${describe(slot)}`} aria-label={`${rangeText(slot)}. ${describe(slot)}${gaps(slot).length ? ". Known instrument gap" : ""}`} aria-controls={`${prefix}-details`}
+                      style={numeric ? { backgroundColor: colorFor(value / (scale.maximum || 1)) } : undefined}
+                      onClick={() => { setPicked(slot.key); setFocused(slot.key); setHovered(""); }}
+                      onFocus={() => { setPicked(slot.key); setFocused(slot.key); setHovered(""); }}
+                      onPointerEnter={(event) => { if (event.pointerType === "mouse") setHovered(slot.key); }} onPointerLeave={() => setHovered("")}
+                      onKeyDown={(event) => { if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) { event.preventDefault(); moveFocus(slot, event.key); } }}>
+                      {slot.record && slot.record.low_sensitivity_share >= .3 && <span className="heatmap-sensitivity-dot" aria-hidden="true" />}
+                    </button>
+                  </div>;
                 })}
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-
-      <div className="legend">
-        <span>{metric === "anomaly" ? "Usual (0)" : "Quiet"}</span>
-        <span className="ramp">{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ background: colorFor(i / 8) }} />)}</span>
-        <span>{metric === "anomaly" ? "Very unusual (100)" : "Intense"}</span>
-        <span className="key"><i className="k-gap" /> known gap</span>
-        <span className="key"><i className="k-dot" /> low-confidence share high</span>
-        <span className="key"><i className="k-nodata" /> no data</span>
-        <span className="key"><i className="k-empty" /> no week (outside range, or year has no 53rd week)</span>
-        <span className="key">"scaled" rows: MODIS scaled to VIIRS</span>
-      </div>
-
-      <div className="tip" aria-live="polite">
-        {hover ? <Tip w={hover} metric={metric} range={`${start} to ${end}`} gap={inGap(hover)} /> : "Hover or tap a week for details."}
+              </div>)}
+            </div>
+          </div>
+          {scroll.max > 0 && <input type="range" className="heat-slider" min={0} max={scroll.max} step={1} value={Math.min(scroll.pos, scroll.max)} aria-label="Scroll the heatmap sideways" onChange={(event) => { if (scroller.current) { scroller.current.scrollLeft = +event.target.value; syncScroll(); } }} />}
+          <p className="heatmap-reading-note">Week columns group Monday start dates within each calendar year. Month labels are approximate guides. Year labels stay visible as you scroll. Use arrow keys to inspect weeks; Home/End move within a year.</p>
+          <section className="heatmap-scale" id={`${prefix}-legend`} hidden={expanded && !legendOpen} aria-label="Heatmap legend">
+            {expanded && <button type="button" className="heatmap-panel-close heatmap-expand-button" aria-label="Close legend" onClick={() => setLegendOpen(false)}>×</button>}
+            <div className="heatmap-scale-heading"><strong>{metricName} scale</strong>{scale.values.length && scale.maximum > 0 ? <div className="calendar-legend-ramp"><span>0</span><span className="ramp">{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ background: colorFor(i / 8) }} />)}</span><span>{formatCalendarValue(scale.maximum)}{metric === "anomaly" ? " / 100" : ""}</span></div> : <span className="small">{scale.values.length ? "Recorded values are zero" : "No numeric values returned"}</span>}</div>
+            <p>{metric === "anomaly" ? "Fixed 0–100 percentile scale, not a probability of future fire." : `Activity colors saturate at the returned data's 98th-percentile value. ${scale.clipped} ${scale.clipped === 1 ? "value is" : "values are"} above this endpoint; the exact values remain available in week details. The scale changes with filters. Units are not supplied by the API contract.`}</p>
+            <div className="heatmap-keys"><span><i className="calendar-value-swatch zero" />Recorded zero</span><span><i className="calendar-value-swatch unavailable" />Unavailable value</span><span><i className="calendar-value-swatch absent" />No record returned</span><span><i className="heatmap-key-gap" />Known gap</span><span><i className="k-dot" />Low sensitivity ≥30%</span><span>Faint cells: outside dates/coverage, or no week starts here.</span></div>
+          </section>
+        </div>
+        <aside className="heatmap-detail" id={`${prefix}-details`} aria-label="Selected week details" aria-live="polite" hidden={expanded && !detailsOpen}>
+          {expanded && <button type="button" className="heatmap-panel-close heatmap-expand-button" aria-label="Close week details" onClick={() => setDetailsOpen(false)}>×</button>}
+          <p className="eyebrow">{hovered && shown?.key !== selected?.key ? "HOVER PREVIEW" : "SELECTED WEEK"}</p>
+          {shown ? <>
+            <h4>{rangeText(shown)}</h4>
+            <p className="heatmap-detail-status">{describe(shown)}</p>
+            {shown.record ? <>
+              <div className="heatmap-primary-values"><div><span>Activity</span><strong>{formatCalendarValue(shown.record.value)}</strong></div><div><span>Anomaly</span><strong>{formatCalendarValue(shown.record.anomaly)}{shown.record.anomaly != null && Number.isFinite(shown.record.anomaly) ? <small> /100</small> : null}</strong></div></div>
+              <dl className="heatmap-detail-fields"><div><dt>Source view</dt><dd>{sourceName}</dd></div><div><dt>Observation provenance</dt><dd>{source !== "harmonized" ? sourceName : shown.record.harmonized_source === "modis_scaled" ? "MODIS scaled to VIIRS" : shown.record.harmonized_source === "modis_fill" ? "MODIS fill" : shown.record.harmonized_source === "viirs" ? "VIIRS" : shown.record.harmonized_source ?? "Not supplied"}</dd></div><div><dt>Uncertainty range</dt><dd>{shown.record.uncertainty_low != null && shown.record.uncertainty_high != null ? `${formatCalendarValue(shown.record.uncertainty_low)} – ${formatCalendarValue(shown.record.uncertainty_high)}` : "Not supplied"}</dd></div><div><dt>Low-sensitivity share</dt><dd>{Number.isFinite(shown.record.low_sensitivity_share) ? `${(shown.record.low_sensitivity_share * 100).toFixed(1)}%` : "Not supplied"}</dd></div><div><dt>Active cells (reported)</dt><dd>{shown.record.active_cells}</dd></div></dl>
+              {shown.record.value === 0 && <p className="calendar-detail-warning">A recorded zero does not prove no burning occurred.</p>}
+            </> : <p>No weekly record was returned. Activity, anomaly and uncertainty are unknown, not zero.</p>}
+            <div className="heatmap-detail-notes"><strong>Flags & observation notes</strong>{shown.record?.flags.length || gaps(shown).length ? <ul>{[...new Set([...(shown.record?.flags ?? []), ...gaps(shown)])].map((flag) => <li key={flag}>{flag}</li>)}</ul> : <p>No flags supplied. This does not guarantee complete observation coverage.</p>}{(shown.record?.low_sensitivity_share ?? 0) > 0 && <p>Low-sensitivity cells are present. Review the uncertainty and data limitations.</p>}</div>
+          </> : <p>No selectable weeks in the requested date range. Check the source and dates above.</p>}
+        </aside>
       </div>
     </div>
-  );
-}
-
-function addDays(iso: string, n: number) {
-  return new Date(Date.parse(iso) + n * 86400000).toISOString().slice(0, 10);
-}
-
-function Tip({ w, metric, gap }: { w: WeekRow; metric: Metric; range: string; gap: boolean }) {
-  const src = w.harmonized_source === "modis_scaled" ? "MODIS scaled to VIIRS" : w.harmonized_source === "viirs" ? "measured by VIIRS" : w.harmonized_source;
-  return (
-    <>
-      <strong>Week of {w.week_start}</strong>{" "}
-      {w.value == null ? "No data for this source." : <>Activity {w.value.toFixed(2)}
-        {w.uncertainty_low != null && <> (range {w.uncertainty_low.toFixed(2)} to {w.uncertainty_high!.toFixed(2)})</>}</>}
-      {" "}| Anomaly {w.anomaly?.toFixed(0) ?? "n/a"}/100 | {w.active_cells} active cell{w.active_cells === 1 ? "" : "s"}
-      {w.low_sensitivity_share > 0 && <> | {Math.round(w.low_sensitivity_share * 100)}% low-sensitivity cells</>}
-      {src && metric !== undefined && <> | {src}</>}
-      {w.flags.length > 0 && <> | flags: {w.flags.join(", ")}</>}
-      {gap && <> | known satellite gap</>}
-    </>
   );
 }
