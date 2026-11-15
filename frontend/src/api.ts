@@ -1,25 +1,24 @@
-// API layer. If VITE_API_URL is set, calls the real API. Otherwise it builds the same
-// responses from public/fake_cell_week.csv so the UI can be developed before real data exists.
+// API layer. Three data modes:
+//   api    : VITE_API_URL is set, so the real backend is called (adds ?region= when a region is known).
+//   static : default. Reads the ML export in public/data/ and computes the same numbers in the browser.
+//   fake   : VITE_USE_FAKE=1. Random values from public/fake_cell_week.csv, for UI work only.
 import type { Bbox, CalendarResponse, Meta, Region, Source, WeekRow } from "./types";
-
+import { staticCalendar, staticMeta, staticRegions } from "./staticData";
 const API = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "");
-export const usingFakeData = !API;
-
+export const dataMode: "api" | "static" | "fake" = API ? "api" : import.meta.env.VITE_USE_FAKE === "1" ? "fake" : "static";
+export const usingFakeData = dataMode === "fake";
 async function getJson<T>(path: string): Promise<T> {
   const res = await fetch(`${API}${path}`);
   if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
   return res.json();
 }
-
-export const getMeta = (): Promise<Meta> => (API ? getJson("/meta") : Promise.resolve(FAKE_META));
-export const getRegions = (): Promise<Region[]> => (API ? getJson("/regions") : Promise.resolve(FAKE_REGIONS));
-
-export async function getCalendar(bbox: Bbox, start: string, end: string, source: Source): Promise<CalendarResponse> {
-  if (API) return getJson(`/calendar?bbox=${bbox.join(",")}&start=${start}&end=${end}&source=${source}`);
-  return fakeCalendar(bbox, start, end, source);
-}
-
-// ---------- fake data below ----------
+export const getMeta = (): Promise<Meta> => (API ? getJson("/meta") : usingFakeData ? Promise.resolve(FAKE_META) : staticMeta());
+export const getRegions = (): Promise<Region[]> => (API ? getJson("/regions") : usingFakeData ? Promise.resolve(FAKE_REGIONS) : staticRegions());
+export async function getCalendar(bbox: Bbox, start: string, end: string, source: Source, regionId?: string): Promise<CalendarResponse> {
+  if (API) return getJson(`/calendar?bbox=${bbox.join(",")}&start=${start}&end=${end}&source=${source}${regionId ? `&region=${encodeURIComponent(regionId)}` : ""}`);
+  if (usingFakeData) return fakeCalendar(bbox, start, end, source);
+  return staticCalendar(bbox, start, end, source, regionId);
+}// ---------- fake data below ----------
 const FAKE_REGIONS: Region[] = [
   { id: "ph-all", name: "Placeholder: Philippines (whole grid)", bbox: [120, 10, 123, 14] },
   { id: "ph-north", name: "Placeholder: northern half", bbox: [120, 12, 123, 14] },

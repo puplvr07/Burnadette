@@ -9,6 +9,11 @@ import type { RadiusSelection } from "../pointRadius";
 
 interface Props { selectionCleared?: boolean; onClearSelection?: () => void; onOpenSettings?: () => void; bbox: Bbox; radiusSelection: RadiusSelection | null; onRadiusSelect: (point: RadiusSelection) => boolean; onChange: (b: Bbox) => void; onBrowse?: () => void; settingsOpen?: boolean }
 
+// Tile loading tuned for smooth panning: load while dragging (Leaflet waits until the drag ends on phones, which
+// leaves blank areas), skip tile churn during the zoom animation, and keep a wider ring of tiles so panning
+// back does not reload them.
+const TILE_TUNING = { updateWhenIdle: false, updateWhenZooming: false, updateInterval: 120, keepBuffer: 4 } as const;
+
 type Shape = "rectangle" | "polygon" | "point";
 type MapTool = Shape | MeasurementKind;
 const SHAPES: [Shape, string][] = [["point", "Point & Radius"], ["rectangle", "Rectangle"], ["polygon", "Polygon"]];
@@ -49,9 +54,18 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
   onBrowseRef.current = onBrowse;
   const [drawingOpen, setDrawingOpen] = useState(false);
   const [toolGroup, setToolGroup] = useState<"draw" | "measure" | "location">("draw");
+  // Minimized Map tools: a small bar beside the tools button so the panel doesn't cover the map while drawing.
+  // Activating a shape on a phone minimizes it automatically; tapping the bar expands it again.
+  const [toolsCollapsed, setToolsCollapsed] = useState(false);
+  useEffect(() => { if (!drawingOpen) setToolsCollapsed(false); }, [drawingOpen]);
   const drawingOpenRef = useRef(false);
   drawingOpenRef.current = drawingOpen;
-  const [coordinate, setCoordinate] = useState({lat: 12, lng: 121.5, source: "center" as "center" | "pointer"});
+  // Only the source (crosshair on or off) is React state. The numbers change every frame while panning,
+  // so they are written straight into the DOM instead of re-rendering this whole component each time.
+  const [coordSource, setCoordSource] = useState<"center" | "pointer">("center");
+  const readoutLabel = useRef<HTMLSpanElement>(null);
+  const readoutLat = useRef<HTMLElement>(null);
+  const readoutLon = useRef<HTMLElement>(null);
   const [mode, setMode] = useState<MapTool | null>(null);
   modeRef.current = mode;
   useEffect(() => {
@@ -78,9 +92,10 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
       noWrap: true,
       bounds: WORLD,
       attribution: "Tiles &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      ...TILE_TUNING,
     }).addTo(m);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
-      maxZoom: 17, noWrap: true, bounds: WORLD,
+      maxZoom: 17, noWrap: true, bounds: WORLD, ...TILE_TUNING,
     }).addTo(m);
     map.current = m;
 
@@ -105,7 +120,16 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
     ro.observe(el.current!);
 
     let clickTimer: ReturnType<typeof setTimeout> | undefined;
-    const browse = () => { clearTimeout(clickTimer); onBrowseRef.current?.(); };
+    // Fired on every wheel tick, and the parent re-renders each time it is called. Closing panels is
+    // idempotent, so only the first signal in a burst needs to get through.
+    let lastBrowse = 0;
+    const browse = () => {
+      clearTimeout(clickTimer);
+      const now = performance.now();
+      if (now - lastBrowse < 400) return;
+      lastBrowse = now;
+      onBrowseRef.current?.();
+    };
     m.on("dragstart", browse);
     m.on("zoomstart", () => clearTimeout(clickTimer));
     const afterNavigation = () => { clearTimeout(clickTimer); ignoreClickUntil.current = Date.now() + 300; };
@@ -120,10 +144,18 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
     let coordinateSource: "center" | "pointer" = "center";
     let coordinateTimer: ReturnType<typeof setTimeout> | undefined;
     let pendingCoordinate: {lat: number; lng: number; source: "center" | "pointer"} = {lat: m.getCenter().lat, lng: m.getCenter().lng, source: coordinateSource};
+    const paintCoordinate = () => {
+      coordinateTimer = undefined;
+      const { lat, lng, source } = pendingCoordinate;
+      if (readoutLabel.current) readoutLabel.current.textContent = source === "center" ? "Map center" : "Pointer";
+      if (readoutLat.current) readoutLat.current.textContent = `${Math.abs(lat).toFixed(4)}\u00b0 ${lat < 0 ? "S" : "N"}`;
+      if (readoutLon.current) readoutLon.current.textContent = `${Math.abs(lng).toFixed(4)}\u00b0 ${lng < 0 ? "W" : "E"}`;
+      setCoordSource(source); // no re-render unless the source actually changed
+    };
     const updateCoordinate = (point: L.LatLng, source: "center" | "pointer") => {
       pendingCoordinate = {lat: point.lat, lng: ((point.lng + 180) % 360 + 360) % 360 - 180, source};
       if (coordinateTimer !== undefined) return;
-      coordinateTimer = setTimeout(() => { coordinateTimer = undefined; setCoordinate(pendingCoordinate); }, 60);
+      coordinateTimer = setTimeout(paintCoordinate, 60);
     };
     const useCenter = () => { coordinateSource = "center"; updateCoordinate(m.getCenter(), "center"); };
     const pointerSource = (event: PointerEvent) => { if (event.pointerType === "touch") useCenter(); else coordinateSource = "pointer"; };
@@ -314,8 +346,24 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
           onClick={() => { if (!drawingOpen) onBrowseRef.current?.(); modeRef.current = null; cancel.current(); setDrawingOpen((open) => !open); setMode(null); }}>
           {drawingOpen ? <span className="close-symbol" aria-hidden="true">×</span> : <MapControlIcon name="tools" />}
         </button>
-      <div className="shape-bar" id="map-drawing-tools" hidden={!drawingOpen}>
-        <div className="unified-tools-heading"><h2>Map tools</h2><button type="button" className="map-tool-settings-link" title="Region & dates" aria-label="Open region and date settings" aria-controls="map-settings" onClick={()=>{cancel.current();setMode(null);setDrawingOpen(false);onOpenSettings?.();}}><MapControlIcon name="tools" /><span>Region & dates</span></button></div>
+      {drawingOpen && toolsCollapsed && (
+        <div className="tools-peek" role="group" aria-label="Map tools, minimized">
+          <button type="button" className="tools-peek-expand" aria-expanded="false" aria-controls="map-drawing-tools" title="Show map tools" onClick={() => setToolsCollapsed(false)}>
+            <span className="tools-peek-text">
+              <strong>{mode && !measuring(mode) ? SHAPES.find(([s]) => s === mode)?.[1] ?? "Map tools" : "Map tools"}</strong>
+              <small>{mode === "polygon" ? "Tap to add corners" : mode === "rectangle" ? "Drag on the map" : mode === "point" ? "Tap the center point" : "Tap to show tools"}</small>
+            </span>
+            <span className="tools-peek-chevron" aria-hidden="true">›</span>
+          </button>
+          {mode === "polygon" && <button type="button" className="finish-btn" onClick={() => finishPoly.current()}>Finish</button>}
+          {mode === "point" && <button type="button" className="finish-btn" onClick={() => {
+            const center = map.current!.getCenter();
+            if (onRadiusSelectRef.current({ lat: center.lat, lon: center.lng, radiusKm: radiusRef.current?.radiusKm ?? DEFAULT_RADIUS_KM })) setMode(null);
+          }}>Use center</button>}
+        </div>
+      )}
+      <div className="shape-bar" id="map-drawing-tools" hidden={!drawingOpen || toolsCollapsed}>
+        <div className="unified-tools-heading"><h2>Map tools</h2><button type="button" className="tools-minimize" aria-label="Minimize map tools" title="Minimize to the side" onClick={() => setToolsCollapsed(true)}><span aria-hidden="true">‹</span> Minimize</button><button type="button" className="map-tool-settings-link" title="Region & dates" aria-label="Open region and date settings" aria-controls="map-settings" onClick={()=>{cancel.current();setMode(null);setDrawingOpen(false);onOpenSettings?.();}}><MapControlIcon name="tools" /><span>Region & dates</span></button></div>
         <div className="map-tool-groups" role="group" aria-label="Map tool categories">
           {([['draw','Draw area'],['measure','Measure'],['location','Location']] as const).map(([group,label])=><button key={group} type="button" aria-pressed={toolGroup===group} onClick={()=>{modeRef.current=null;cancel.current();utilities.cancel();setMode(null);setToolGroup(group);}}>{label}</button>)}
         </div>
@@ -323,7 +371,12 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
         <p className="small" role={selectionCleared ? "status" : undefined}>{selectionCleared ? "Map cleared. No analysis region selected. " : ""}Select an analysis region. Activate a shape, then draw on the map.</p>
         <div className="seg" role="group" aria-label="Selection shape">
           {SHAPES.map(([s, label]) => (
-            <button key={s} aria-pressed={mode === s} onClick={() => { onBrowseRef.current?.(); setMode(mode === s ? null : s); }}>{label}</button>
+            <button key={s} aria-pressed={mode === s} onClick={() => {
+              onBrowseRef.current?.();
+              const next = mode === s ? null : s;
+              setMode(next);
+              if (next && window.matchMedia("(max-width: 700px)").matches) setToolsCollapsed(true);
+            }}>{label}</button>
           ))}
         </div>
         {mode === "point" && <button type="button" className="finish-btn" onClick={() => {
@@ -343,11 +396,11 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
         <p className="map-clear-explanation">Clears drawn regions, measurements, location markers and analysis results. Dates and source are kept.</p>
       </div>
       </div>
-      {coordinate.source === "center" && <span className="map-center-crosshair" aria-hidden="true" />}
+      {coordSource === "center" && <span className="map-center-crosshair" aria-hidden="true" />}
       <div className="map-coordinate-readout" role="group" aria-label="Map coordinates in WGS 84" aria-live="off">
-        <span className="coordinate-source">{coordinate.source === "center" ? "Map center" : "Pointer"}</span>
-        <span>Lat <strong>{Math.abs(coordinate.lat).toFixed(4)}° {coordinate.lat < 0 ? "S" : "N"}</strong></span>
-        <span>Lon <strong>{Math.abs(coordinate.lng).toFixed(4)}° {coordinate.lng < 0 ? "W" : "E"}</strong></span>
+        <span className="coordinate-source" ref={readoutLabel}>Map center</span>
+        <span>Lat <strong ref={readoutLat}>{"12.0000\u00b0 N"}</strong></span>
+        <span>Lon <strong ref={readoutLon}>{"121.5000\u00b0 E"}</strong></span>
         <span className="coordinate-system">WGS 84</span>
       </div>
       <div ref={el} className="map" aria-label="Satellite map for choosing an area" />

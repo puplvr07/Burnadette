@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { emptyTyping, typeMonth, typeYear } from "../typedDate";
+import type { TypingState } from "../typedDate";
+import { activeSquaresText, provenanceLabel, sensitivityText } from "../display";
 import type { Meta, Metric, Source, WeekRow } from "../types";
 import { colorFor } from "../colors";
 import { calendarCoverage, formatCalendarDate, formatCalendarValue, monthWeeks, shiftCalendarMonth, weekMetricState } from "../calendarModel";
@@ -8,10 +11,12 @@ interface Props { weeks: WeekRow[]; start: string; end: string; metric: Metric; 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const sourceTitle = (source: Source) => source === "modis" ? "MODIS" : source === "viirs" ? "VIIRS" : "Harmonized";
-const provenance = (source?: string) => source === "modis_scaled" ? "MODIS scaled to VIIRS" : source === "modis_fill" ? "MODIS fill" : source === "viirs" ? "VIIRS" : source ?? "Not supplied";
+const provenance = provenanceLabel;
 
 export default function MonthCalendar({ weeks, start, end, metric, source, meta, loading = false, error = "", onRetry }: Props) {
   const [requestedMonth, setRequestedMonth] = useState("");
+  const monthTyping = useRef<TypingState>(emptyTyping);
+  const yearTyping = useRef<TypingState>(emptyTyping);
   const [picked, setPicked] = useState("");
   if (!start || !end || start > end) return <div className="calendar-state" role="status"><h3>Choose a valid date range</h3><p>Complete the From and To filters above, with the start date on or before the end date.</p></div>;
   const coverage = calendarCoverage(start, end, meta, source);
@@ -47,10 +52,20 @@ export default function MonthCalendar({ weeks, start, end, metric, source, meta,
         <div><p className="eyebrow">WEEKLY OBSERVATIONS</p><h3 id="calendar-month-heading">{MONTHS[monthIndex - 1]} {year}</h3><p>One row is one week. Dates are calendar guides, not daily measurements.</p></div>
         <div className="calendar-month-controls" role="group" aria-label="Calendar month navigation">
           <button type="button" className="calendar-arrow" title="Previous month" aria-label="Previous month" disabled={month <= minMonth} onClick={() => selectMonth(shiftCalendarMonth(month, -1))}>‹</button>
-          <label>Month<select aria-label="Calendar month" value={monthIndex} onChange={(e) => selectMonth(`${year}-${e.target.value.padStart(2, "0")}`)}>
+          <label title="Type a number to jump, for example 09 for September">Month<select aria-label="Calendar month" value={monthIndex} onKeyDown={(e) => {
+  if (e.ctrlKey || e.metaKey || e.altKey || !/^\d$/.test(e.key)) return;
+  e.preventDefault();
+  const r = typeMonth(monthTyping.current, e.key, e.timeStamp); monthTyping.current = r.state;
+  if (r.month) selectMonth(`${year}-${String(r.month).padStart(2, "0")}`);
+}} onChange={(e) => selectMonth(`${year}-${e.target.value.padStart(2, "0")}`)}>
             {MONTHS.map((name, i) => { const candidate = `${year}-${String(i + 1).padStart(2, "0")}`; return <option key={name} value={i + 1} disabled={candidate < minMonth || candidate > maxMonth}>{name}</option>; })}
           </select></label>
-          <label>Year<select aria-label="Calendar year" value={year} onChange={(e) => selectMonth(`${e.target.value}-${String(monthIndex).padStart(2, "0")}`)}>{years.map((y) => <option key={y} value={y}>{y}</option>)}</select></label>
+          <label title="Type a year to jump, for example 2017 or 17">Year<select aria-label="Calendar year" value={year} onKeyDown={(e) => {
+  if (e.ctrlKey || e.metaKey || e.altKey || !/^\d$/.test(e.key)) return;
+  e.preventDefault();
+  const r = typeYear(yearTyping.current, e.key, e.timeStamp, years[0], years[years.length - 1]); yearTyping.current = r.state;
+  if (r.year) selectMonth(`${r.year}-${String(monthIndex).padStart(2, "0")}`);
+}} onChange={(e) => selectMonth(`${e.target.value}-${String(monthIndex).padStart(2, "0")}`)}>{years.map((y) => <option key={y} value={y}>{y}</option>)}</select></label>
           <button type="button" className="calendar-arrow" title="Next month" aria-label="Next month" disabled={month >= maxMonth} onClick={() => selectMonth(shiftCalendarMonth(month, 1))}>›</button>
         </div>
       </header>
@@ -100,15 +115,15 @@ export default function MonthCalendar({ weeks, start, end, metric, source, meta,
                     <div className="calendar-primary-metric"><dt>Anomaly percentile</dt><dd>{formatCalendarValue(observation.anomaly)}{observation.anomaly != null && Number.isFinite(observation.anomaly) ? " / 100" : ""}</dd></div>
                     <div><dt>Source view</dt><dd>{sourceTitle(source)}</dd></div>
                     <div><dt>Observation provenance</dt><dd>{source === "harmonized" ? provenance(observation.harmonized_source) : sourceTitle(source)}</dd></div>
-                    <div><dt>Active cells (reported)</dt><dd>{observation.active_cells}</dd></div>
+                    <div><dt>Active squares</dt><dd>{activeSquaresText(observation)}</dd></div>
                     <div><dt>Uncertainty range</dt><dd>{observation.uncertainty_low != null && observation.uncertainty_high != null ? `${formatCalendarValue(observation.uncertainty_low)} – ${formatCalendarValue(observation.uncertainty_high)}` : "Not supplied"}</dd></div>
-                    <div><dt>Low-sensitivity share</dt><dd>{Number.isFinite(observation.low_sensitivity_share) ? `${(observation.low_sensitivity_share * 100).toFixed(1)}%` : "Not supplied"}</dd></div>
+                    <div><dt>Low-sensitivity share</dt><dd>{sensitivityText(observation.low_sensitivity_share)}</dd></div>
                   </dl>
                   {(selected.start < coverage.start || selected.end > coverage.end) && <p className="calendar-detail-warning">This week partly extends outside the selected coverage. The displayed value is the returned whole-week observation.</p>}
                   <div className="calendar-observation-notes"><strong>Observation notes</strong>
                     <ul>{[...new Set([...observation.flags, ...gapLabels(selected)])].map((note) => <li key={note}>{note}</li>)}</ul>
                     {!observation.flags.length && !gapLabels(selected).length && <p>No flags supplied. This does not guarantee complete observation coverage.</p>}
-                    {observation.low_sensitivity_share > 0 && <p>Some cells have low sensitivity. Review the uncertainty and data limitations.</p>}
+                    {(observation.low_sensitivity_share ?? 0) > 0 && <p>Some cells have low sensitivity. Review the uncertainty and data limitations.</p>}
                   </div>
                   {observation.value === 0 && <p className="calendar-detail-warning">A reported zero does not prove no burning occurred. Observation coverage and known gaps still matter.</p>}
                 </> : <><p>No observation was returned for this week. Its activity and anomaly are unknown, not zero.</p>{gapLabels(selected).length > 0 && <div className="calendar-observation-notes"><strong>Known gaps overlapping this week</strong><ul>{gapLabels(selected).map((gap) => <li key={gap}>{gap}</li>)}</ul></div>}</>}
