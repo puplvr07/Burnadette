@@ -107,10 +107,8 @@ export default function CalendarPage({ view, hidden }: Props) {
     <div className={`page page-wide explore-page${view === "map" ? " immersive-map-page" : view === "heatmap" ? " heatmap-view" : ""}${view !== "map" && !selection ? " heatmap-empty" : ""}${showSample ? " sample-expanded" : ""}`} hidden={hidden}>
       <div className="results-intro compact-results-intro" hidden={view === "map"}>
         <header className="hero">
-          <p className="eyebrow">BURNING ACTIVITY EXPLORER</p>
-          <h1>{view === "heatmap" ? "The bigger picture" : "One month, week by week"}</h1>
-          <p>{view === "heatmap" ? "Compare weekly burning patterns across years." : "Inspect weekly observations in a selected month."}</p>
-          {meta && !usingFakeData && <p className="data-scope">Weekly fire activity, {monthYear(meta.date_start)} to {monthYear(meta.date_end)}. Each square is about 55 km wide.</p>}
+          <h1>{view === "heatmap" ? "Heatmap" : "Calendar"}</h1>
+          <p>{view === "heatmap" ? "Weekly patterns, across the years." : "A month at a time, one observation per week."}</p>
         </header>
         {usingFakeData && <span className="sample-tag">SAMPLE DATA · Not satellite findings</span>}
         <div className="selection-summary" hidden={!selection}>
@@ -123,7 +121,6 @@ export default function CalendarPage({ view, hidden }: Props) {
         {selection && meta && <FilterControls value={selection} meta={meta} onChange={(patch) => { const next = { ...selection, ...patch }; setSelection(next); setDraft(next); setPointInputError(""); setRadiusEditorKey((n) => n + 1); }} />}
       </div>
       {view !== "map" && selection && data && !loading && !error && <DataNotes data={data} source={selection.source} region={regions.find((r) => r.id === (data.region ?? selection.regionId))} />}
-      {view === "calendar" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
       {error && (view === "map" || !meta || !selection) && <div className={`error${view === "map" ? " map-error" : ""}`} role="alert">{error}</div>}
 
       <section className={`immersive-map${toolsOpen ? " settings-open" : ""}`} aria-label="Map" hidden={view !== "map"}>
