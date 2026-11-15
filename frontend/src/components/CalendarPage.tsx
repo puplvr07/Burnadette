@@ -10,6 +10,7 @@ import Heatmap from "./Heatmap";
 import MonthCalendar from "./MonthCalendar";
 import Caveats from "./Caveats";
 import AvailabilityNotice from "./AvailabilityNotice";
+import Analytics from "./Analytics";
 import { sourceDateRange } from "../availability";
 import { FireBackdrop } from "./Fire";
 
@@ -173,6 +174,12 @@ export default function CalendarPage({ view, hidden }: Props) {
         {meta && selection && <Heatmap weeks={data?.weeks ?? []} source={selection.source} metric={selection.metric} meta={meta} start={selection.start} end={selection.end} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
         {meta && meta.gaps.length > 0 && <p className="small">Known gaps: {meta.gaps.map((g) => `${g.label} (${g.start} to ${g.end})`).join("; ")}</p>}
       </section>
+      {meta && selection && data && !loading && !error && (
+        <section className="panel explore-panel compare-panel" aria-label="Compare and download" hidden={view !== "heatmap"}>
+          <h2>Compare and download</h2>
+          <Analytics weeks={data.weeks} meta={meta} bbox={selection.bbox} start={selection.start} end={selection.end} source={selection.source} />
+        </section>
+      )}
       {view === "heatmap" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
       <section className="panel explore-panel" aria-label="Calendar" hidden={view !== "calendar"}>
         {meta && selection && <MonthCalendar weeks={data?.weeks ?? []} start={selection.start} end={selection.end} metric={selection.metric} source={selection.source} meta={meta} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
