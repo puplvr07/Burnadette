@@ -1,0 +1,241 @@
+===== 2026-11-15 15:11 =====
+--- MODIS 2000 philippines ---
+  input rows                                                                  100
+  type == 0 (vegetation fire)                                                 100
+  drop low confidence                                                          95   (removed 5)
+  drop persistent spots (>= 5 dates/year)                                      95
+  outside the region grid (other territories)                                  95   (removed 0)
+--- MODIS 2001 philippines ---
+  input rows                                                                 1403
+  type == 0 (vegetation fire)                                                1384   (removed 19)
+  drop low confidence                                                        1269   (removed 115)
+  drop persistent spots (>= 5 dates/year)                                    1264   (removed 5)
+  outside the region grid (other territories)                                1264   (removed 0)
+--- MODIS 2002 philippines ---
+  input rows                                                                 3435
+  type == 0 (vegetation fire)                                                3426   (removed 9)
+  drop low confidence                                                        3143   (removed 283)
+  drop persistent spots (>= 5 dates/year)                                    3115   (removed 28)
+  outside the region grid (other territories)                                3115   (removed 0)
+--- MODIS 2003 philippines ---
+  input rows                                                                 7758
+  type == 0 (vegetation fire)                                                7748   (removed 10)
+  drop low confidence                                                        7228   (removed 520)
+  drop persistent spots (>= 5 dates/year)                                    7212   (removed 16)
+  outside the region grid (other territories)                                7212   (removed 0)
+--- MODIS 2004 philippines ---
+  input rows                                                                 6823
+  type == 0 (vegetation fire)                                                6814   (removed 9)
+  drop low confidence                                                        6311   (removed 503)
+  drop persistent spots (>= 5 dates/year)                                    6297   (removed 14)
+  outside the region grid (other territories)                                6297   (removed 0)
+--- MODIS 2005 philippines ---
+  input rows                                                                 8635
+  type == 0 (vegetation fire)                                                8627   (removed 8)
+  drop low confidence                                                        8047   (removed 580)
+  drop persistent spots (>= 5 dates/year)                                    8028   (removed 19)
+  outside the region grid (other territories)                                8028   (removed 0)
+--- MODIS 2006 philippines ---
+  input rows                                                                 5770
+  type == 0 (vegetation fire)                                                5524   (removed 246)
+  drop low confidence                                                        5098   (removed 426)
+  drop persistent spots (>= 5 dates/year)                                    5064   (removed 34)
+  outside the region grid (other territories)                                5064   (removed 0)
+--- MODIS 2007 philippines ---
+  input rows                                                                 6959
+  type == 0 (vegetation fire)                                                6951   (removed 8)
+  drop low confidence                                                        6455   (removed 496)
+  drop persistent spots (>= 5 dates/year)                                    6450   (removed 5)
+  outside the region grid (other territories)                                6450   (removed 0)
+--- MODIS 2008 philippines ---
+  input rows                                                                 3325
+  type == 0 (vegetation fire)                                                3325
+  drop low confidence                                                        3049   (removed 276)
+  drop persistent spots (>= 5 dates/year)                                    3007   (removed 42)
+  outside the region grid (other territories)                                3007   (removed 0)
+--- MODIS 2009 philippines ---
+  input rows                                                                 4216
+  type == 0 (vegetation fire)                                                4146   (removed 70)
+  drop low confidence                                                        3844   (removed 302)
+  drop persistent spots (>= 5 dates/year)                                    3747   (removed 97)
+  outside the region grid (other territories)                                3747   (removed 0)
+--- MODIS 2010 philippines ---
+  input rows                                                                 9393
+  type == 0 (vegetation fire)                                                9310   (removed 83)
+  drop low confidence                                                        8657   (removed 653)
+  drop persistent spots (>= 5 dates/year)                                    8628   (removed 29)
+  outside the region grid (other territories)                                8628   (removed 0)
+--- MODIS 2011 philippines ---
+  input rows                                                                 3216
+  type == 0 (vegetation fire)                                                3216
+  drop low confidence                                                        2944   (removed 272)
+  drop persistent spots (>= 5 dates/year)                                    2921   (removed 23)
+  outside the region grid (other territories)                                2921   (removed 0)
+--- MODIS 2012 philippines ---
+  input rows                                                                 3271
+  type == 0 (vegetation fire)                                                3264   (removed 7)
+  drop low confidence                                                        3012   (removed 252)
+  drop persistent spots (>= 5 dates/year)                                    2990   (removed 22)
+  outside the region grid (other territories)                                2990   (removed 0)
+--- MODIS 2013 philippines ---
+  input rows                                                                 4158
+  type == 0 (vegetation fire)                                                4153   (removed 5)
+  drop low confidence                                                        3833   (removed 320)
+  drop persistent spots (>= 5 dates/year)                                    3814   (removed 19)
+  outside the region grid (other territories)                                3814   (removed 0)
+--- MODIS 2014 philippines ---
+  input rows                                                                 5392
+  type == 0 (vegetation fire)                                                5383   (removed 9)
+  drop low confidence                                                        4963   (removed 420)
+  drop persistent spots (>= 5 dates/year)                                    4900   (removed 63)
+  outside the region grid (other territories)                                4900   (removed 0)
+--- MODIS 2015 philippines ---
+  input rows                                                                 7511
+  type == 0 (vegetation fire)                                                7422   (removed 89)
+  drop low confidence                                                        6871   (removed 551)
+  drop persistent spots (>= 5 dates/year)                                    6837   (removed 34)
+  outside the region grid (other territories)                                6837   (removed 0)
+--- MODIS 2016 philippines ---
+  input rows                                                                 7271
+  type == 0 (vegetation fire)                                                7214   (removed 57)
+  drop low confidence                                                        6663   (removed 551)
+  drop persistent spots (>= 5 dates/year)                                    6651   (removed 12)
+  outside the region grid (other territories)                                6651   (removed 0)
+--- MODIS 2017 philippines ---
+  input rows                                                                 3367
+  type == 0 (vegetation fire)                                                3365   (removed 2)
+  drop low confidence                                                        3033   (removed 332)
+  drop persistent spots (>= 5 dates/year)                                    2930   (removed 103)
+  outside the region grid (other territories)                                2930   (removed 0)
+--- MODIS 2018 philippines ---
+  input rows                                                                 4718
+  type == 0 (vegetation fire)                                                3951   (removed 767)
+  drop low confidence                                                        3619   (removed 332)
+  drop persistent spots (>= 5 dates/year)                                    3609   (removed 10)
+  outside the region grid (other territories)                                3609   (removed 0)
+--- MODIS 2019 philippines ---
+  input rows                                                                 6886
+  type == 0 (vegetation fire)                                                6520   (removed 366)
+  drop low confidence                                                        6098   (removed 422)
+  drop persistent spots (>= 5 dates/year)                                    6079   (removed 19)
+  outside the region grid (other territories)                                6079   (removed 0)
+--- MODIS 2020 philippines ---
+  input rows                                                                 5941
+  type == 0 (vegetation fire)                                                5421   (removed 520)
+  drop low confidence                                                        4933   (removed 488)
+  drop persistent spots (>= 5 dates/year)                                    4876   (removed 57)
+  outside the region grid (other territories)                                4876   (removed 0)
+--- MODIS 2021 philippines ---
+  input rows                                                                 3227
+  type == 0 (vegetation fire)                                                2766   (removed 461)
+  drop low confidence                                                        2521   (removed 245)
+  drop persistent spots (>= 5 dates/year)                                    2502   (removed 19)
+  outside the region grid (other territories)                                2502   (removed 0)
+--- MODIS 2022 philippines ---
+  input rows                                                                 2569
+  type == 0 (vegetation fire)                                                2068   (removed 501)
+  drop low confidence                                                        1879   (removed 189)
+  drop persistent spots (>= 5 dates/year)                                    1857   (removed 22)
+  outside the region grid (other territories)                                1857   (removed 0)
+--- MODIS 2023 philippines ---
+  input rows                                                                 4267
+  type == 0 (vegetation fire)                                                3288   (removed 979)
+  drop low confidence                                                        3030   (removed 258)
+  drop persistent spots (>= 5 dates/year)                                    3001   (removed 29)
+  outside the region grid (other territories)                                3001   (removed 0)
+--- MODIS 2024 philippines ---
+  input rows                                                                 6318
+  type == 0 (vegetation fire)                                                5753   (removed 565)
+  drop low confidence                                                        5372   (removed 381)
+  drop persistent spots (>= 5 dates/year)                                    5362   (removed 10)
+  outside the region grid (other territories)                                5362   (removed 0)
+--- MODIS 2025 philippines ---
+  input rows                                                                 1988
+  type == 0 (vegetation fire)                                                1750   (removed 238)
+  drop low confidence                                                        1639   (removed 111)
+  drop persistent spots (>= 5 dates/year)                                    1621   (removed 18)
+  outside the region grid (other territories)                                1621   (removed 0)
+--- SNPP 2012 philippines ---
+  input rows                                                                20667
+  type == 0 (vegetation fire)                                               20327   (removed 340)
+  drop low confidence                                                       19352   (removed 975)
+  drop persistent spots (>= 5 dates/year)                                   19195   (removed 157)
+  outside the region grid (other territories)                               19195   (removed 0)
+--- SNPP 2013 philippines ---
+  input rows                                                                26887
+  type == 0 (vegetation fire)                                               26472   (removed 415)
+  drop low confidence                                                       25030   (removed 1442)
+  drop persistent spots (>= 5 dates/year)                                   24851   (removed 179)
+  outside the region grid (other territories)                               24851   (removed 0)
+--- SNPP 2014 philippines ---
+  input rows                                                                35595
+  type == 0 (vegetation fire)                                               35052   (removed 543)
+  drop low confidence                                                       32874   (removed 2178)
+  drop persistent spots (>= 5 dates/year)                                   32565   (removed 309)
+  outside the region grid (other territories)                               32565   (removed 0)
+--- SNPP 2015 philippines ---
+  input rows                                                                47695
+  type == 0 (vegetation fire)                                               46957   (removed 738)
+  drop low confidence                                                       43041   (removed 3916)
+  drop persistent spots (>= 5 dates/year)                                   42182   (removed 859)
+  outside the region grid (other territories)                               42182   (removed 0)
+--- SNPP 2016 philippines ---
+  input rows                                                                51664
+  type == 0 (vegetation fire)                                               51070   (removed 594)
+  drop low confidence                                                       45673   (removed 5397)
+  drop persistent spots (>= 5 dates/year)                                   44328   (removed 1345)
+  outside the region grid (other territories)                               44328   (removed 0)
+--- SNPP 2017 philippines ---
+  input rows                                                                19982
+  type == 0 (vegetation fire)                                               19369   (removed 613)
+  drop low confidence                                                       18310   (removed 1059)
+  drop persistent spots (>= 5 dates/year)                                   18138   (removed 172)
+  outside the region grid (other territories)                               18138   (removed 0)
+--- SNPP 2018 philippines ---
+  input rows                                                                28463
+  type == 0 (vegetation fire)                                               27502   (removed 961)
+  drop low confidence                                                       25887   (removed 1615)
+  drop persistent spots (>= 5 dates/year)                                   24445   (removed 1442)
+  outside the region grid (other territories)                               24445   (removed 0)
+--- SNPP 2019 philippines ---
+  input rows                                                                44311
+  type == 0 (vegetation fire)                                               43251   (removed 1060)
+  drop low confidence                                                       39112   (removed 4139)
+  drop persistent spots (>= 5 dates/year)                                   38628   (removed 484)
+  outside the region grid (other territories)                               38628   (removed 0)
+--- SNPP 2020 philippines ---
+  input rows                                                                38745
+  type == 0 (vegetation fire)                                               37373   (removed 1372)
+  drop low confidence                                                       33957   (removed 3416)
+  drop persistent spots (>= 5 dates/year)                                   33463   (removed 494)
+  outside the region grid (other territories)                               33463   (removed 0)
+--- SNPP 2021 philippines ---
+  input rows                                                                19655
+  type == 0 (vegetation fire)                                               18091   (removed 1564)
+  drop low confidence                                                       16733   (removed 1358)
+  drop persistent spots (>= 5 dates/year)                                   16524   (removed 209)
+  outside the region grid (other territories)                               16524   (removed 0)
+--- SNPP 2022 philippines ---
+  input rows                                                                14370
+  type == 0 (vegetation fire)                                               12863   (removed 1507)
+  drop low confidence                                                       12316   (removed 547)
+  drop persistent spots (>= 5 dates/year)                                   12122   (removed 194)
+  outside the region grid (other territories)                               12122   (removed 0)
+--- SNPP 2023 philippines ---
+  input rows                                                                24094
+  type == 0 (vegetation fire)                                               21526   (removed 2568)
+  drop low confidence                                                       20313   (removed 1213)
+  drop persistent spots (>= 5 dates/year)                                   19229   (removed 1084)
+  outside the region grid (other territories)                               19229   (removed 0)
+--- SNPP 2024 philippines ---
+  input rows                                                                42425
+  type == 0 (vegetation fire)                                               40701   (removed 1724)
+  drop low confidence                                                       36408   (removed 4293)
+  drop persistent spots (>= 5 dates/year)                                   35966   (removed 442)
+  outside the region grid (other territories)                               35966   (removed 0)
+--- SNPP 2025 philippines ---
+  input rows                                                                13253
+  type == 0 (vegetation fire)                                               12441   (removed 812)
+  drop low confidence                                                       11489   (removed 952)
+  drop persistent spots (>= 5 dates/year)                                   11367   (removed 122)
+  outside the region grid (other territories)                               11367   (removed 0)
