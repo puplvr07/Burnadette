@@ -11,6 +11,7 @@ import MonthCalendar from "./MonthCalendar";
 import Caveats from "./Caveats";
 import AvailabilityNotice from "./AvailabilityNotice";
 import Analytics from "./Analytics";
+import DataNotes from "./DataNotes";
 import { sourceDateRange } from "../availability";
 import { FireBackdrop } from "./Fire";
 
@@ -49,7 +50,7 @@ export default function CalendarPage({ view, hidden }: Props) {
       if (stale) return;
       setMeta(m); setRegions(r);
       // Metadata supplies viewport defaults only. A region is not selected or queried until Apply.
-      const initial: Selection = { bbox: r[0]?.bbox ?? [116, 4, 127, 21], regionId: "", source: "harmonized", metric: "activity", start: m.date_start, end: m.date_end };
+      const initial: Selection = { bbox: (r.find((x) => x.id === "philippines") ?? r[0])?.bbox ?? [116, 4, 127, 21], regionId: "", source: "harmonized", metric: "activity", start: m.date_start, end: m.date_end };
       setDraft(initial);
     }).catch((e) => { if (!stale) setError(String(e.message ?? e)); });
     return () => { stale = true; };
@@ -59,16 +60,17 @@ export default function CalendarPage({ view, hidden }: Props) {
   const start = selection?.start;
   const end = selection?.end;
   const source = selection?.source;
+  const regionId = selection?.regionId;
   useEffect(() => {
     if (!bbox || !start || !end || !source) return;
     let stale = false;
     setLoading(true); setError(""); setData(null);
-    getCalendar(bbox, start, end, source)
+    getCalendar(bbox, start, end, source, regionId || undefined)
       .then((d) => { if (!stale) setData(d); })
       .catch((e) => { if (!stale) setError(String(e.message ?? e)); })
       .finally(() => { if (!stale) setLoading(false); });
     return () => { stale = true; };
-  }, [bbox, start, end, source, retryVersion]);
+  }, [bbox, start, end, source, regionId, retryVersion]);
 
   useEffect(() => {
     if (toolsOpen && view === "map" && !hidden) toolsHeading.current?.focus();
@@ -107,6 +109,7 @@ export default function CalendarPage({ view, hidden }: Props) {
           <p className="eyebrow">BURNING ACTIVITY EXPLORER</p>
           <h1>{view === "heatmap" ? "The bigger picture" : "One month, week by week"}</h1>
           <p>{view === "heatmap" ? "Compare weekly burning patterns across years." : "Inspect weekly observations in a selected month."}</p>
+          {meta && !usingFakeData && <p className="data-scope">Weekly fire activity, {monthYear(meta.date_start)} to {monthYear(meta.date_end)}. Each square is about 55 km wide.</p>}
         </header>
         {usingFakeData && <div className="fake-banner" role="status">SAMPLE DATA · Random development values, not satellite findings.</div>}
         <div className="selection-summary">
@@ -118,6 +121,7 @@ export default function CalendarPage({ view, hidden }: Props) {
         </div>
         {selection && meta && <FilterControls value={selection} meta={meta} onChange={(patch) => { const next = { ...selection, ...patch }; setSelection(next); setDraft(next); setPointInputError(""); setRadiusEditorKey((n) => n + 1); }} />}
       </div>
+      {view !== "map" && selection && data && !loading && !error && <DataNotes data={data} source={selection.source} region={regions.find((r) => r.id === (data.region ?? selection.regionId))} />}
       {view === "calendar" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
       {error && (view === "map" || !meta || !selection) && <div className={`error${view === "map" ? " map-error" : ""}`} role="alert">{error}</div>}
 
@@ -206,6 +210,8 @@ export default function CalendarPage({ view, hidden }: Props) {
     </div>
   );
 }
+
+const monthYear = (iso: string) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 function FilterControls({ value, meta, onChange }: { value: Selection; meta: Meta; onChange: (patch: Partial<Selection>) => void }) {
   const available = sourceDateRange(meta, value.source);

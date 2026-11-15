@@ -1290,3 +1290,73 @@ html.theme-transition body, html.theme-transition :is(.site-header, .site-footer
   background-attachment: fixed;
 }
 >>>>>>> 807ff85b890804529df006440efe9ff0f5cbe3da
+
+/* Data notes and scope line (real-data integration) */
+.data-scope { margin: .5rem 0 0; opacity: .85; font-size: .95rem; }
+.data-notes { margin: 0 0 1rem; padding: .75rem 1rem; border-left: 4px solid var(--teal); font-size: .9rem; line-height: 1.5; }
+.data-notes ul { margin: 0; padding-left: 1.1rem; display: grid; gap: .35rem; }
+
+/* 2012 era divider in the heatmap (guide section 5.1) */
+.heatmap-era { position: sticky; left: 0; width: min(100%, 100vw); box-sizing: border-box; margin: 6px 0 10px; padding-top: 4px; border-top: 2px dashed var(--teal); font-size: 12px; line-height: 1.4; color: var(--teal); }
+.heatmap-era span { position: sticky; left: 8px; display: inline-block; max-width: calc(100vw - 96px); }
+
+/* About page: validation table and extra-narrow screens */
+.validation { margin-bottom: 1rem; }
+.validation .table-scroll { overflow-x: auto; margin: .75rem 0; }
+.validation table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.validation th, .validation td { padding: .5rem .75rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.validation tbody th { font-weight: 600; }
+.validation { margin-top: 1.5rem; }
+.validation tbody td:last-child { white-space: normal; }
+@media (max-width: 700px) {
+  .validation th, .validation td { padding: .45rem .4rem; font-size: 13px; white-space: normal; }
+}
+
+
+/* ================= Dark mode: hero band styled like the light theme ================= */
+/* The hero is its own clipped band (indigo to plum, with orange bullseye rings in the same spot as light mode),
+   and the text below sits on a separate, darker navy band. */
+:root:not([data-theme="light"]) .home-hero {
+  background:
+    repeating-radial-gradient(circle at 80% 75%, transparent 0 95px, #ffb36b1f 96px 97px, transparent 98px 190px),
+    linear-gradient(135deg, #1b2152 0%, #2a1f48 55%, #3a2438 100%);
+  color: var(--text);
+  border-bottom: 1px solid #ffa63d66;
+  box-shadow: 0 10px 30px -12px #00000099;
+}
+:root:not([data-theme="light"]) .home-page { background: #0b1226cc; }
+
+/* ================= Map: search button that stands out ================= */
+.region-search-launcher .search-toggle {
+  flex: 0 0 auto; width: auto; min-width: 44px; gap: 8px; padding: 0 16px 0 12px;
+  color: var(--teal); border-color: var(--teal); background: #1c1611f5;
+  font: 600 13px var(--f-head); box-shadow: 0 0 0 3px #ffa63d26, 0 6px 18px #00000066;
+  animation: search-hint 2.6s ease-out 3;
+}
+.region-search-launcher .search-toggle svg { width: 22px; height: 22px; stroke-width: 2.4; }
+.region-search-launcher .search-toggle[aria-expanded="false"]::after { content: "Search"; }
+.region-search-launcher .search-toggle[aria-expanded="true"] { width: 44px; padding: 0; animation: none; }
+.region-search-launcher .search-toggle:hover { background: #2a2018; }
+@keyframes search-hint { 0% { box-shadow: 0 0 0 0 #ffa63d99, 0 6px 18px #00000066; } 70%, 100% { box-shadow: 0 0 0 12px #ffa63d00, 0 6px 18px #00000066; } }
+:root[data-theme="light"] .region-search-launcher .search-toggle { background: #fff; box-shadow: 0 0 0 3px #064fc41f, 0 6px 18px #064fc433; }
+:root[data-theme="light"] .region-search-launcher .search-toggle:hover { background: #eef4ff; }
+@keyframes search-hint-light { 0% { box-shadow: 0 0 0 0 #064fc499, 0 6px 18px #064fc433; } 70%, 100% { box-shadow: 0 0 0 12px #064fc400, 0 6px 18px #064fc433; } }
+:root[data-theme="light"] .region-search-launcher .search-toggle { animation-name: search-hint-light; }
+@media (prefers-reduced-motion: reduce) { .region-search-launcher .search-toggle { animation: none; } }
+
+/* ================= Map: buttons in the lower-left corner ================= */
+.immersive-map { --map-zoom-bottom: 16px; }
+.immersive-map .map-bottom-bar { left: 84px; bottom: 16px; }
+@media (max-width: 700px) {
+  /* The attribution strip spans the bottom of a phone screen, so the buttons sit just above it */
+  .immersive-map { --map-zoom-bottom: 46px; }
+  .immersive-map .map-bottom-bar { bottom: 100px; }
+}
+@media (max-height: 400px) { .immersive-map { --map-zoom-bottom: 24px; } }
+
+/* ================= Map: smoother panning and zooming ================= */
+/* Blurring whatever is behind a panel means re-blurring the moving map on every frame. The panels are
+   already about 95% opaque, so a plain background looks the same and costs far less. */
+.immersive-map :is(.shape-bar, .map-settings, .map-discovery, .region-search, .map-measurement-panel, .map-location-message, .map-caveats, .tools-peek, .map-coordinate-readout, .map-icon-button, .map-bottom-bar button),
+.map-shell :is(.site-header, .map-nav-handle) { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.immersive-map .leaflet-tile-pane { will-change: transform; }

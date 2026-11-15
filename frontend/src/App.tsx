@@ -27,6 +27,19 @@ export default function App() {
     }, 3000);
   };
   useEffect(() => () => clearTimeout(hideTimer.current), []);
+  // Map page: moving a mouse (or pen) to the very top edge of the window, anywhere along its width, shows the
+  // navigation. It is a listener, not an element, so nothing sits on top of the map and map clicks and drags
+  // still work right up to the edge. Touch uses the "Navigation" tab instead.
+  useEffect(() => {
+    if (page !== "map") return;
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch" || e.clientY > 24) return;
+      clearTimeout(hideTimer.current);
+      setNavVisible(true);
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [page]);
   const [exploreView, setExploreView] = useState<ExploreView>(() => {
     const initial = fromHash();
     return isExplore(initial) ? initial : "map";

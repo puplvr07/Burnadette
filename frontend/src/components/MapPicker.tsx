@@ -9,6 +9,11 @@ import type { RadiusSelection } from "../pointRadius";
 
 interface Props { selectionCleared?: boolean; onClearSelection?: () => void; onOpenSettings?: () => void; bbox: Bbox; radiusSelection: RadiusSelection | null; onRadiusSelect: (point: RadiusSelection) => boolean; onChange: (b: Bbox) => void; onBrowse?: () => void; settingsOpen?: boolean }
 
+// Tile loading tuned for smooth panning: load while dragging (Leaflet waits until the drag ends on phones, which
+// leaves blank areas), skip tile churn during the zoom animation, and keep a wider ring of tiles so panning
+// back does not reload them.
+const TILE_TUNING = { updateWhenIdle: false, updateWhenZooming: false, updateInterval: 120, keepBuffer: 4 } as const;
+
 type Shape = "rectangle" | "polygon" | "point";
 type MapTool = Shape | MeasurementKind;
 const SHAPES: [Shape, string][] = [["point", "Point & Radius"], ["rectangle", "Rectangle"], ["polygon", "Polygon"]];
@@ -55,7 +60,12 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
   useEffect(() => { if (!drawingOpen) setToolsCollapsed(false); }, [drawingOpen]);
   const drawingOpenRef = useRef(false);
   drawingOpenRef.current = drawingOpen;
-  const [coordinate, setCoordinate] = useState({lat: 12, lng: 121.5, source: "center" as "center" | "pointer"});
+  // Only the source (crosshair on or off) is React state. The numbers change every frame while panning,
+  // so they are written straight into the DOM instead of re-rendering this whole component each time.
+  const [coordSource, setCoordSource] = useState<"center" | "pointer">("center");
+  const readoutLabel = useRef<HTMLSpanElement>(null);
+  const readoutLat = useRef<HTMLElement>(null);
+  const readoutLon = useRef<HTMLElement>(null);
   const [mode, setMode] = useState<MapTool | null>(null);
   modeRef.current = mode;
   useEffect(() => {
@@ -82,9 +92,10 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
       noWrap: true,
       bounds: WORLD,
       attribution: "Tiles &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+      ...TILE_TUNING,
     }).addTo(m);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
-      maxZoom: 17, noWrap: true, bounds: WORLD,
+      maxZoom: 17, noWrap: true, bounds: WORLD, ...TILE_TUNING,
     }).addTo(m);
     map.current = m;
 
@@ -109,7 +120,16 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
     ro.observe(el.current!);
 
     let clickTimer: ReturnType<typeof setTimeout> | undefined;
-    const browse = () => { clearTimeout(clickTimer); onBrowseRef.current?.(); };
+    // Fired on every wheel tick, and the parent re-renders each time it is called. Closing panels is
+    // idempotent, so only the first signal in a burst needs to get through.
+    let lastBrowse = 0;
+    const browse = () => {
+      clearTimeout(clickTimer);
+      const now = performance.now();
+      if (now - lastBrowse < 400) return;
+      lastBrowse = now;
+      onBrowseRef.current?.();
+    };
     m.on("dragstart", browse);
     m.on("zoomstart", () => clearTimeout(clickTimer));
     const afterNavigation = () => { clearTimeout(clickTimer); ignoreClickUntil.current = Date.now() + 300; };
@@ -124,10 +144,18 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
     let coordinateSource: "center" | "pointer" = "center";
     let coordinateTimer: ReturnType<typeof setTimeout> | undefined;
     let pendingCoordinate: {lat: number; lng: number; source: "center" | "pointer"} = {lat: m.getCenter().lat, lng: m.getCenter().lng, source: coordinateSource};
+    const paintCoordinate = () => {
+      coordinateTimer = undefined;
+      const { lat, lng, source } = pendingCoordinate;
+      if (readoutLabel.current) readoutLabel.current.textContent = source === "center" ? "Map center" : "Pointer";
+      if (readoutLat.current) readoutLat.current.textContent = `${Math.abs(lat).toFixed(4)}\u00b0 ${lat < 0 ? "S" : "N"}`;
+      if (readoutLon.current) readoutLon.current.textContent = `${Math.abs(lng).toFixed(4)}\u00b0 ${lng < 0 ? "W" : "E"}`;
+      setCoordSource(source); // no re-render unless the source actually changed
+    };
     const updateCoordinate = (point: L.LatLng, source: "center" | "pointer") => {
       pendingCoordinate = {lat: point.lat, lng: ((point.lng + 180) % 360 + 360) % 360 - 180, source};
       if (coordinateTimer !== undefined) return;
-      coordinateTimer = setTimeout(() => { coordinateTimer = undefined; setCoordinate(pendingCoordinate); }, 60);
+      coordinateTimer = setTimeout(paintCoordinate, 60);
     };
     const useCenter = () => { coordinateSource = "center"; updateCoordinate(m.getCenter(), "center"); };
     const pointerSource = (event: PointerEvent) => { if (event.pointerType === "touch") useCenter(); else coordinateSource = "pointer"; };
@@ -368,11 +396,11 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
         <p className="map-clear-explanation">Clears drawn regions, measurements, location markers and analysis results. Dates and source are kept.</p>
       </div>
       </div>
-      {coordinate.source === "center" && <span className="map-center-crosshair" aria-hidden="true" />}
+      {coordSource === "center" && <span className="map-center-crosshair" aria-hidden="true" />}
       <div className="map-coordinate-readout" role="group" aria-label="Map coordinates in WGS 84" aria-live="off">
-        <span className="coordinate-source">{coordinate.source === "center" ? "Map center" : "Pointer"}</span>
-        <span>Lat <strong>{Math.abs(coordinate.lat).toFixed(4)}° {coordinate.lat < 0 ? "S" : "N"}</strong></span>
-        <span>Lon <strong>{Math.abs(coordinate.lng).toFixed(4)}° {coordinate.lng < 0 ? "W" : "E"}</strong></span>
+        <span className="coordinate-source" ref={readoutLabel}>Map center</span>
+        <span>Lat <strong ref={readoutLat}>{"12.0000\u00b0 N"}</strong></span>
+        <span>Lon <strong ref={readoutLon}>{"121.5000\u00b0 E"}</strong></span>
         <span className="coordinate-system">WGS 84</span>
       </div>
       <div ref={el} className="map" aria-label="Satellite map for choosing an area" />
