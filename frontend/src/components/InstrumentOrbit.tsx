@@ -50,9 +50,9 @@ export default function InstrumentOrbit({active,onSelect,onExpand,expandRef}:{ac
       const paused = active || container.closest("[hidden]") ||
         items.some(item=>item.matches(":hover, :focus-visible"));
       if (!reduced.matches && !paused) elapsed += dt;
-      const theta = -Math.PI/4 + elapsed * Math.PI*2/100;
+      const theta = -Math.PI/4 + elapsed * Math.PI*2/45;
       const angles = reduced.matches ? [-Math.PI/3,Math.PI/3] :
-        [theta,theta+Math.PI+.18*Math.sin(2*theta)];
+        [theta,-Math.PI/4 + elapsed * Math.PI*2/60 + Math.PI];
       const {width,height,itemWidth,itemHeight} = geometry;
       const rx = Math.max(0,(width-itemWidth-24)/2);
       const laneTravel = Math.max(0,(height-2*itemHeight-24)/2);
@@ -73,7 +73,7 @@ export default function InstrumentOrbit({active,onSelect,onExpand,expandRef}:{ac
     return ()=>{cancelAnimationFrame(frame);observer.disconnect();};
   },[active]);
   return <div ref={stage} className={`instrument-stage${active?" is-paused":""}`} role="group" aria-label="Conceptual Earth and satellite illustration. Dark-mode city lights are a NASA 2016 composite; fire markers are decorative.">
-    <div className="instrument-earth" aria-hidden="true" />
+    <div className="instrument-earth" aria-hidden="true"><span className="earth-spherical-lighting" /></div>
     {greeting && <div className="satellite-message" role="status">{greeting === "modis" ? "Hi there! I’m MODIS." : "Hello, Earth! I’m VIIRS."}</div>}
     {onExpand&&<button ref={expandRef} className="earth-card-open" onClick={onExpand} aria-label="Expand Earth overview" title="Expand Earth overview"/>}
     {(["modis","viirs"] as const).map(kind=><button type="button" key={kind} className={`satellite-button floating-satellite upright-${kind}`} aria-label={`Learn about ${kind.toUpperCase()}`} aria-pressed={active===kind} onPointerEnter={event=>{if(event.pointerType==="mouse")setGreeting(kind);}} onPointerLeave={event=>{if(event.currentTarget!==document.activeElement)setGreeting(null);}} onFocus={()=>setGreeting(kind)} onBlur={()=>setGreeting(null)} onClick={()=>onSelect(kind)}><span className="satellite-greeting" aria-hidden="true">{kind==="modis"?"Hi there!":"Hello, Earth!"}</span><SatelliteIcon kind={kind}/><span>{kind.toUpperCase()}</span><small>Explore instrument</small></button>)}

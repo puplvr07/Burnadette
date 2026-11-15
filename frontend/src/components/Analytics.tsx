@@ -20,7 +20,13 @@ const colorClass = (i: number) => `c-yr${i}`;
 export default function Analytics({ weeks, meta, bbox, start, end, source }: Props) {
   const years = useMemo(() => yearStats(weeks), [weeks]);
   const withData = years.filter((y) => y.weeks > 0);
-  const [picked, setPicked] = useState<number[]>([]);
+  const [storedPicked, setPicked] = useState<number[]>([]);
+  // Props can change before the selection-sync effect runs. Never render
+  // a comparison for a year that disappeared from the new response.
+  const picked = useMemo(() => {
+    const keep = storedPicked.filter((year) => withData.some((stat) => stat.year === year));
+    return keep.length ? keep : withData.length ? [withData[withData.length - 1].year] : [];
+  }, [storedPicked, years]);
   const [busy, setBusy] = useState("");
   const [err, setErr] = useState("");
 
@@ -107,7 +113,7 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
       title: "Total activity by year",
       caption,
       lines: [
-        `Sum of weekly activity per year (${SOURCE_LABEL[source]}). Partial years have fewer than 50 weeks with data, so their totals are not comparable.`,
+        `Sum of weekly activity per year (${SOURCE_LABEL[source]}). Partial years lack one or more expected Monday-start observations, so their totals are not comparable.`,
         `Full-year average total: ${fullAvg != null ? precise(fullAvg, 4) : "n/a"} (${complete.length} full year${complete.length === 1 ? "" : "s"})`,
         "",
         col("Year", 8) + col("Weeks", 8) + col("Total activity", 17) + col("Mean weekly", 14) + col("Max weekly", 13) + col("Mean anomaly", 15) + col("vs full-year avg", 18) + "Note",
@@ -159,7 +165,9 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
         Weekly activity in {yearList} against the average of the other years. The shaded band is the typical range (10th to 90th percentile).
         {" "}Compare up to {MAX_YEARS} years: add them here or select bars below.
       </p>
-      <SeasonChart W={cw} season={season} compared={compared} showBand={source === "harmonized" && picked.length === 1} />
+      <div className="chart-transition" key={yearTag || "empty"}>
+        <SeasonChart W={cw} season={season} compared={compared} showBand={source === "harmonized" && picked.length === 1} />
+      </div>
       <div className="chart-legend">
         {compared.map((c) => <span key={c.year} className={`key ${colorClass(c.i)}`}><i className="lg-yr" /> {c.year}</span>)}
         {source === "harmonized" && picked.length === 1 && <span className="key"><i className="lg-selband" /> {picked[0]} uncertainty band</span>}
@@ -185,10 +193,12 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
       )}
 
       <div className="chart-head"><h3>Activity by year</h3></div>
-      <p className="small">Total of weekly activity per year. Select bars to add or remove years above. Hatched bars are partial years, so their totals are not comparable.</p>
+      <p className="small">Sum of weekly active-cell fractions, not a count of fires. Select bars to compare years. Hatched bars cover partial years and are not directly comparable.</p>
       <YearChart W={cw} years={years} picked={picked} onToggle={toggle} />
 
-      <div className="chart-head"><h3>Most unusual weeks in {yearList}</h3></div>
+      <div className="analytics-bottom-grid">
+      <section className="analytics-unusual" aria-labelledby="unusual-heading">
+      <div className="chart-head"><h3 id="unusual-heading">Most unusual weeks in {yearList}</h3></div>
       {unusual.length ? (
         <ol className="unusual">
           {unusual.map((w) => (
@@ -201,8 +211,9 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
           ))}
         </ol>
       ) : <p className="small">No anomaly values for {yearList}.</p>}
-
-      <div className="chart-head"><h3>Download</h3></div>
+      </section>
+      <section className="analytics-download" aria-labelledby="download-heading">
+      <div className="chart-head"><h3 id="download-heading">Download</h3></div>
       <p className="small">Exports use the area, dates, source and years selected above. Downloads include exact figures{usingFakeData ? ". File names start with SAMPLE_ while sample data is in use." : "."}</p>
       <div className="downloads">
         <button type="button" disabled={!!busy} onClick={() => run("weekly", () => downloadCsv(`${base}_weekly.csv`, weeklyRows(weeks, bbox, inGap)))}>Weekly data (CSV)</button>
@@ -213,6 +224,8 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
       </div>
       {busy && <p className="small" aria-live="polite">Preparing download...</p>}
       {err && <p className="error" role="alert">{err}</p>}
+      </section>
+      </div>
     </div>
   );
 }

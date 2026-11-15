@@ -124,8 +124,8 @@ export default function Heatmap({ regionLabel = "Selected analysis region", bbox
 
   const legend = (          <section className="heatmap-scale" id={`${prefix}-legend`} hidden={expanded && !legendOpen} aria-label="Heatmap legend">
             {expanded && <button type="button" className="heatmap-panel-close heatmap-expand-button" aria-label="Close legend" onClick={() => setLegendOpen(false)}>×</button>}
-            <div className="heatmap-scale-heading"><strong>{metricName} scale</strong>{scale.values.length && scale.maximum > 0 ? <div className="calendar-legend-ramp"><span>0</span><span className="ramp">{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ background: colorFor(i / 8) }} />)}</span><span>{formatCalendarValue(scale.maximum)}{metric === "anomaly" ? " / 100" : ""}</span></div> : <span className="small">{scale.values.length ? "Recorded values are zero" : "No numeric values returned"}</span>}</div>
-            <p>{metric === "anomaly" ? "Fixed 0–100 percentile scale, not a probability of future fire." : `Activity colors saturate at the returned data's 98th-percentile value. ${scale.clipped} ${scale.clipped === 1 ? "value is" : "values are"} above this endpoint; the exact values remain available in week details. The scale changes with filters. Units are not supplied by the API contract.`}</p>
+            <div className="heatmap-scale-heading"><strong title={metric === "activity" ? "Fraction of selected 0.5° (~55 km) grid cells with fire activity; harmonized values may be estimated." : "Anomaly percentile, 0–100"}>{metric === "activity" ? "Active cell share (0–1)" : "Anomaly (0–100)"}</strong>{scale.values.length && scale.maximum > 0 ? <div className="calendar-legend-ramp"><span>0</span><span className="ramp">{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ background: colorFor(i / 8) }} />)}</span><span>{formatCalendarValue(scale.maximum)}{metric === "anomaly" ? " / 100" : ""}</span></div> : <span className="small">{scale.values.length ? "Recorded values are zero" : "No numeric values returned"}</span>}</div>
+            <p>{metric === "anomaly" ? "Fixed 0–100 percentile scale, not a probability of future fire." : `Activity colors saturate at the returned data's 98th-percentile value. ${scale.clipped} ${scale.clipped === 1 ? "value is" : "values are"} above this endpoint; the exact values remain available in week details. The scale changes with filters. `}</p>
             <div className="heatmap-keys"><span><i className="calendar-value-swatch zero" />Recorded zero</span><span><i className="calendar-value-swatch unavailable" />Unavailable value</span><span><i className="calendar-value-swatch absent" />No record returned</span><span><i className="heatmap-key-gap" />Known gap</span><span><i className="k-dot" />Low sensitivity ≥30%</span><span>Faint cells: outside dates/coverage, or no week starts here.</span></div>
           </section>);
 
@@ -168,7 +168,7 @@ export default function Heatmap({ regionLabel = "Selected analysis region", bbox
             {bbox&&<><svg className="bbox-overview" viewBox="0 0 200 110" role="img" aria-label="Bounding-box overview, not a map of detections"><path d="M0 27.5h200M0 55h200M0 82.5h200M50 0v110M100 0v110M150 0v110" stroke="currentColor" opacity=".15"/><rect x={(bbox[0]+180)/360*200} y={(90-bbox[3])/180*110} width={Math.max((bbox[2]-bbox[0])/360*200,2)} height={Math.max((bbox[3]-bbox[1])/180*110,2)} fill="none" stroke="var(--teal)" strokeWidth="2"/></svg><p className="small">{bbox.map(n=>n.toFixed(2)).join(", ")}<br/>West · south · east · north</p></>}
             <a className="outline-action" href="#map">Edit on Map ↗</a>
           </section>
-          <section className="reading-guide"><p className="eyebrow">HOW TO READ THIS</p>{!expanded&&legend}<p className="small">Known instrument gaps are metadata warnings. A record may still contain observations from another source. Lower activity is not proof of no fire.</p></section>
+          <section className="reading-guide"><p className="eyebrow">HOW TO READ THIS</p>{!expanded&&legend}</section>
         </aside>
         <div className="heatmap-visual">
           <div className="heatmap-chart-heading"><div><h3>Year × Week</h3><p>Select a week to inspect its month below.</p></div><span>{sourceName} · {metricName}</span></div>
@@ -200,25 +200,25 @@ export default function Heatmap({ regionLabel = "Selected analysis region", bbox
             </div>
           </div>
           {scroll.max > 0 && <input type="range" className="heat-slider" min={0} max={scroll.max} step={1} value={Math.min(scroll.pos, scroll.max)} aria-label="Scroll the heatmap sideways" onChange={(event) => { if (scroller.current) { scroller.current.scrollLeft = +event.target.value; syncScroll(); } }} />}
-          <p className="heatmap-reading-note">Week columns group Monday start dates within each calendar year. Month labels are approximate guides. Year labels stay visible as you scroll. Use arrow keys to inspect weeks; Home/End move within a year.</p>
+
 
         </div>
         {selected&&<section className="heatmap-month-detail" aria-label="Selected month weekly observations"><div className="month-detail-heading"><div><p className="eyebrow">MONTH DETAIL</p><h3>{new Date(`${selected.start.slice(0,7)}-01T00:00:00Z`).toLocaleDateString(undefined,{month:"long",year:"numeric",timeZone:"UTC"})}</h3></div><span className="small">Weekly start dates · {metricName}</span></div><div className="month-week-bars">{monthSlots.map(slot=>{
           const value=valueFor(slot),numeric=value!=null&&Number.isFinite(value);return <button type="button" key={slot.key} aria-pressed={selected.key===slot.key} onClick={()=>{setPicked(slot.key);setFocused(slot.key);setHovered("");}} title={`${rangeText(slot)} · ${describe(slot)}`}><span className={`month-observation-bar state-${stateFor(slot)}`} style={numeric?{height:Math.max(3,value/(monthMaximum||1)*100),background:value===0?undefined:colorFor(value/(scale.maximum||1))}:undefined}/><strong>{numeric?formatCalendarValue(value):slot.record?"Unavailable":"No record"}</strong><span>{formatCalendarDate(slot.start)}</span>{gaps(slot).length>0&&<small>Instrument gap</small>}</button>;
-        })}</div><p className="small">Bar heights use this month's maximum; colors use the overview legend. Each observation covers seven days from its start date. Missing records are not zero.</p></section>}
+        })}</div></section>}
         <aside className="heatmap-detail" id={`${prefix}-details`} aria-label="Selected week details" aria-live="polite" hidden={expanded && !detailsOpen}>
           {expanded && <button type="button" className="heatmap-panel-close heatmap-expand-button" aria-label="Close week details" onClick={() => setDetailsOpen(false)}>×</button>}
-          <p className="small initial-week-note">{!picked ? "Initially showing the latest available numeric week, or latest returned record when values are unavailable." : "Your selected week"}</p>
+          <p className="small initial-week-note">{!picked ? "Showing the latest numeric week, or latest record if unavailable." : "Your selected week"}</p>
           <p className="eyebrow">{hovered && shown?.key !== selected?.key ? "HOVER PREVIEW" : "SELECTED WEEK"}</p>
           {shown ? <>
             <h4>{rangeText(shown)}</h4>
             <p className="heatmap-detail-status">{describe(shown)}</p>
             {shown.record ? <>
-              <div className="heatmap-primary-values"><div><span>Activity</span><strong>{formatCalendarValue(shown.record.value)}</strong></div><div><span>Anomaly</span><strong>{formatCalendarValue(shown.record.anomaly)}{shown.record.anomaly != null && Number.isFinite(shown.record.anomaly) ? <small> /100</small> : null}</strong></div></div>
+              <div className="heatmap-primary-values"><div><span title="Fraction of selected 0.5° (~55 km) grid cells with fire activity">Active cell share (0–1)</span><strong>{formatCalendarValue(shown.record.value)}</strong></div><div><span>Anomaly</span><strong>{formatCalendarValue(shown.record.anomaly)}{shown.record.anomaly != null && Number.isFinite(shown.record.anomaly) ? <small> /100</small> : null}</strong></div></div>
               <dl className="heatmap-detail-fields"><div><dt>Source view</dt><dd>{sourceName}</dd></div><div><dt>Observation provenance</dt><dd>{source !== "harmonized" ? sourceName : provenanceLabel(shown.record.harmonized_source)}</dd></div><div><dt>Uncertainty range</dt><dd>{shown.record.uncertainty_low != null && shown.record.uncertainty_high != null ? `${formatCalendarValue(shown.record.uncertainty_low)} – ${formatCalendarValue(shown.record.uncertainty_high)}` : "Not supplied"}</dd></div><div><dt>Low-sensitivity share</dt><dd>{sensitivityText(shown.record.low_sensitivity_share)}</dd></div><div><dt>Active squares</dt><dd>{activeSquaresText(shown.record)}</dd></div></dl>
-              {shown.record.value === 0 && <p className="calendar-detail-warning">A recorded zero does not prove no burning occurred.</p>}
+
             </> : <p>No weekly record was returned. Activity, anomaly and uncertainty are unknown, not zero.</p>}
-            <div className="heatmap-detail-notes"><strong>Flags & observation notes</strong>{shown.record?.flags.length || gaps(shown).length ? <ul>{[...new Set([...(shown.record?.flags ?? []), ...gaps(shown)])].map((flag) => <li key={flag}>{flag}</li>)}</ul> : <p>No flags supplied. This does not guarantee complete observation coverage.</p>}{(shown.record?.low_sensitivity_share ?? 0) > 0 && <p>Low-sensitivity cells are present. Review the uncertainty and data limitations.</p>}</div>
+            <div className="heatmap-detail-notes"><strong>Flags & observation notes</strong>{shown.record?.flags.length || gaps(shown).length ? <ul>{[...new Set([...(shown.record?.flags ?? []), ...gaps(shown)])].map((flag) => <li key={flag}>{flag}</li>)}</ul> : <p>No flags supplied.</p>}{(shown.record?.low_sensitivity_share ?? 0) > 0 && <p>Low-sensitivity cells are present. Review the uncertainty and data limitations.</p>}</div>
           </> : <p>No selectable weeks in the requested date range. Check the source and dates above.</p>}
         </aside>
       </div>

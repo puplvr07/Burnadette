@@ -55,7 +55,7 @@ function loadCsv(): Promise<Row[]> {
         value: +c[12], src: c[13], anomaly: +c[14], lowSens: +c[15], ulo: +c[16], uhi: +c[17], flags: c[18] ?? "",
       };
     });
-  });
+  }).catch((error) => { cache = null; throw error; });
   return cache;
 }
 

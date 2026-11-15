@@ -14,7 +14,6 @@ import Analytics from "./Analytics";
 import DataNotes from "./DataNotes";
 import { sourceDateRange } from "../availability";
 import HomeCalendarPreview from "./HomeCalendarPreview";
-import HistoricalInsights from "./HistoricalInsights";
 
 interface Props { view: "map" | "heatmap" | "calendar"; hidden: boolean }
 interface Selection { radius?: RadiusSelection; bbox: Bbox; regionId: string; source: Source; metric: Metric; start: string; end: string }
@@ -35,6 +34,7 @@ export default function CalendarPage({ view, hidden }: Props) {
   const [resultView, setResultView] = useState<"heatmap" | "calendar">("heatmap");
   const [data, setData] = useState<CalendarResponse | null>(null);
   const [retryVersion, setRetryVersion] = useState(0);
+  const [metadataRetry, setMetadataRetry] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const toolsHeading = useRef<HTMLHeadingElement>(null);
@@ -48,6 +48,7 @@ export default function CalendarPage({ view, hidden }: Props) {
 
   useEffect(() => {
     let stale = false;
+    setError("");
     Promise.all([getMeta(), getRegions()]).then(([m, r]) => {
       if (stale) return;
       setMeta(m); setRegions(r);
@@ -56,7 +57,7 @@ export default function CalendarPage({ view, hidden }: Props) {
       setDraft(initial);
     }).catch((e) => { if (!stale) setError(String(e.message ?? e)); });
     return () => { stale = true; };
-  }, []);
+  }, [metadataRetry]);
 
   const bbox = selection?.bbox;
   const start = selection?.start;
@@ -120,8 +121,7 @@ export default function CalendarPage({ view, hidden }: Props) {
         </div>
         {selection && meta && <FilterControls value={selection} meta={meta} onChange={(patch) => { const next = { ...selection, ...patch }; setSelection(next); setDraft(next); setPointInputError(""); setRadiusEditorKey((n) => n + 1); }} />}
       </div>
-      {view !== "map" && selection && data && !loading && !error && <DataNotes data={data} source={selection.source} region={regions.find((r) => r.id === (data.region ?? selection.regionId))} />}
-      {error && (view === "map" || !meta || !selection) && <div className={`error${view === "map" ? " map-error" : ""}`} role="alert">{error}</div>}
+      {error && (view === "map" || !meta || !selection) && <div className={`error${view === "map" ? " map-error" : ""}`} role="alert">{error} {!meta && <button type="button" className="outline-action" onClick={() => setMetadataRetry((value) => value + 1)}>Retry loading data</button>}</div>}
 
       <section className={`immersive-map${toolsOpen ? " settings-open" : ""}`} aria-label="Map" hidden={view !== "map"}>
         {draft ? <MapPicker sample={usingFakeData || !!meta?.is_fake} exportContext={selection ? {bbox:selection.bbox,region:regionName(selection),start:selection.start,end:selection.end,source:selection.source,sample:usingFakeData || !!meta?.is_fake} : null} selectionCleared={areaCleared} onClearSelection={() => {
@@ -152,7 +152,7 @@ export default function CalendarPage({ view, hidden }: Props) {
             <div><p className="eyebrow">YOUR SELECTION</p><h2 ref={toolsHeading} tabIndex={-1} id="map-settings-heading">Region & dates</h2></div>
             <button type="button" className="close-map-tools map-icon-button" aria-label="Close settings panel" title="Close settings" onClick={closeTools}><span className="close-symbol" aria-hidden="true">×</span></button>
           </div>
-          <p className="small">Changes here are drafts until you open the results.</p>
+          <p className="small">Changes apply when you open results.</p>
           <label>Pilot region
             <select value={draft?.regionId ?? ""} onChange={(e) => {
               const r = regions.find((item) => item.id === e.target.value);
@@ -164,8 +164,8 @@ export default function CalendarPage({ view, hidden }: Props) {
           </label>
           {draft?.radius && <PointRadiusControls key={radiusEditorKey} value={draft.radius} onChange={updateRadius} onValidationChange={setPointInputError} />}
           {pointFeedback && <p className="point-radius-error" role="status">{pointFeedback}</p>}
-          {areaCleared && <p className="availability-inline" role="status">No region selected. Draw an area or choose a pilot region before applying.</p>}
-          {draft && !areaCleared && <p className="small selection-coordinates">{draft.bbox.map((n) => n.toFixed(2)).join(", ")}<br/>West, south, east, north. Queries cover the bounding box, including for circles and polygons.</p>}
+          {areaCleared && <p className="availability-inline" role="status">Choose a pilot region or draw an area.</p>}
+          {draft && !areaCleared && <p className="small selection-coordinates">{draft.bbox.map((n) => n.toFixed(2)).join(", ")}<br/>West, south, east, north. Results cover the bounding box, including outside drawn shapes.</p>}
           {draft && meta && <FilterControls value={draft} meta={meta} onChange={(patch) => setDraft((d) => d ? { ...d, ...patch } : d)} />}
           <label>Open results in
             <select value={resultView} onChange={(e) => setResultView(e.target.value as "heatmap" | "calendar")}>
@@ -187,7 +187,7 @@ export default function CalendarPage({ view, hidden }: Props) {
         </aside>
       </section>
 
-      {!selection && view !== "map" && <div className="calendar-state" role="status"><h3>No analysis region selected</h3><p>Choose a region on the map and apply it to see results.</p><div className="hero-actions"><a className="primary-action" href="#map">Choose a region on Map →</a><button type="button" className="outline-action" aria-expanded={showSample} onClick={()=>setShowSample(value=>!value)}>{showSample?"Close local sample":"Explore a local sample"}</button></div><p className="small">No analysis runs until a region is chosen and applied.</p>{showSample&&<HomeCalendarPreview/>}</div>}
+      {!selection && view !== "map" && <div className="calendar-state" role="status"><h3>No analysis region selected</h3><p>Choose and apply a region to see results.</p><div className="hero-actions"><a className="primary-action" href="#map">Choose a region on Map →</a><button type="button" className="outline-action" aria-expanded={showSample} onClick={()=>setShowSample(value=>!value)}>{showSample?"Close local sample":"Explore a local sample"}</button></div><p className="small">No analysis runs until you apply a region.</p>{showSample&&<HomeCalendarPreview/>}</div>}
       <section className="panel panel-fire explore-panel" aria-label="Heatmap" hidden={view !== "heatmap" || !selection}>
         {meta && selection && <Heatmap regionLabel={regionName(selection)} bbox={selection.bbox} weeks={data?.weeks ?? []} source={selection.source} metric={selection.metric} meta={meta} start={selection.start} end={selection.end} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
       </section>
@@ -203,8 +203,7 @@ export default function CalendarPage({ view, hidden }: Props) {
         <a className="view-calendar-btn" href="#heatmap">Compare years in Heatmap</a>
       </section>
       {view === "calendar" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
-      {view !== "map" && selection && meta && <HistoricalInsights weeks={data?.weeks ?? []} start={selection.start} end={selection.end} source={selection.source} region={regionName(selection)} meta={meta} sample={usingFakeData || !!meta.is_fake} loading={loading || (!data && !error)} error={error} />}
-      <div className="explore-caveats" hidden={view === "map"}><Caveats /></div>
+      <div className="explore-caveats" hidden={view === "map"}><Caveats>{selection && data && !loading && !error && <DataNotes data={data} source={selection.source} region={regions.find((r) => r.id === (data.region ?? selection.regionId))} />}</Caveats></div>
     </div>
   );
 }
@@ -219,7 +218,7 @@ function FilterControls({ value, meta, onChange }: { value: Selection; meta: Met
       <fieldset><legend>Metric</legend><Seg value={value.metric} onChange={(metric) => onChange({ metric })} options={[["activity", "Activity"], ["anomaly", "How unusual"]]} /></fieldset>
       <label>From<input type="date" value={value.start} min={available.start} max={value.end < available.end ? value.end : available.end} onChange={(e) => onChange({ start: e.target.value })} /></label>
       <label>To<input type="date" value={value.end} min={value.start > available.start ? value.start : available.start} max={available.end} onChange={(e) => onChange({ end: e.target.value })} /></label>
-      <p className="coverage-filter-hint">{meta.is_fake ? "Sample metadata" : "Metadata"} coverage for {value.source === "harmonized" ? "harmonized activity" : value.source.toUpperCase()}: {available.start} to {available.end}. Changing source can change available dates.</p>
+      <p className="coverage-filter-hint">{meta.is_fake ? "Sample metadata" : "Metadata"} coverage for {value.source === "harmonized" ? "harmonized activity" : value.source.toUpperCase()}: {available.start} to {available.end}. Dates vary by source.</p>
     </div>
   );
 }

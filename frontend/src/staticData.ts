@@ -75,7 +75,7 @@ function loadWeeks(info: RawRegion): Promise<Map<string, YearWeek>> {
   if (!p) {
     const years: number[] = [];
     for (let y = info.years[0]; y <= info.years[1]; y++) years.push(y);
-    p = Promise.all(years.map((y) => fetchJson<{ weeks: Record<string, YearWeek> }>(`${info.slug}/${y}.json`).catch(() => ({ weeks: {} as Record<string, YearWeek> }))))
+    p = Promise.all(years.map((y) => fetchJson<{ weeks: Record<string, YearWeek> }>(`${info.slug}/${y}.json`)))
       .then((files) => {
         const all = new Map<string, YearWeek>();
         for (const f of files) for (const [k, v] of Object.entries(f.weeks)) all.set(k, v);
@@ -167,7 +167,9 @@ const r1 = (x: number) => Math.round(x * 10) / 10;
 
 export async function staticCalendar(bbox: Bbox, start: string, end: string, source: Source, regionId?: string): Promise<CalendarResponse> {
   const infos = await rawRegions();
-  const loaded = await Promise.all(infos.map(loadRegion));
+  const namedInfo = regionId ? infos.find((info) => info.slug === regionId) : undefined;
+  // A named region does not depend on downloads for unrelated regions.
+  const loaded = await Promise.all((namedInfo ? [namedInfo] : infos).map(loadRegion));
   const [west, south, east, north] = bbox;
   const select = (reg: Loaded) => {
     const mask = new Uint8Array(reg.cells.length);
