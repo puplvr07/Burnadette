@@ -106,12 +106,6 @@ export default function About() {
         <dl>
           {CREDITS.map((c) => <div key={c.what}><dt>{c.what}</dt><dd>{c.detail}</dd></div>)}
         </dl>
-        <h3>AI assistance</h3>
-        <p>
-          Parts of this website&rsquo;s code, layout and styling were written with help from an AI coding assistant
-          (Kiro), working from the team&rsquo;s own plan and design requests. The project idea, the data method and
-          the plan are the team&rsquo;s own.
-        </p>
       </section>
     </div>
   );

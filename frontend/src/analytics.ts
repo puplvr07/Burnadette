@@ -16,7 +16,7 @@ export const hasCoverageFlag = (w: WeekRow) => w.flags.some((f) => LOW_COVERAGE.
 
 const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
 const pct = (sorted: number[], p: number) => sorted[Math.min(sorted.length - 1, Math.max(0, Math.round((sorted.length - 1) * p)))];
-const nums = (xs: (number | null)[]) => xs.filter((v): v is number => v != null);
+const nums = (xs: (number | null)[]) => xs.filter((v): v is number => v != null && Number.isFinite(v));
 
 export interface YearStat {
   year: number;
@@ -25,7 +25,7 @@ export interface YearStat {
   mean: number;
   max: number;
   meanAnomaly: number | null;
-  partial: boolean; // fewer than 50 weeks with data, so totals are not comparable
+  partial: boolean; // one or more expected Monday-start records are missing
 }
 
 export function yearStats(weeks: WeekRow[]): YearStat[] {
@@ -35,12 +35,19 @@ export function yearStats(weeks: WeekRow[]): YearStat[] {
     const vals = nums(rs.map((r) => r.value));
     const an = nums(rs.map((r) => r.anomaly));
     const total = vals.reduce((a, b) => a + b, 0);
+    const dates = new Set(rs.filter((row) => row.value != null && Number.isFinite(row.value)).map((row) => row.week_start));
+    const firstMonday = new Date(Date.UTC(year, 0, 1));
+    firstMonday.setUTCDate(firstMonday.getUTCDate() + (8 - firstMonday.getUTCDay()) % 7);
+    let partial = dates.size !== vals.length;
+    for (let day = firstMonday; day.getUTCFullYear() === year; day = new Date(day.getTime() + 7 * 86400000)) {
+      if (!dates.has(day.toISOString().slice(0, 10))) partial = true;
+    }
     return {
       year, weeks: vals.length, total,
       mean: vals.length ? total / vals.length : 0,
       max: vals.length ? Math.max(...vals) : 0,
       meanAnomaly: an.length ? mean(an) : null,
-      partial: vals.length < 50,
+      partial,
     };
   });
 }
@@ -52,7 +59,7 @@ export function seasonal(weeks: WeekRow[], exclude: number[]): Season {
   const cols: number[][] = Array.from({ length: COLS }, () => []);
   const ys = new Set<number>();
   for (const w of weeks) {
-    if (w.value == null || exclude.includes(yearOf(w))) continue;
+    if (w.value == null || !Number.isFinite(w.value) || exclude.includes(yearOf(w))) continue;
     cols[colOf(w.week_start)].push(w.value);
     ys.add(yearOf(w));
   }
@@ -77,25 +84,25 @@ export function compareToAverage(series: (WeekRow | undefined)[], season: Season
   let a = 0, b = 0, n = 0;
   series.forEach((w, i) => {
     const avg = season.avg[i];
-    if (w?.value != null && avg != null) { a += w.value; b += avg; n++; }
+    if (w?.value != null && Number.isFinite(w.value) && avg != null && Number.isFinite(avg)) { a += w.value; b += avg; n++; }
   });
   return n && b > 0 ? { pct: ((a - b) / b) * 100, weeks: n } : null;
 }
 
 export function monthAverages(weeks: WeekRow[]): (number | null)[] {
   const m: number[][] = Array.from({ length: 12 }, () => []);
-  for (const w of weeks) if (w.value != null) m[+w.week_start.slice(5, 7) - 1].push(w.value);
+  for (const w of weeks) if (w.value != null && Number.isFinite(w.value)) m[+w.week_start.slice(5, 7) - 1].push(w.value);
   return m.map((xs) => (xs.length ? mean(xs) : null));
 }
 
 export function topAnomalies(weeks: WeekRow[], years: number[], n = 5): WeekRow[] {
-  return weeks.filter((w) => years.includes(yearOf(w)) && w.anomaly != null)
+  return weeks.filter((w) => years.includes(yearOf(w)) && w.anomaly != null && Number.isFinite(w.anomaly))
     .sort((a, b) => b.anomaly! - a.anomaly!).slice(0, n);
 }
 
 // Highest-activity week in a year's series.
 export const peakWeek = (series: (WeekRow | undefined)[]) =>
-  series.reduce<WeekRow | undefined>((best, w) => (w?.value != null && (best?.value == null || w.value > best.value) ? w : best), undefined);
+  series.reduce<WeekRow | undefined>((best, w) => (w?.value != null && Number.isFinite(w.value) && (best?.value == null || w.value > best.value) ? w : best), undefined);
 
 // Full precision for exports, without floating-point noise (0.30000000000000004 -> 0.3).
 export const precise = (v: number | null | undefined, d = 6) => (v == null || !Number.isFinite(v) ? "" : String(+v.toFixed(d)));
@@ -104,7 +111,7 @@ export const precise = (v: number | null | undefined, d = 6) => (v == null || !N
 
 const esc = (v: unknown) => {
   const s = v == null ? "" : String(v);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 export const toCsv = (rows: unknown[][]) => rows.map((r) => r.map(esc).join(",")).join("\n") + "\n";
 
@@ -151,6 +158,7 @@ function wrapLine(g: CanvasRenderingContext2D, line: string, max: number): strin
 export function downloadSvgPng(svg: SVGSVGElement, name: string, text: ExportText, scale = 2): Promise<void> {
   const vb = svg.viewBox.baseVal;
   const w = vb?.width || svg.clientWidth, h = vb?.height || svg.clientHeight;
+  if (!(w > 0 && h > 0)) return Promise.reject(new Error("The chart is not visible yet."));
   const clone = svg.cloneNode(true) as SVGSVGElement;
   inlineStyles(svg, clone);
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
@@ -163,17 +171,21 @@ export function downloadSvgPng(svg: SVGSVGElement, name: string, text: ExportTex
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
+      try {
       const pad = 24, titleH = 34, lineH = 17, body = "12px monospace";
       const W = Math.max(w, 960); // wide enough for the figure tables, even when exported from a phone
       const cw = Math.min(W, w * 1.6), ch = h * (cw / w); // the chart is vector, so scaling up stays sharp
-      const meas = document.createElement("canvas").getContext("2d")!;
+      const meas = document.createElement("canvas").getContext("2d");
+      if (!meas) throw new Error("Image export is unavailable in this browser.");
       meas.font = body;
       const lines = text.lines.flatMap((l) => (l === "" ? [""] : wrapLine(meas, l, W)));
-      const H = pad + titleH + ch + 20 + lines.length * lineH + 30 + pad;
+      const captions = wrapLine(meas, text.caption, W);
+      const H = pad + titleH + ch + 20 + lines.length * lineH + captions.length * lineH + 30 + pad;
       const c = document.createElement("canvas");
       c.width = (W + pad * 2) * scale;
       c.height = H * scale;
-      const g = c.getContext("2d")!;
+      const g = c.getContext("2d");
+      if (!g) throw new Error("Image export is unavailable in this browser.");
       g.scale(scale, scale);
       g.fillStyle = bg;
       g.fillRect(0, 0, W + pad * 2, H);
@@ -186,9 +198,13 @@ export function downloadSvgPng(svg: SVGSVGElement, name: string, text: ExportTex
       for (const l of lines) { g.fillText(l, pad, y); y += lineH; }
       g.fillStyle = sub;
       g.font = "11px monospace";
-      g.fillText(text.caption, pad, y + 14);
+      for (const caption of captions) { g.fillText(caption, pad, y + 14); y += lineH; }
       URL.revokeObjectURL(url);
       c.toBlob((b) => (b ? (download(name, b), resolve()) : reject(new Error("PNG export failed"))), "image/png");
+      } catch (error) {
+        URL.revokeObjectURL(url);
+        reject(error);
+      }
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not render the image")); };
     img.src = url;

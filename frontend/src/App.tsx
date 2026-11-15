@@ -60,8 +60,11 @@ export default function App() {
         window.scrollTo(0, 0);
       };
       const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!reduced && typeof document.startViewTransition === "function") {
-        document.startViewTransition(update);
+      if (!reduced && document.visibilityState !== "hidden" && typeof document.startViewTransition === "function") {
+        const transition = document.startViewTransition(update);
+        // Switching browser tabs or starting another transition can skip the animation.
+        // The content update still runs; a skipped animation must not become an unhandled error.
+        void transition.ready.catch(() => {});
       } else {
         update();
         if (!reduced) document.querySelector("main")?.animate(

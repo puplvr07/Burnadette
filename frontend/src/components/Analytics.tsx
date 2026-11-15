@@ -20,7 +20,13 @@ const colorClass = (i: number) => `c-yr${i}`;
 export default function Analytics({ weeks, meta, bbox, start, end, source }: Props) {
   const years = useMemo(() => yearStats(weeks), [weeks]);
   const withData = years.filter((y) => y.weeks > 0);
-  const [picked, setPicked] = useState<number[]>([]);
+  const [storedPicked, setPicked] = useState<number[]>([]);
+  // Props can change before the selection-sync effect runs. Never render
+  // a comparison for a year that disappeared from the new response.
+  const picked = useMemo(() => {
+    const keep = storedPicked.filter((year) => withData.some((stat) => stat.year === year));
+    return keep.length ? keep : withData.length ? [withData[withData.length - 1].year] : [];
+  }, [storedPicked, years]);
   const [busy, setBusy] = useState("");
   const [err, setErr] = useState("");
 
@@ -107,13 +113,13 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
       title: "Total activity by year",
       caption,
       lines: [
-        `Sum of weekly activity per year (${SOURCE_LABEL[source]}). Partial years have fewer than 50 weeks with data, so their totals are not comparable.`,
+        `Sum of weekly activity per year (${SOURCE_LABEL[source]}). Partial years lack one or more expected Monday-start observations, so their totals are not comparable.`,
         `Full-year average total: ${fullAvg != null ? precise(fullAvg, 4) : "n/a"} (${complete.length} full year${complete.length === 1 ? "" : "s"})`,
         "",
         col("Year", 8) + col("Weeks", 8) + col("Total activity", 17) + col("Mean weekly", 14) + col("Max weekly", 13) + col("Mean anomaly", 15) + col("vs full-year avg", 18) + "Note",
         ...years.map((s) => col(String(s.year), 8) + col(String(s.weeks), 8) + col(precise(s.total, 4), 17) + col(precise(s.mean, 4), 14)
           + col(precise(s.max, 4), 13) + col(s.meanAnomaly != null ? `${precise(s.meanAnomaly, 2)}/100` : "n/a", 15)
-          + col(fullAvg && s.weeks ? signed(((s.total - fullAvg) / fullAvg) * 100, 2) : "n/a", 18)
+          + col(fullAvg && s.weeks && !s.partial ? signed(((s.total - fullAvg) / fullAvg) * 100, 2) : "n/a", 18)
           + [s.partial ? "partial year" : "", picked.includes(s.year) ? "selected" : ""].filter(Boolean).join(", ")),
       ],
     };
@@ -159,7 +165,9 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
         Weekly activity in {yearList} against the average of the other years. The shaded band is the typical range (10th to 90th percentile).
         {" "}Compare up to {MAX_YEARS} years: add them here or select bars below.
       </p>
-      <SeasonChart W={cw} season={season} compared={compared} showBand={source === "harmonized" && picked.length === 1} />
+      <div className="chart-transition" key={yearTag || "empty"}>
+        <SeasonChart W={cw} season={season} compared={compared} showBand={source === "harmonized" && picked.length === 1} />
+      </div>
       <div className="chart-legend">
         {compared.map((c) => <span key={c.year} className={`key ${colorClass(c.i)}`}><i className="lg-yr" /> {c.year}</span>)}
         {source === "harmonized" && picked.length === 1 && <span className="key"><i className="lg-selband" /> {picked[0]} uncertainty band</span>}
@@ -185,10 +193,12 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
       )}
 
       <div className="chart-head"><h3>Activity by year</h3></div>
-      <p className="small">Total of weekly activity per year. Select bars to add or remove years above. Hatched bars are partial years, so their totals are not comparable.</p>
+      <p className="small">Sum of weekly active-cell fractions, not a count of fires. Select bars to compare years. Hatched bars cover partial years and are not directly comparable.</p>
       <YearChart W={cw} years={years} picked={picked} onToggle={toggle} />
 
-      <div className="chart-head"><h3>Most unusual weeks in {yearList}</h3></div>
+      <div className="analytics-bottom-grid">
+      <section className="analytics-unusual" aria-labelledby="unusual-heading">
+      <div className="chart-head"><h3 id="unusual-heading">Most unusual weeks in {yearList}</h3></div>
       {unusual.length ? (
         <ol className="unusual">
           {unusual.map((w) => (
@@ -201,8 +211,9 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
           ))}
         </ol>
       ) : <p className="small">No anomaly values for {yearList}.</p>}
-
-      <div className="chart-head"><h3>Download</h3></div>
+      </section>
+      <section className="analytics-download" aria-labelledby="download-heading">
+      <div className="chart-head"><h3 id="download-heading">Download</h3></div>
       <p className="small">Exports use the area, dates, source and years selected above. Downloads include exact figures{usingFakeData ? ". File names start with SAMPLE_ while sample data is in use." : "."}</p>
       <div className="downloads">
         <button type="button" disabled={!!busy} onClick={() => run("weekly", () => downloadCsv(`${base}_weekly.csv`, weeklyRows(weeks, bbox, inGap)))}>Weekly data (CSV)</button>
@@ -213,6 +224,8 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
       </div>
       {busy && <p className="small" aria-live="polite">Preparing download...</p>}
       {err && <p className="error" role="alert">{err}</p>}
+      </section>
+      </div>
     </div>
   );
 }
@@ -236,7 +249,7 @@ interface Compared { year: number; i: number; series: (WeekRow | undefined)[]; s
 function linePath(vals: (number | null)[], x: (i: number) => number, y: (v: number) => number) {
   let d = "", pen = false;
   vals.forEach((v, i) => {
-    if (v == null) { pen = false; return; }
+    if (v == null || !Number.isFinite(v)) { pen = false; return; }
     d += `${pen ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`;
     pen = true;
   });
@@ -254,7 +267,7 @@ function bandPaths(lo: (number | null)[], hi: (number | null)[], x: (i: number) 
     }
     run = [];
   };
-  lo.forEach((v, i) => (v != null && hi[i] != null ? run.push(i) : flush()));
+  lo.forEach((v, i) => (v != null && Number.isFinite(v) && hi[i] != null && Number.isFinite(hi[i]) ? run.push(i) : flush()));
   flush();
   return out;
 }
@@ -271,7 +284,7 @@ function SeasonChart({ W, season, compared, showBand }: { W: number; season: Sea
   const band = showBand ? compared[0] : undefined;
   const bandLo = band?.series.map((w) => w?.uncertainty_low ?? null) ?? [];
   const bandHi = band?.series.map((w) => w?.uncertainty_high ?? null) ?? [];
-  const max = Math.max(1e-6, ...[...season.hi, ...vals.flat(), ...bandHi].filter((v): v is number => v != null)) * 1.12;
+  const max = Math.max(1e-6, ...[...season.hi, ...vals.flat(), ...bandHi].filter((v): v is number => v != null && Number.isFinite(v))) * 1.12;
   const x = (i: number) => L + (i * (W - L - R)) / (COLS - 1);
   const y = (v: number) => T + (1 - v / max) * (H - T - B);
   return (
@@ -321,7 +334,7 @@ function YearChart({ W, years, picked, onToggle }: { W: number; years: YearStat[
   // Exact totals (export only) turn sideways when bars are too narrow for the number.
   const vertical = slot < 48;
   return (
-    <svg id="years-svg" className="chart-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Total activity per year">
+    <svg id="years-svg" className="chart-svg" viewBox={`0 0 ${W} ${H}`} role="group" aria-label="Total activity per year; select a year to compare">
       <defs>
         <pattern id="partial-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <rect width="6" height="6" fill="#ffa63d22" /><line x1="0" y1="0" x2="0" y2="6" stroke="#ffa63d" strokeWidth="2" />
@@ -340,7 +353,11 @@ function YearChart({ W, years, picked, onToggle }: { W: number; years: YearStat[
         const cls = s.partial ? "bar bar-partial" : k >= 0 ? `bar bar-pick${color}` : "bar";
         const top = y(s.total), height = Math.max(0, y(0) - top);
         return (
-          <g key={s.year} className={`bar-hit${color}`} onClick={() => s.weeks > 0 && onToggle(s.year)}>
+          <g key={s.year} className={`bar-hit${color}`} role="button" tabIndex={s.weeks > 0 ? 0 : -1}
+            aria-label={`${s.year}: total ${precise(s.total)} over ${s.weeks} weeks${s.partial ? ", partial year" : ""}`}
+            aria-pressed={k >= 0} aria-disabled={s.weeks === 0}
+            onKeyDown={(event) => { if (s.weeks > 0 && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onToggle(s.year); } }}
+            onClick={() => s.weeks > 0 && onToggle(s.year)}>
             <title>{`${s.year}: total ${s.total.toFixed(1)} over ${s.weeks} weeks${s.partial ? " (partial year)" : ""}. ${k >= 0 ? "Click to remove" : "Click to compare"}.`}</title>
             <rect x={L + slot * i} y={T} width={slot} height={H - T - B} fill="transparent" />
             <rect x={cx - bw / 2} y={top} width={bw} height={height} rx={2} className={cls} fill={s.partial ? "url(#partial-hatch)" : undefined} />
@@ -387,7 +404,7 @@ function yearlyRows(years: YearStat[], picked: number[]): unknown[][] {
   return [
     ["year", "weeks_with_data", "total_activity", "mean_weekly_activity", "max_weekly_activity", "mean_anomaly", "vs_full_year_average_pct", "partial_year", "selected"],
     ...years.map((y) => [y.year, y.weeks, precise(y.total), precise(y.mean), precise(y.max), precise(y.meanAnomaly),
-      avg && y.weeks ? precise(((y.total - avg) / avg) * 100, 4) : "", y.partial ? 1 : 0, picked.includes(y.year) ? 1 : 0]),
+      avg && y.weeks && !y.partial ? precise(((y.total - avg) / avg) * 100, 4) : "", y.partial ? 1 : 0, picked.includes(y.year) ? 1 : 0]),
   ];
 }
 // One row per week of the year: the multi-year average and range, then each compared year.
