@@ -6,7 +6,7 @@
     "api/main.py": {
       "maxDuration": 60,
       "includeFiles": "api/data/published/**",
-      "excludeFiles": "{.git/**,.github/**,.agents/**,.codex/**,.aws/**,.vercel/**,**/.vercel/**,.venv/**,venv/**,**/.venv/**,**/venv/**,**/node_modules/**,__pycache__/**,**/__pycache__/**,.pytest*/**,**/.pytest*/**,tmp/**,temp/**,**/tmp/**,**/temp/**,dist/**,build/**,.env*,**/.env*,frontend/**,ML/**,processed/**,docs/**,scripts/**,api/tests/**,api/data/development/**,api/README.md,api/requirements-dev.txt,README.md,pytest.ini,.gitignore,**/.gitignore,**/.gitattributes,.packaging/**,.packaging-report.json,**/*.pyc,**/*.pyo,**/*.tsbuildinfo}"
+      "excludeFiles": "{**/.*/**,**/.env*,**/.git*,**/*.py[co],dist/**,build/**,frontend/**,ML/**,processed/**,docs/**,scripts/**,api/tests/**,api/data/development/**,**/*.md,pytest.ini,api/requirements-dev.txt}"
     }
   }
 }
