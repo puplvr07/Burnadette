@@ -1,0 +1,241 @@
+===== 2026-11-15 15:11 =====
+--- MODIS 2000 indonesia ---
+  input rows                                                                  691
+  type == 0 (vegetation fire)                                                 594   (removed 97)
+  drop low confidence                                                         507   (removed 87)
+  drop persistent spots (>= 5 dates/year)                                     507
+  outside the region grid (other territories)                                 507   (removed 0)
+--- MODIS 2001 indonesia ---
+  input rows                                                                15078
+  type == 0 (vegetation fire)                                               13736   (removed 1342)
+  drop low confidence                                                       12668   (removed 1068)
+  drop persistent spots (>= 5 dates/year)                                   11726   (removed 942)
+  outside the region grid (other territories)                               11726   (removed 0)
+--- MODIS 2002 indonesia ---
+  input rows                                                               123327
+  type == 0 (vegetation fire)                                              120781   (removed 2546)
+  drop low confidence                                                      112275   (removed 8506)
+  drop persistent spots (>= 5 dates/year)                                  101219   (removed 11056)
+  outside the region grid (other territories)                              101219   (removed 0)
+--- MODIS 2003 indonesia ---
+  input rows                                                                62751
+  type == 0 (vegetation fire)                                               60545   (removed 2206)
+  drop low confidence                                                       56595   (removed 3950)
+  drop persistent spots (>= 5 dates/year)                                   51153   (removed 5442)
+  outside the region grid (other territories)                               51153   (removed 0)
+--- MODIS 2004 indonesia ---
+  input rows                                                               107117
+  type == 0 (vegetation fire)                                              103390   (removed 3727)
+  drop low confidence                                                       96686   (removed 6704)
+  drop persistent spots (>= 5 dates/year)                                   86303   (removed 10383)
+  outside the region grid (other territories)                               86303   (removed 0)
+--- MODIS 2005 indonesia ---
+  input rows                                                                74797
+  type == 0 (vegetation fire)                                               64369   (removed 10428)
+  drop low confidence                                                       59948   (removed 4421)
+  drop persistent spots (>= 5 dates/year)                                   50591   (removed 9357)
+  outside the region grid (other territories)                               50591   (removed 0)
+--- MODIS 2006 indonesia ---
+  input rows                                                               154985
+  type == 0 (vegetation fire)                                              147458   (removed 7527)
+  drop low confidence                                                      137004   (removed 10454)
+  drop persistent spots (>= 5 dates/year)                                  122067   (removed 14937)
+  outside the region grid (other territories)                              122067   (removed 0)
+--- MODIS 2007 indonesia ---
+  input rows                                                                43224
+  type == 0 (vegetation fire)                                               41945   (removed 1279)
+  drop low confidence                                                       39362   (removed 2583)
+  drop persistent spots (>= 5 dates/year)                                   37632   (removed 1730)
+  outside the region grid (other territories)                               37632   (removed 0)
+--- MODIS 2008 indonesia ---
+  input rows                                                                41161
+  type == 0 (vegetation fire)                                               39940   (removed 1221)
+  drop low confidence                                                       37598   (removed 2342)
+  drop persistent spots (>= 5 dates/year)                                   35670   (removed 1928)
+  outside the region grid (other territories)                               35670   (removed 0)
+--- MODIS 2009 indonesia ---
+  input rows                                                               102344
+  type == 0 (vegetation fire)                                               99752   (removed 2592)
+  drop low confidence                                                       93176   (removed 6576)
+  drop persistent spots (>= 5 dates/year)                                   80732   (removed 12444)
+  outside the region grid (other territories)                               80732   (removed 0)
+--- MODIS 2010 indonesia ---
+  input rows                                                                20792
+  type == 0 (vegetation fire)                                               19666   (removed 1126)
+  drop low confidence                                                       18119   (removed 1547)
+  drop persistent spots (>= 5 dates/year)                                   17104   (removed 1015)
+  outside the region grid (other territories)                               17104   (removed 0)
+--- MODIS 2011 indonesia ---
+  input rows                                                                62790
+  type == 0 (vegetation fire)                                               61606   (removed 1184)
+  drop low confidence                                                       57462   (removed 4144)
+  drop persistent spots (>= 5 dates/year)                                   53035   (removed 4427)
+  outside the region grid (other territories)                               53035   (removed 0)
+--- MODIS 2012 indonesia ---
+  input rows                                                                71135
+  type == 0 (vegetation fire)                                               69745   (removed 1390)
+  drop low confidence                                                       65188   (removed 4557)
+  drop persistent spots (>= 5 dates/year)                                   59231   (removed 5957)
+  outside the region grid (other territories)                               59231   (removed 0)
+--- MODIS 2013 indonesia ---
+  input rows                                                                53852
+  type == 0 (vegetation fire)                                               52604   (removed 1248)
+  drop low confidence                                                       49131   (removed 3473)
+  drop persistent spots (>= 5 dates/year)                                   43624   (removed 5507)
+  outside the region grid (other territories)                               43624   (removed 0)
+--- MODIS 2014 indonesia ---
+  input rows                                                               115121
+  type == 0 (vegetation fire)                                              108038   (removed 7083)
+  drop low confidence                                                      100197   (removed 7841)
+  drop persistent spots (>= 5 dates/year)                                   84639   (removed 15558)
+  outside the region grid (other territories)                               84639   (removed 0)
+--- MODIS 2015 indonesia ---
+  input rows                                                               178578
+  type == 0 (vegetation fire)                                              161757   (removed 16821)
+  drop low confidence                                                      149819   (removed 11938)
+  drop persistent spots (>= 5 dates/year)                                  128236   (removed 21583)
+  outside the region grid (other territories)                              128236   (removed 0)
+--- MODIS 2016 indonesia ---
+  input rows                                                                24061
+  type == 0 (vegetation fire)                                               22541   (removed 1520)
+  drop low confidence                                                       20447   (removed 2094)
+  drop persistent spots (>= 5 dates/year)                                   19370   (removed 1077)
+  outside the region grid (other territories)                               19370   (removed 0)
+--- MODIS 2017 indonesia ---
+  input rows                                                                17823
+  type == 0 (vegetation fire)                                               16829   (removed 994)
+  drop low confidence                                                       15427   (removed 1402)
+  drop persistent spots (>= 5 dates/year)                                   14454   (removed 973)
+  outside the region grid (other territories)                               14454   (removed 0)
+--- MODIS 2018 indonesia ---
+  input rows                                                                38074
+  type == 0 (vegetation fire)                                               35337   (removed 2737)
+  drop low confidence                                                       33016   (removed 2321)
+  drop persistent spots (>= 5 dates/year)                                   31242   (removed 1774)
+  outside the region grid (other territories)                               31242   (removed 0)
+--- MODIS 2019 indonesia ---
+  input rows                                                                90475
+  type == 0 (vegetation fire)                                               86621   (removed 3854)
+  drop low confidence                                                       80150   (removed 6471)
+  drop persistent spots (>= 5 dates/year)                                   66493   (removed 13657)
+  outside the region grid (other territories)                               66493   (removed 0)
+--- MODIS 2020 indonesia ---
+  input rows                                                                16201
+  type == 0 (vegetation fire)                                               13490   (removed 2711)
+  drop low confidence                                                       12092   (removed 1398)
+  drop persistent spots (>= 5 dates/year)                                   11412   (removed 680)
+  outside the region grid (other territories)                               11412   (removed 0)
+--- MODIS 2021 indonesia ---
+  input rows                                                                14210
+  type == 0 (vegetation fire)                                               11715   (removed 2495)
+  drop low confidence                                                       10669   (removed 1046)
+  drop persistent spots (>= 5 dates/year)                                   10121   (removed 548)
+  outside the region grid (other territories)                               10121   (removed 0)
+--- MODIS 2022 indonesia ---
+  input rows                                                                11279
+  type == 0 (vegetation fire)                                                8881   (removed 2398)
+  drop low confidence                                                        8100   (removed 781)
+  drop persistent spots (>= 5 dates/year)                                    7832   (removed 268)
+  outside the region grid (other territories)                                7832   (removed 0)
+--- MODIS 2023 indonesia ---
+  input rows                                                                52156
+  type == 0 (vegetation fire)                                               47883   (removed 4273)
+  drop low confidence                                                       44808   (removed 3075)
+  drop persistent spots (>= 5 dates/year)                                   41370   (removed 3438)
+  outside the region grid (other territories)                               41370   (removed 0)
+--- MODIS 2024 indonesia ---
+  input rows                                                                23542
+  type == 0 (vegetation fire)                                               19458   (removed 4084)
+  drop low confidence                                                       18214   (removed 1244)
+  drop persistent spots (>= 5 dates/year)                                   17769   (removed 445)
+  outside the region grid (other territories)                               17769   (removed 0)
+--- MODIS 2025 indonesia ---
+  input rows                                                                17847
+  type == 0 (vegetation fire)                                               14910   (removed 2937)
+  drop low confidence                                                       14162   (removed 748)
+  drop persistent spots (>= 5 dates/year)                                   13712   (removed 450)
+  outside the region grid (other territories)                               13712   (removed 0)
+--- SNPP 2012 indonesia ---
+  input rows                                                               318613
+  type == 0 (vegetation fire)                                              308551   (removed 10062)
+  drop low confidence                                                      289775   (removed 18776)
+  drop persistent spots (>= 5 dates/year)                                  203809   (removed 85966)
+  outside the region grid (other territories)                              203809   (removed 0)
+--- SNPP 2013 indonesia ---
+  input rows                                                               257222
+  type == 0 (vegetation fire)                                              248917   (removed 8305)
+  drop low confidence                                                      235397   (removed 13520)
+  drop persistent spots (>= 5 dates/year)                                  155559   (removed 79838)
+  outside the region grid (other territories)                              155559   (removed 0)
+--- SNPP 2014 indonesia ---
+  input rows                                                               555597
+  type == 0 (vegetation fire)                                              540491   (removed 15106)
+  drop low confidence                                                      506915   (removed 33576)
+  drop persistent spots (>= 5 dates/year)                                  284405   (removed 222510)
+  outside the region grid (other territories)                              284405   (removed 0)
+--- SNPP 2015 indonesia ---
+  input rows                                                               875824
+  type == 0 (vegetation fire)                                              859411   (removed 16413)
+  drop low confidence                                                      812329   (removed 47082)
+  drop persistent spots (>= 5 dates/year)                                  418761   (removed 393568)
+  outside the region grid (other territories)                              418761   (removed 0)
+--- SNPP 2016 indonesia ---
+  input rows                                                               117250
+  type == 0 (vegetation fire)                                              107803   (removed 9447)
+  drop low confidence                                                      101899   (removed 5904)
+  drop persistent spots (>= 5 dates/year)                                   86806   (removed 15093)
+  outside the region grid (other territories)                               86806   (removed 0)
+--- SNPP 2017 indonesia ---
+  input rows                                                                90849
+  type == 0 (vegetation fire)                                               83051   (removed 7798)
+  drop low confidence                                                       77006   (removed 6045)
+  drop persistent spots (>= 5 dates/year)                                   70932   (removed 6074)
+  outside the region grid (other territories)                               70932   (removed 0)
+--- SNPP 2018 indonesia ---
+  input rows                                                               191173
+  type == 0 (vegetation fire)                                              181236   (removed 9937)
+  drop low confidence                                                      166835   (removed 14401)
+  drop persistent spots (>= 5 dates/year)                                  137678   (removed 29157)
+  outside the region grid (other territories)                              137678   (removed 0)
+--- SNPP 2019 indonesia ---
+  input rows                                                               437281
+  type == 0 (vegetation fire)                                              424533   (removed 12748)
+  drop low confidence                                                      395044   (removed 29489)
+  drop persistent spots (>= 5 dates/year)                                  234642   (removed 160402)
+  outside the region grid (other territories)                              234642   (removed 0)
+--- SNPP 2020 indonesia ---
+  input rows                                                                91536
+  type == 0 (vegetation fire)                                               81518   (removed 10018)
+  drop low confidence                                                       74844   (removed 6674)
+  drop persistent spots (>= 5 dates/year)                                   67277   (removed 7567)
+  outside the region grid (other territories)                               67277   (removed 0)
+--- SNPP 2021 indonesia ---
+  input rows                                                                68325
+  type == 0 (vegetation fire)                                               58784   (removed 9541)
+  drop low confidence                                                       55062   (removed 3722)
+  drop persistent spots (>= 5 dates/year)                                   49606   (removed 5456)
+  outside the region grid (other territories)                               49606   (removed 0)
+--- SNPP 2022 indonesia ---
+  input rows                                                                57220
+  type == 0 (vegetation fire)                                               47333   (removed 9887)
+  drop low confidence                                                       44811   (removed 2522)
+  drop persistent spots (>= 5 dates/year)                                   40070   (removed 4741)
+  outside the region grid (other territories)                               40070   (removed 0)
+--- SNPP 2023 indonesia ---
+  input rows                                                               253388
+  type == 0 (vegetation fire)                                              236123   (removed 17265)
+  drop low confidence                                                      217583   (removed 18540)
+  drop persistent spots (>= 5 dates/year)                                  170471   (removed 47112)
+  outside the region grid (other territories)                              170471   (removed 0)
+--- SNPP 2024 indonesia ---
+  input rows                                                               104186
+  type == 0 (vegetation fire)                                               89940   (removed 14246)
+  drop low confidence                                                       83282   (removed 6658)
+  drop persistent spots (>= 5 dates/year)                                   76009   (removed 7273)
+  outside the region grid (other territories)                               76009   (removed 0)
+--- SNPP 2025 indonesia ---
+  input rows                                                                96056
+  type == 0 (vegetation fire)                                               83270   (removed 12786)
+  drop low confidence                                                       79412   (removed 3858)
+  drop persistent spots (>= 5 dates/year)                                   72763   (removed 6649)
+  outside the region grid (other territories)                               72763   (removed 0)

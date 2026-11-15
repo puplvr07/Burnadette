@@ -1,13 +1,21 @@
-# Large fire datasets (never push raw CSVs or big Parquets to GitHub)
+# Large fire datasets
 raw_data/
 *.csv
 *.parquet
+*.csv.gz
+processed/clean_parquet/
 
-# Python environment & cache
+# but keep the small sample for teammates
+!processed/sample/
+!processed/sample/*.csv
+!processed/sample/*.parquet
+
+# Python
 __pycache__/
 *.py[cod]
 .venv/
 venv/
+.vscode/
 
 # Secrets & OS files
 .env

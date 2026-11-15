@@ -1,0 +1,902 @@
+{
+ "region": "belgium",
+ "settings": {
+  "ridge": 20,
+  "smooth_weeks": 3,
+  "season_window_days": 21,
+  "min_clim": 0.02,
+  "min_ref": 20,
+  "low_sens": 0.25,
+  "min_pos": 30,
+  "boot": 200,
+  "seed": 42,
+  "min_overlap_years": 3,
+  "anom_high": 90
+ },
+ "overlap_years": [
+  2012,
+  2013,
+  2014,
+  2015,
+  2016,
+  2017,
+  2018,
+  2019,
+  2020,
+  2021,
+  2022,
+  2023,
+  2024,
+  2025
+ ],
+ "band_method": "bootstrap over overlap years (10th-90th percentile)",
+ "busy_week_cut_share_of_cells": 0.0312,
+ "p_viirs_active_given_modis_state": {
+  "Jan": {
+   "state0_busy0": {
+    "p": 0.0147,
+    "low": 0.0125,
+    "high": 0.0171,
+    "cell_weeks": 1887
+   },
+   "state0_busy1": {
+    "p": 0.0599,
+    "low": 0.0479,
+    "high": 0.1105,
+    "cell_weeks": 31
+   },
+   "state0_busy2": {
+    "p": 0.137,
+    "low": 0.1302,
+    "high": 0.1459,
+    "cell_weeks": 0
+   },
+   "state1_busy0": {
+    "p": 0.2162,
+    "low": 0.1797,
+    "high": 0.2647,
+    "cell_weeks": 1
+   },
+   "state1_busy1": {
+    "p": 0.2907,
+    "low": 0.2442,
+    "high": 0.3466,
+    "cell_weeks": 0
+   },
+   "state1_busy2": {
+    "p": 0.3553,
+    "low": 0.3083,
+    "high": 0.4119,
+    "cell_weeks": 0
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3822,
+    "low": 0.3125,
+    "high": 0.4537,
+    "cell_weeks": 1
+   },
+   "state2_busy2": {
+    "p": 0.5243,
+    "low": 0.4946,
+    "high": 0.5518,
+    "cell_weeks": 0
+   }
+  },
+  "Feb": {
+   "state0_busy0": {
+    "p": 0.0335,
+    "low": 0.027,
+    "high": 0.0413,
+    "cell_weeks": 1678
+   },
+   "state0_busy1": {
+    "p": 0.0494,
+    "low": 0.0269,
+    "high": 0.0995,
+    "cell_weeks": 62
+   },
+   "state0_busy2": {
+    "p": 0.1135,
+    "low": 0.0942,
+    "high": 0.1358,
+    "cell_weeks": 57
+   },
+   "state1_busy0": {
+    "p": 0.1195,
+    "low": 0.0997,
+    "high": 0.1459,
+    "cell_weeks": 18
+   },
+   "state1_busy1": {
+    "p": 0.2907,
+    "low": 0.2442,
+    "high": 0.3466,
+    "cell_weeks": 0
+   },
+   "state1_busy2": {
+    "p": 0.323,
+    "low": 0.2644,
+    "high": 0.3962,
+    "cell_weeks": 2
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3649,
+    "low": 0.2811,
+    "high": 0.4621,
+    "cell_weeks": 2
+   },
+   "state2_busy2": {
+    "p": 0.5395,
+    "low": 0.4722,
+    "high": 0.604,
+    "cell_weeks": 5
+   }
+  },
+  "Mar": {
+   "state0_busy0": {
+    "p": 0.039,
+    "low": 0.0296,
+    "high": 0.0481,
+    "cell_weeks": 671
+   },
+   "state0_busy1": {
+    "p": 0.0791,
+    "low": 0.0581,
+    "high": 0.0992,
+    "cell_weeks": 474
+   },
+   "state0_busy2": {
+    "p": 0.1056,
+    "low": 0.0879,
+    "high": 0.1246,
+    "cell_weeks": 555
+   },
+   "state1_busy0": {
+    "p": 0.1423,
+    "low": 0.0882,
+    "high": 0.1944,
+    "cell_weeks": 33
+   },
+   "state1_busy1": {
+    "p": 0.2577,
+    "low": 0.1776,
+    "high": 0.3329,
+    "cell_weeks": 53
+   },
+   "state1_busy2": {
+    "p": 0.3013,
+    "low": 0.2544,
+    "high": 0.3515,
+    "cell_weeks": 60
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3251,
+    "low": 0.2583,
+    "high": 0.4081,
+    "cell_weeks": 17
+   },
+   "state2_busy2": {
+    "p": 0.4448,
+    "low": 0.4024,
+    "high": 0.4901,
+    "cell_weeks": 89
+   }
+  },
+  "Apr": {
+   "state0_busy0": {
+    "p": 0.0675,
+    "low": 0.0541,
+    "high": 0.0877,
+    "cell_weeks": 483
+   },
+   "state0_busy1": {
+    "p": 0.0813,
+    "low": 0.0631,
+    "high": 0.0958,
+    "cell_weeks": 411
+   },
+   "state0_busy2": {
+    "p": 0.1375,
+    "low": 0.1216,
+    "high": 0.1499,
+    "cell_weeks": 771
+   },
+   "state1_busy0": {
+    "p": 0.2412,
+    "low": 0.1746,
+    "high": 0.3089,
+    "cell_weeks": 61
+   },
+   "state1_busy1": {
+    "p": 0.298,
+    "low": 0.2203,
+    "high": 0.4127,
+    "cell_weeks": 23
+   },
+   "state1_busy2": {
+    "p": 0.3411,
+    "low": 0.2588,
+    "high": 0.4245,
+    "cell_weeks": 80
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.2655,
+    "low": 0.2075,
+    "high": 0.3314,
+    "cell_weeks": 14
+   },
+   "state2_busy2": {
+    "p": 0.5619,
+    "low": 0.4948,
+    "high": 0.6205,
+    "cell_weeks": 109
+   }
+  },
+  "May": {
+   "state0_busy0": {
+    "p": 0.088,
+    "low": 0.0787,
+    "high": 0.0977,
+    "cell_weeks": 536
+   },
+   "state0_busy1": {
+    "p": 0.1203,
+    "low": 0.0988,
+    "high": 0.1436,
+    "cell_weeks": 579
+   },
+   "state0_busy2": {
+    "p": 0.1609,
+    "low": 0.1343,
+    "high": 0.1907,
+    "cell_weeks": 637
+   },
+   "state1_busy0": {
+    "p": 0.3757,
+    "low": 0.3049,
+    "high": 0.452,
+    "cell_weeks": 40
+   },
+   "state1_busy1": {
+    "p": 0.2757,
+    "low": 0.2267,
+    "high": 0.3228,
+    "cell_weeks": 41
+   },
+   "state1_busy2": {
+    "p": 0.4156,
+    "low": 0.3367,
+    "high": 0.4918,
+    "cell_weeks": 38
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3007,
+    "low": 0.2335,
+    "high": 0.3688,
+    "cell_weeks": 20
+   },
+   "state2_busy2": {
+    "p": 0.5492,
+    "low": 0.4819,
+    "high": 0.6128,
+    "cell_weeks": 61
+   }
+  },
+  "Jun": {
+   "state0_busy0": {
+    "p": 0.1114,
+    "low": 0.0911,
+    "high": 0.1313,
+    "cell_weeks": 886
+   },
+   "state0_busy1": {
+    "p": 0.1359,
+    "low": 0.1143,
+    "high": 0.1612,
+    "cell_weeks": 569
+   },
+   "state0_busy2": {
+    "p": 0.1527,
+    "low": 0.1362,
+    "high": 0.1756,
+    "cell_weeks": 345
+   },
+   "state1_busy0": {
+    "p": 0.2668,
+    "low": 0.2057,
+    "high": 0.3432,
+    "cell_weeks": 42
+   },
+   "state1_busy1": {
+    "p": 0.3954,
+    "low": 0.3014,
+    "high": 0.4745,
+    "cell_weeks": 20
+   },
+   "state1_busy2": {
+    "p": 0.3905,
+    "low": 0.3121,
+    "high": 0.4724,
+    "cell_weeks": 11
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.334,
+    "low": 0.2367,
+    "high": 0.4179,
+    "cell_weeks": 19
+   },
+   "state2_busy2": {
+    "p": 0.406,
+    "low": 0.3734,
+    "high": 0.4575,
+    "cell_weeks": 28
+   }
+  },
+  "Jul": {
+   "state0_busy0": {
+    "p": 0.1113,
+    "low": 0.0909,
+    "high": 0.1359,
+    "cell_weeks": 887
+   },
+   "state0_busy1": {
+    "p": 0.1356,
+    "low": 0.1151,
+    "high": 0.1607,
+    "cell_weeks": 600
+   },
+   "state0_busy2": {
+    "p": 0.1269,
+    "low": 0.1144,
+    "high": 0.145,
+    "cell_weeks": 372
+   },
+   "state1_busy0": {
+    "p": 0.2875,
+    "low": 0.2292,
+    "high": 0.3893,
+    "cell_weeks": 41
+   },
+   "state1_busy1": {
+    "p": 0.2454,
+    "low": 0.1971,
+    "high": 0.303,
+    "cell_weeks": 20
+   },
+   "state1_busy2": {
+    "p": 0.3158,
+    "low": 0.2627,
+    "high": 0.4029,
+    "cell_weeks": 12
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.4757,
+    "low": 0.3421,
+    "high": 0.614,
+    "cell_weeks": 20
+   },
+   "state2_busy2": {
+    "p": 0.5286,
+    "low": 0.4658,
+    "high": 0.601,
+    "cell_weeks": 32
+   }
+  },
+  "Aug": {
+   "state0_busy0": {
+    "p": 0.0983,
+    "low": 0.0834,
+    "high": 0.1184,
+    "cell_weeks": 478
+   },
+   "state0_busy1": {
+    "p": 0.1225,
+    "low": 0.1046,
+    "high": 0.1375,
+    "cell_weeks": 552
+   },
+   "state0_busy2": {
+    "p": 0.1401,
+    "low": 0.127,
+    "high": 0.1522,
+    "cell_weeks": 549
+   },
+   "state1_busy0": {
+    "p": 0.2137,
+    "low": 0.1647,
+    "high": 0.2792,
+    "cell_weeks": 34
+   },
+   "state1_busy1": {
+    "p": 0.2775,
+    "low": 0.1634,
+    "high": 0.4174,
+    "cell_weeks": 37
+   },
+   "state1_busy2": {
+    "p": 0.3605,
+    "low": 0.2937,
+    "high": 0.4334,
+    "cell_weeks": 33
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3853,
+    "low": 0.2867,
+    "high": 0.4897,
+    "cell_weeks": 19
+   },
+   "state2_busy2": {
+    "p": 0.4806,
+    "low": 0.4005,
+    "high": 0.5498,
+    "cell_weeks": 58
+   }
+  },
+  "Sep": {
+   "state0_busy0": {
+    "p": 0.0715,
+    "low": 0.0544,
+    "high": 0.0873,
+    "cell_weeks": 651
+   },
+   "state0_busy1": {
+    "p": 0.1005,
+    "low": 0.0856,
+    "high": 0.1133,
+    "cell_weeks": 468
+   },
+   "state0_busy2": {
+    "p": 0.1446,
+    "low": 0.1214,
+    "high": 0.1714,
+    "cell_weeks": 635
+   },
+   "state1_busy0": {
+    "p": 0.2129,
+    "low": 0.1488,
+    "high": 0.2905,
+    "cell_weeks": 53
+   },
+   "state1_busy1": {
+    "p": 0.3295,
+    "low": 0.2758,
+    "high": 0.3822,
+    "cell_weeks": 28
+   },
+   "state1_busy2": {
+    "p": 0.4126,
+    "low": 0.3405,
+    "high": 0.5038,
+    "cell_weeks": 36
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3896,
+    "low": 0.3264,
+    "high": 0.4429,
+    "cell_weeks": 16
+   },
+   "state2_busy2": {
+    "p": 0.6645,
+    "low": 0.5871,
+    "high": 0.7276,
+    "cell_weeks": 65
+   }
+  },
+  "Oct": {
+   "state0_busy0": {
+    "p": 0.0295,
+    "low": 0.0245,
+    "high": 0.0339,
+    "cell_weeks": 1540
+   },
+   "state0_busy1": {
+    "p": 0.0516,
+    "low": 0.0415,
+    "high": 0.065,
+    "cell_weeks": 369
+   },
+   "state0_busy2": {
+    "p": 0.1171,
+    "low": 0.1102,
+    "high": 0.1403,
+    "cell_weeks": 29
+   },
+   "state1_busy0": {
+    "p": 0.1571,
+    "low": 0.104,
+    "high": 0.2313,
+    "cell_weeks": 28
+   },
+   "state1_busy1": {
+    "p": 0.2963,
+    "low": 0.2437,
+    "high": 0.3549,
+    "cell_weeks": 3
+   },
+   "state1_busy2": {
+    "p": 0.3553,
+    "low": 0.3083,
+    "high": 0.4119,
+    "cell_weeks": 0
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3133,
+    "low": 0.227,
+    "high": 0.4298,
+    "cell_weeks": 12
+   },
+   "state2_busy2": {
+    "p": 0.4559,
+    "low": 0.3664,
+    "high": 0.5475,
+    "cell_weeks": 3
+   }
+  },
+  "Nov": {
+   "state0_busy0": {
+    "p": 0.0364,
+    "low": 0.0297,
+    "high": 0.0417,
+    "cell_weeks": 1654
+   },
+   "state0_busy1": {
+    "p": 0.064,
+    "low": 0.0486,
+    "high": 0.0808,
+    "cell_weeks": 184
+   },
+   "state0_busy2": {
+    "p": 0.0559,
+    "low": 0.0338,
+    "high": 0.1431,
+    "cell_weeks": 29
+   },
+   "state1_busy0": {
+    "p": 0.1847,
+    "low": 0.1207,
+    "high": 0.2668,
+    "cell_weeks": 10
+   },
+   "state1_busy1": {
+    "p": 0.2643,
+    "low": 0.2159,
+    "high": 0.3334,
+    "cell_weeks": 2
+   },
+   "state1_busy2": {
+    "p": 0.3384,
+    "low": 0.2845,
+    "high": 0.4028,
+    "cell_weeks": 1
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3087,
+    "low": 0.241,
+    "high": 0.3726,
+    "cell_weeks": 6
+   },
+   "state2_busy2": {
+    "p": 0.5221,
+    "low": 0.4946,
+    "high": 0.547,
+    "cell_weeks": 2
+   }
+  },
+  "Dec": {
+   "state0_busy0": {
+    "p": 0.0197,
+    "low": 0.0144,
+    "high": 0.0254,
+    "cell_weeks": 1911
+   },
+   "state0_busy1": {
+    "p": 0.0373,
+    "low": 0.0262,
+    "high": 0.0969,
+    "cell_weeks": 62
+   },
+   "state0_busy2": {
+    "p": 0.137,
+    "low": 0.1302,
+    "high": 0.1459,
+    "cell_weeks": 0
+   },
+   "state1_busy0": {
+    "p": 0.1911,
+    "low": 0.1552,
+    "high": 0.2302,
+    "cell_weeks": 9
+   },
+   "state1_busy1": {
+    "p": 0.2907,
+    "low": 0.2442,
+    "high": 0.3466,
+    "cell_weeks": 0
+   },
+   "state1_busy2": {
+    "p": 0.3553,
+    "low": 0.3083,
+    "high": 0.4119,
+    "cell_weeks": 0
+   },
+   "state2_busy0": {
+    "p": 0.0,
+    "low": 0.0,
+    "high": 0.0,
+    "cell_weeks": 0
+   },
+   "state2_busy1": {
+    "p": 0.3649,
+    "low": 0.2791,
+    "high": 0.4439,
+    "cell_weeks": 2
+   },
+   "state2_busy2": {
+    "p": 0.5243,
+    "low": 0.4946,
+    "high": 0.5518,
+    "cell_weeks": 0
+   }
+  }
+ },
+ "modis_sensitivity_by_month": {
+  "Jan": 0.034,
+  "Feb": 0.059,
+  "Mar": 0.218,
+  "Apr": 0.225,
+  "May": 0.127,
+  "Jun": 0.055,
+  "Jul": 0.104,
+  "Aug": 0.136,
+  "Sep": 0.192,
+  "Oct": 0.041,
+  "Nov": 0.027,
+  "Dec": 0.025
+ },
+ "modis_false_alarm_rate_by_month": {
+  "Jan": 0.0,
+  "Feb": 0.002,
+  "Mar": 0.036,
+  "Apr": 0.035,
+  "May": 0.026,
+  "Jun": 0.019,
+  "Jul": 0.013,
+  "Aug": 0.028,
+  "Sep": 0.017,
+  "Oct": 0.006,
+  "Nov": 0.003,
+  "Dec": 0.001
+ },
+ "viirs_positive_cell_weeks_by_month": {
+  "Jan": 29,
+  "Feb": 68,
+  "Mar": 197,
+  "Apr": 285,
+  "May": 306,
+  "Jun": 273,
+  "Jul": 278,
+  "Aug": 257,
+  "Sep": 276,
+  "Oct": 73,
+  "Nov": 74,
+  "Dec": 40
+ },
+ "low_sensitivity_months": [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+ ],
+ "validation": {
+  "leave_one_year_out": {
+   "weeks": 730,
+   "r_calibrated": 0.6917932134826639,
+   "r_raw_modis": 0.5872548606909551,
+   "mae_calibrated": 1.5597050050402237,
+   "mae_raw_modis": 2.213698630136986,
+   "bias_pct_calibrated": 0.5884847261440528,
+   "bias_pct_raw_modis": -72.17068645640074
+  },
+  "per_year": {
+   "2012": {
+    "predicted_active_cells": 166.22439747761769,
+    "actual_viirs_active_cells": 150.0,
+    "raw_modis_active_cells": 59.0
+   },
+   "2013": {
+    "predicted_active_cells": 165.21604470148196,
+    "actual_viirs_active_cells": 153.0,
+    "raw_modis_active_cells": 48.0
+   },
+   "2014": {
+    "predicted_active_cells": 171.8076733074401,
+    "actual_viirs_active_cells": 153.0,
+    "raw_modis_active_cells": 52.0
+   },
+   "2015": {
+    "predicted_active_cells": 179.60327420099838,
+    "actual_viirs_active_cells": 157.0,
+    "raw_modis_active_cells": 62.0
+   },
+   "2016": {
+    "predicted_active_cells": 167.33369800828962,
+    "actual_viirs_active_cells": 151.0,
+    "raw_modis_active_cells": 51.0
+   },
+   "2017": {
+    "predicted_active_cells": 168.166547691213,
+    "actual_viirs_active_cells": 149.0,
+    "raw_modis_active_cells": 52.0
+   },
+   "2018": {
+    "predicted_active_cells": 136.60609811324736,
+    "actual_viirs_active_cells": 169.0,
+    "raw_modis_active_cells": 30.0
+   },
+   "2019": {
+    "predicted_active_cells": 150.4377404716954,
+    "actual_viirs_active_cells": 174.0,
+    "raw_modis_active_cells": 35.0
+   },
+   "2020": {
+    "predicted_active_cells": 143.79059801868672,
+    "actual_viirs_active_cells": 185.0,
+    "raw_modis_active_cells": 43.0
+   },
+   "2021": {
+    "predicted_active_cells": 149.93446441714735,
+    "actual_viirs_active_cells": 151.0,
+    "raw_modis_active_cells": 36.0
+   },
+   "2022": {
+    "predicted_active_cells": 136.10990317409684,
+    "actual_viirs_active_cells": 155.0,
+    "raw_modis_active_cells": 33.0
+   },
+   "2023": {
+    "predicted_active_cells": 137.83067201899576,
+    "actual_viirs_active_cells": 147.0,
+    "raw_modis_active_cells": 27.0
+   },
+   "2024": {
+    "predicted_active_cells": 130.94264490659583,
+    "actual_viirs_active_cells": 101.0,
+    "raw_modis_active_cells": 19.0
+   },
+   "2025": {
+    "predicted_active_cells": 164.68397418815994,
+    "actual_viirs_active_cells": 161.0,
+    "raw_modis_active_cells": 53.0
+   }
+  },
+  "fit_early_test_late": {
+   "weeks": 364,
+   "r_calibrated": 0.6950703228450263,
+   "r_raw_modis": 0.5817740992841689,
+   "mae_calibrated": 1.5143663321058862,
+   "mae_raw_modis": 2.291208791208791,
+   "bias_pct_calibrated": -9.304318386397965,
+   "bias_pct_raw_modis": -77.09497206703911,
+   "fit_years": [
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018
+   ],
+   "test_years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ]
+  },
+  "fit_late_test_early": {
+   "weeks": 366,
+   "r_calibrated": 0.6620576327615609,
+   "r_raw_modis": 0.6013904589516946,
+   "mae_calibrated": 1.7137233485533927,
+   "mae_raw_modis": 2.1366120218579234,
+   "bias_pct_calibrated": 14.259125350237673,
+   "bias_pct_raw_modis": -67.28280961182995,
+   "fit_years": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+   ],
+   "test_years": [
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018
+   ]
+  }
+ },
+ "validated": true
+}

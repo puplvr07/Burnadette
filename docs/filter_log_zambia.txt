@@ -1,0 +1,241 @@
+===== 2026-11-15 15:11 =====
+--- MODIS 2000 zambia ---
+  input rows                                                                  615
+  type == 0 (vegetation fire)                                                 595   (removed 20)
+  drop low confidence                                                         571   (removed 24)
+  drop persistent spots (>= 5 dates/year)                                     571
+  outside the region grid (other territories)                                 571   (removed 0)
+--- MODIS 2001 zambia ---
+  input rows                                                                57182
+  type == 0 (vegetation fire)                                               57182
+  drop low confidence                                                       55199   (removed 1983)
+  drop persistent spots (>= 5 dates/year)                                   55150   (removed 49)
+  outside the region grid (other territories)                               55150   (removed 0)
+--- MODIS 2002 zambia ---
+  input rows                                                               136610
+  type == 0 (vegetation fire)                                              136610
+  drop low confidence                                                      131805   (removed 4805)
+  drop persistent spots (>= 5 dates/year)                                  131706   (removed 99)
+  outside the region grid (other territories)                              131706   (removed 0)
+--- MODIS 2003 zambia ---
+  input rows                                                               203320
+  type == 0 (vegetation fire)                                              203320
+  drop low confidence                                                      196437   (removed 6883)
+  drop persistent spots (>= 5 dates/year)                                  196245   (removed 192)
+  outside the region grid (other territories)                              196245   (removed 0)
+--- MODIS 2004 zambia ---
+  input rows                                                               195114
+  type == 0 (vegetation fire)                                              195021   (removed 93)
+  drop low confidence                                                      188443   (removed 6578)
+  drop persistent spots (>= 5 dates/year)                                  188242   (removed 201)
+  outside the region grid (other territories)                              188242   (removed 0)
+--- MODIS 2005 zambia ---
+  input rows                                                               216263
+  type == 0 (vegetation fire)                                              216189   (removed 74)
+  drop low confidence                                                      208901   (removed 7288)
+  drop persistent spots (>= 5 dates/year)                                  208654   (removed 247)
+  outside the region grid (other territories)                              208654   (removed 0)
+--- MODIS 2006 zambia ---
+  input rows                                                               186422
+  type == 0 (vegetation fire)                                              186335   (removed 87)
+  drop low confidence                                                      180185   (removed 6150)
+  drop persistent spots (>= 5 dates/year)                                  179990   (removed 195)
+  outside the region grid (other territories)                              179990   (removed 0)
+--- MODIS 2007 zambia ---
+  input rows                                                               207080
+  type == 0 (vegetation fire)                                              206988   (removed 92)
+  drop low confidence                                                      200072   (removed 6916)
+  drop persistent spots (>= 5 dates/year)                                  199898   (removed 174)
+  outside the region grid (other territories)                              199898   (removed 0)
+--- MODIS 2008 zambia ---
+  input rows                                                               223013
+  type == 0 (vegetation fire)                                              222910   (removed 103)
+  drop low confidence                                                      215520   (removed 7390)
+  drop persistent spots (>= 5 dates/year)                                  215084   (removed 436)
+  outside the region grid (other territories)                              215084   (removed 0)
+--- MODIS 2009 zambia ---
+  input rows                                                               195186
+  type == 0 (vegetation fire)                                              194968   (removed 218)
+  drop low confidence                                                      188585   (removed 6383)
+  drop persistent spots (>= 5 dates/year)                                  188341   (removed 244)
+  outside the region grid (other territories)                              188341   (removed 0)
+--- MODIS 2010 zambia ---
+  input rows                                                               217636
+  type == 0 (vegetation fire)                                              217568   (removed 68)
+  drop low confidence                                                      210286   (removed 7282)
+  drop persistent spots (>= 5 dates/year)                                  210061   (removed 225)
+  outside the region grid (other territories)                              210061   (removed 0)
+--- MODIS 2011 zambia ---
+  input rows                                                               216455
+  type == 0 (vegetation fire)                                              216320   (removed 135)
+  drop low confidence                                                      208942   (removed 7378)
+  drop persistent spots (>= 5 dates/year)                                  208737   (removed 205)
+  outside the region grid (other territories)                              208737   (removed 0)
+--- MODIS 2012 zambia ---
+  input rows                                                               218784
+  type == 0 (vegetation fire)                                              218601   (removed 183)
+  drop low confidence                                                      211512   (removed 7089)
+  drop persistent spots (>= 5 dates/year)                                  211130   (removed 382)
+  outside the region grid (other territories)                              211130   (removed 0)
+--- MODIS 2013 zambia ---
+  input rows                                                               216768
+  type == 0 (vegetation fire)                                              216415   (removed 353)
+  drop low confidence                                                      209094   (removed 7321)
+  drop persistent spots (>= 5 dates/year)                                  208763   (removed 331)
+  outside the region grid (other territories)                              208763   (removed 0)
+--- MODIS 2014 zambia ---
+  input rows                                                               199699
+  type == 0 (vegetation fire)                                              198931   (removed 768)
+  drop low confidence                                                      192386   (removed 6545)
+  drop persistent spots (>= 5 dates/year)                                  191799   (removed 587)
+  outside the region grid (other territories)                              191799   (removed 0)
+--- MODIS 2015 zambia ---
+  input rows                                                               219535
+  type == 0 (vegetation fire)                                              219046   (removed 489)
+  drop low confidence                                                      211889   (removed 7157)
+  drop persistent spots (>= 5 dates/year)                                  211138   (removed 751)
+  outside the region grid (other territories)                              211138   (removed 0)
+--- MODIS 2016 zambia ---
+  input rows                                                               215220
+  type == 0 (vegetation fire)                                              214730   (removed 490)
+  drop low confidence                                                      207492   (removed 7238)
+  drop persistent spots (>= 5 dates/year)                                  206628   (removed 864)
+  outside the region grid (other territories)                              206628   (removed 0)
+--- MODIS 2017 zambia ---
+  input rows                                                               198686
+  type == 0 (vegetation fire)                                              198283   (removed 403)
+  drop low confidence                                                      191576   (removed 6707)
+  drop persistent spots (>= 5 dates/year)                                  190992   (removed 584)
+  outside the region grid (other territories)                              190992   (removed 0)
+--- MODIS 2018 zambia ---
+  input rows                                                               194736
+  type == 0 (vegetation fire)                                              194075   (removed 661)
+  drop low confidence                                                      187460   (removed 6615)
+  drop persistent spots (>= 5 dates/year)                                  186975   (removed 485)
+  outside the region grid (other territories)                              186975   (removed 0)
+--- MODIS 2019 zambia ---
+  input rows                                                               205018
+  type == 0 (vegetation fire)                                              204432   (removed 586)
+  drop low confidence                                                      197373   (removed 7059)
+  drop persistent spots (>= 5 dates/year)                                  196973   (removed 400)
+  outside the region grid (other territories)                              196973   (removed 0)
+--- MODIS 2020 zambia ---
+  input rows                                                               166904
+  type == 0 (vegetation fire)                                              166373   (removed 531)
+  drop low confidence                                                      160850   (removed 5523)
+  drop persistent spots (>= 5 dates/year)                                  160655   (removed 195)
+  outside the region grid (other territories)                              160655   (removed 0)
+--- MODIS 2021 zambia ---
+  input rows                                                               183429
+  type == 0 (vegetation fire)                                              182979   (removed 450)
+  drop low confidence                                                      176953   (removed 6026)
+  drop persistent spots (>= 5 dates/year)                                  176626   (removed 327)
+  outside the region grid (other territories)                              176626   (removed 0)
+--- MODIS 2022 zambia ---
+  input rows                                                               186677
+  type == 0 (vegetation fire)                                              186295   (removed 382)
+  drop low confidence                                                      179914   (removed 6381)
+  drop persistent spots (>= 5 dates/year)                                  179549   (removed 365)
+  outside the region grid (other territories)                              179549   (removed 0)
+--- MODIS 2023 zambia ---
+  input rows                                                               191327
+  type == 0 (vegetation fire)                                              190960   (removed 367)
+  drop low confidence                                                      184564   (removed 6396)
+  drop persistent spots (>= 5 dates/year)                                  184264   (removed 300)
+  outside the region grid (other territories)                              184264   (removed 0)
+--- MODIS 2024 zambia ---
+  input rows                                                               205982
+  type == 0 (vegetation fire)                                              205551   (removed 431)
+  drop low confidence                                                      198486   (removed 7065)
+  drop persistent spots (>= 5 dates/year)                                  197618   (removed 868)
+  outside the region grid (other territories)                              197618   (removed 0)
+--- MODIS 2025 zambia ---
+  input rows                                                               186254
+  type == 0 (vegetation fire)                                              185772   (removed 482)
+  drop low confidence                                                      179128   (removed 6644)
+  drop persistent spots (>= 5 dates/year)                                  178294   (removed 834)
+  outside the region grid (other territories)                              178294   (removed 0)
+--- SNPP 2012 zambia ---
+  input rows                                                               899925
+  type == 0 (vegetation fire)                                              898162   (removed 1763)
+  drop low confidence                                                      749701   (removed 148461)
+  drop persistent spots (>= 5 dates/year)                                  742511   (removed 7190)
+  outside the region grid (other territories)                              742511   (removed 0)
+--- SNPP 2013 zambia ---
+  input rows                                                               921618
+  type == 0 (vegetation fire)                                              919850   (removed 1768)
+  drop low confidence                                                      765960   (removed 153890)
+  drop persistent spots (>= 5 dates/year)                                  757749   (removed 8211)
+  outside the region grid (other territories)                              757749   (removed 0)
+--- SNPP 2014 zambia ---
+  input rows                                                               850626
+  type == 0 (vegetation fire)                                              849291   (removed 1335)
+  drop low confidence                                                      700971   (removed 148320)
+  drop persistent spots (>= 5 dates/year)                                  692018   (removed 8953)
+  outside the region grid (other territories)                              692018   (removed 0)
+--- SNPP 2015 zambia ---
+  input rows                                                               930638
+  type == 0 (vegetation fire)                                              929053   (removed 1585)
+  drop low confidence                                                      764608   (removed 164445)
+  drop persistent spots (>= 5 dates/year)                                  749200   (removed 15408)
+  outside the region grid (other territories)                              749200   (removed 0)
+--- SNPP 2016 zambia ---
+  input rows                                                               914893
+  type == 0 (vegetation fire)                                              913061   (removed 1832)
+  drop low confidence                                                      756008   (removed 157053)
+  drop persistent spots (>= 5 dates/year)                                  743719   (removed 12289)
+  outside the region grid (other territories)                              743719   (removed 0)
+--- SNPP 2017 zambia ---
+  input rows                                                               838997
+  type == 0 (vegetation fire)                                              837034   (removed 1963)
+  drop low confidence                                                      684986   (removed 152048)
+  drop persistent spots (>= 5 dates/year)                                  678351   (removed 6635)
+  outside the region grid (other territories)                              678351   (removed 0)
+--- SNPP 2018 zambia ---
+  input rows                                                               857746
+  type == 0 (vegetation fire)                                              855997   (removed 1749)
+  drop low confidence                                                      700720   (removed 155277)
+  drop persistent spots (>= 5 dates/year)                                  694321   (removed 6399)
+  outside the region grid (other territories)                              694321   (removed 0)
+--- SNPP 2019 zambia ---
+  input rows                                                               902208
+  type == 0 (vegetation fire)                                              900289   (removed 1919)
+  drop low confidence                                                      744410   (removed 155879)
+  drop persistent spots (>= 5 dates/year)                                  732591   (removed 11819)
+  outside the region grid (other territories)                              732591   (removed 0)
+--- SNPP 2020 zambia ---
+  input rows                                                               803331
+  type == 0 (vegetation fire)                                              801780   (removed 1551)
+  drop low confidence                                                      662429   (removed 139351)
+  drop persistent spots (>= 5 dates/year)                                  656399   (removed 6030)
+  outside the region grid (other territories)                              656399   (removed 0)
+--- SNPP 2021 zambia ---
+  input rows                                                               814598
+  type == 0 (vegetation fire)                                              812988   (removed 1610)
+  drop low confidence                                                      674394   (removed 138594)
+  drop persistent spots (>= 5 dates/year)                                  667409   (removed 6985)
+  outside the region grid (other territories)                              667409   (removed 0)
+--- SNPP 2022 zambia ---
+  input rows                                                               763731
+  type == 0 (vegetation fire)                                              762098   (removed 1633)
+  drop low confidence                                                      621387   (removed 140711)
+  drop persistent spots (>= 5 dates/year)                                  615035   (removed 6352)
+  outside the region grid (other territories)                              615035   (removed 0)
+--- SNPP 2023 zambia ---
+  input rows                                                               867429
+  type == 0 (vegetation fire)                                              865949   (removed 1480)
+  drop low confidence                                                      713875   (removed 152074)
+  drop persistent spots (>= 5 dates/year)                                  706477   (removed 7398)
+  outside the region grid (other territories)                              706477   (removed 0)
+--- SNPP 2024 zambia ---
+  input rows                                                               775316
+  type == 0 (vegetation fire)                                              773855   (removed 1461)
+  drop low confidence                                                      639383   (removed 134472)
+  drop persistent spots (>= 5 dates/year)                                  621293   (removed 18090)
+  outside the region grid (other territories)                              621293   (removed 0)
+--- SNPP 2025 zambia ---
+  input rows                                                               862158
+  type == 0 (vegetation fire)                                              860526   (removed 1632)
+  drop low confidence                                                      697051   (removed 163475)
+  drop persistent spots (>= 5 dates/year)                                  678690   (removed 18361)
+  outside the region grid (other territories)                              678690   (removed 0)
