@@ -24,16 +24,18 @@ export default function Home() {
         <p className="eyebrow">// about the project</p>
         <h2>Fire has a season. We make it visible.</h2>
         <p className="lead">
-          Satellites have watched Earth burn since 2000, but the raw detections are scattered across
-          instruments and file formats. Burnadette puts weekly fire activity for any area you pick on a
-          single scale, so you can spot the burning season, a quiet year, or an unusual one.
+          Satellites have tracked fire hotspots for more than two decades, but the record is split between
+          two instruments, MODIS and VIIRS, whose data can&rsquo;t be compared directly. Burnadette joins them
+          into one consistent weekly record for any area you pick, so you can see which months burn most,
+          which years were unusual, and how this year compares with past ones.
         </p>
+        <p className="lead audience">Built for early warning and emergency responders, firefighters, land managers and scientists.</p>
       </section>
 
       <section className="cards">
         <article className="panel feature">
           <h3>Pick any area</h3>
-          <p>Choose a pilot region or draw your own box on the map.</p>
+          <p>Choose a pilot region, draw a rectangle or polygon on the map, or set a point and radius.</p>
         </article>
         <article className="panel feature">
           <h3>Two satellites, one scale</h3>
@@ -42,6 +44,10 @@ export default function Home() {
         <article className="panel feature">
           <h3>See what is unusual</h3>
           <p>Switch from raw activity to how unusual a week is, and see known data gaps marked on the calendar.</p>
+        </article>
+        <article className="panel feature">
+          <h3>Compare and download</h3>
+          <p>Compare a year with the multi-year average, find the most unusual weeks, and download the data and charts.</p>
         </article>
       </section>
     </div>
