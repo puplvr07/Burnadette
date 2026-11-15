@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getRegions } from "../api";
 import type { Region } from "../types";
 // Names, order and affiliations as set in minazaki-ui. Roles follow the project brief (Frontend / Backend / ML).
@@ -56,11 +56,32 @@ function Validation() {
 }
 
 export default function About() {
+  const audio = useRef<AudioContext | null>(null);
+  useEffect(() => () => { void audio.current?.close(); }, []);
+  const playSound = async () => {
+    let context: AudioContext;
+    try {
+      context = audio.current ??= new AudioContext();
+      if (context.state !== "running") await context.resume();
+    } catch { return; }
+    if (context.state !== "running") return;
+    const oscillator = context.createOscillator(), gain = context.createGain();
+    const start = context.currentTime;
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(760, start);
+    oscillator.frequency.exponentialRampToValueAtTime(480, start + .055);
+    gain.gain.setValueAtTime(.0001, start);
+    gain.gain.exponentialRampToValueAtTime(.035, start + .006);
+    gain.gain.exponentialRampToValueAtTime(.0001, start + .075);
+    oscillator.connect(gain); gain.connect(context.destination);
+    oscillator.start(start); oscillator.stop(start + .08);
+    oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
+  };
   return (
-    <div className="page page-fill">
+    <div className="page page-fill about-page">
       <section className="intro">
-        <p className="eyebrow">// about us</p>
-        <h2>The team behind Burnadette</h2>
+        <p className="eyebrow">// ABOUT US</p>
+        <h2>THE TEAM BEHIND BURNADETTE</h2>
         <p className="lead">
           We are team Burnadette, taking part in the 2026 NASA Space Apps Challenge on the challenge
           &ldquo;Harmonization of MODIS and VIIRS Hot Spots&rdquo;. Our goal is to give emergency responders,
@@ -70,7 +91,7 @@ export default function About() {
 
       <section className="cards members">
         {MEMBERS.map((m) => (
-          <article key={m.name} className="panel member" tabIndex={0} aria-label={m.name}>
+          <article key={m.name} className="panel member" tabIndex={0} aria-label={m.name} onPointerEnter={event => { if (event.pointerType === "mouse") playSound(); }} onFocus={playSound}>
             <div className="avatar" aria-hidden="true">{m.name.charAt(0)}</div>
             <h3>{m.name}</h3>
             {m.role && <span className="chip">{m.role}</span>}

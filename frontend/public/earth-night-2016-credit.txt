@@ -1,0 +1,4 @@
+NASA Earth Observatory / Black Marble, 2016 global night-lights composite.
+NASA Earth Observatory images by Joshua Stevens, using Suomi NPP VIIRS data from Miguel Roman, NASA GSFC.
+Source: https://science.nasa.gov/earth/earth-observatory/earth-at-night/maps/
+The texture is a historical composite, not a live view. Fire markers in the application are decorative.

@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import Home from "./components/Home";
 import CalendarPage from "./components/CalendarPage";
 import About from "./components/About";
 import ThemeToggle from "./components/ThemeToggle";
+import ExploreDock from "./components/ExploreDock";
 
 type ExploreView = "map" | "heatmap" | "calendar";
 type Page = "home" | ExploreView | "about";
@@ -49,10 +51,24 @@ export default function App() {
   useEffect(() => {
     const onHash = () => {
       const next = fromHash();
-      setPage(next);
-      setNavVisible(false);
-      if (isExplore(next)) { setExploreView(next); setExploreVisited(true); }
-      window.scrollTo(0, 0);
+      const update = () => {
+        flushSync(() => {
+          setPage(next);
+          setNavVisible(false);
+          if (isExplore(next)) { setExploreView(next); setExploreVisited(true); }
+        });
+        window.scrollTo(0, 0);
+      };
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!reduced && typeof document.startViewTransition === "function") {
+        document.startViewTransition(update);
+      } else {
+        update();
+        if (!reduced) document.querySelector("main")?.animate(
+          [{opacity: 0, transform: "translateY(14px)"}, {opacity: 1, transform: "translateY(0)"}],
+          {duration: 520, easing: "cubic-bezier(.22,1,.36,1)"}
+        );
+      }
     };
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
@@ -60,9 +76,9 @@ export default function App() {
 
   return (
     <div className={`shell${page === "map" ? " map-shell" : ""}${navVisible ? " navigation-visible" : ""}`}>
-      {page === "map" && <button className="map-nav-handle" type="button" aria-controls="main-navigation" aria-expanded={navVisible}
+      {page === "map" && <button className="map-nav-handle" type="button" aria-label="Show main navigation" title="Show main navigation" aria-controls="main-navigation" aria-expanded={navVisible}
         onPointerEnter={revealNav} onFocus={revealNav} onClick={revealNav}>
-        <span aria-hidden="true">⌃</span> Navigation
+        <span aria-hidden="true">⌃</span>
       </button>}
       <header ref={nav} id="main-navigation" className="site-header"
         onPointerEnter={() => { clearTimeout(hideTimer.current); setNavVisible(true); }}
@@ -70,8 +86,8 @@ export default function App() {
         onFocusCapture={() => { clearTimeout(hideTimer.current); setNavVisible(true); }}
         onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setNavVisible(false); }}>
 
-        <div className="primary-header-row">
-          <a className="site-title" href="#home">Burnadette</a>
+        <div className={`primary-header-row${page === "home" ? " has-home-brand" : ""}`}>
+          {page === "home" && <a className="site-title home-brand" href="#home">Burnadette</a>}
           <div className="header-actions">
           <nav className="nav-links" aria-label="Main navigation">
             <a href="#home" aria-current={page === "home" ? "page" : undefined}>Home</a>
@@ -81,15 +97,8 @@ export default function App() {
           <ThemeToggle />
           </div>
         </div>
-        {isExplore(page) && <div className="explore-section-nav">
-          <span className="explore-section-label">EXPLORE</span>
-          <nav className="nav-links explore-view-links" aria-label="Explore views">
-            {EXPLORE_VIEWS.map(([route, label]) => (
-              <a key={route} href={`#${route}`} aria-current={page === route ? "page" : undefined}>{label}</a>
-            ))}
-          </nav>
-        </div>}
       </header>
+      {isExplore(page) && <ExploreDock page={page}/>}
       <main>
         {page === "home" && <Home />}
         {exploreVisited && <CalendarPage view={exploreView} hidden={!isExplore(page)} />}
