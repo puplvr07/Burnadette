@@ -1,0 +1,241 @@
+===== 2026-11-15 15:11 =====
+--- MODIS 2000 belgium ---
+  input rows                                                                   14
+  type == 0 (vegetation fire)                                                   8   (removed 6)
+  drop low confidence                                                           6   (removed 2)
+  drop persistent spots (>= 5 dates/year)                                       6
+  outside the region grid (other territories)                                   6   (removed 0)
+--- MODIS 2001 belgium ---
+  input rows                                                                  187
+  type == 0 (vegetation fire)                                                 124   (removed 63)
+  drop low confidence                                                         111   (removed 13)
+  drop persistent spots (>= 5 dates/year)                                      79   (removed 32)
+  outside the region grid (other territories)                                  79   (removed 0)
+--- MODIS 2002 belgium ---
+  input rows                                                                  356
+  type == 0 (vegetation fire)                                                 179   (removed 177)
+  drop low confidence                                                         170   (removed 9)
+  drop persistent spots (>= 5 dates/year)                                      99   (removed 71)
+  outside the region grid (other territories)                                  99   (removed 0)
+--- MODIS 2003 belgium ---
+  input rows                                                                  708
+  type == 0 (vegetation fire)                                                 334   (removed 374)
+  drop low confidence                                                         302   (removed 32)
+  drop persistent spots (>= 5 dates/year)                                     238   (removed 64)
+  outside the region grid (other territories)                                 238   (removed 0)
+--- MODIS 2004 belgium ---
+  input rows                                                                  577
+  type == 0 (vegetation fire)                                                 222   (removed 355)
+  drop low confidence                                                         190   (removed 32)
+  drop persistent spots (>= 5 dates/year)                                     143   (removed 47)
+  outside the region grid (other territories)                                 143   (removed 0)
+--- MODIS 2005 belgium ---
+  input rows                                                                  602
+  type == 0 (vegetation fire)                                                 270   (removed 332)
+  drop low confidence                                                         240   (removed 30)
+  drop persistent spots (>= 5 dates/year)                                     137   (removed 103)
+  outside the region grid (other territories)                                 137   (removed 0)
+--- MODIS 2006 belgium ---
+  input rows                                                                  608
+  type == 0 (vegetation fire)                                                 267   (removed 341)
+  drop low confidence                                                         234   (removed 33)
+  drop persistent spots (>= 5 dates/year)                                     140   (removed 94)
+  outside the region grid (other territories)                                 140   (removed 0)
+--- MODIS 2007 belgium ---
+  input rows                                                                  543
+  type == 0 (vegetation fire)                                                 181   (removed 362)
+  drop low confidence                                                         169   (removed 12)
+  drop persistent spots (>= 5 dates/year)                                     125   (removed 44)
+  outside the region grid (other territories)                                 125   (removed 0)
+--- MODIS 2008 belgium ---
+  input rows                                                                  459
+  type == 0 (vegetation fire)                                                 209   (removed 250)
+  drop low confidence                                                         181   (removed 28)
+  drop persistent spots (>= 5 dates/year)                                     122   (removed 59)
+  outside the region grid (other territories)                                 122   (removed 0)
+--- MODIS 2009 belgium ---
+  input rows                                                                  313
+  type == 0 (vegetation fire)                                                 153   (removed 160)
+  drop low confidence                                                         134   (removed 19)
+  drop persistent spots (>= 5 dates/year)                                     120   (removed 14)
+  outside the region grid (other territories)                                 120   (removed 0)
+--- MODIS 2010 belgium ---
+  input rows                                                                  400
+  type == 0 (vegetation fire)                                                 140   (removed 260)
+  drop low confidence                                                         119   (removed 21)
+  drop persistent spots (>= 5 dates/year)                                      85   (removed 34)
+  outside the region grid (other territories)                                  85   (removed 0)
+--- MODIS 2011 belgium ---
+  input rows                                                                  473
+  type == 0 (vegetation fire)                                                 178   (removed 295)
+  drop low confidence                                                         163   (removed 15)
+  drop persistent spots (>= 5 dates/year)                                     124   (removed 39)
+  outside the region grid (other territories)                                 124   (removed 0)
+--- MODIS 2012 belgium ---
+  input rows                                                                  433
+  type == 0 (vegetation fire)                                                 158   (removed 275)
+  drop low confidence                                                         139   (removed 19)
+  drop persistent spots (>= 5 dates/year)                                     105   (removed 34)
+  outside the region grid (other territories)                                 105   (removed 0)
+--- MODIS 2013 belgium ---
+  input rows                                                                  466
+  type == 0 (vegetation fire)                                                 123   (removed 343)
+  drop low confidence                                                         108   (removed 15)
+  drop persistent spots (>= 5 dates/year)                                      69   (removed 39)
+  outside the region grid (other territories)                                  69   (removed 0)
+--- MODIS 2014 belgium ---
+  input rows                                                                  492
+  type == 0 (vegetation fire)                                                  83   (removed 409)
+  drop low confidence                                                          77   (removed 6)
+  drop persistent spots (>= 5 dates/year)                                      77
+  outside the region grid (other territories)                                  77   (removed 0)
+--- MODIS 2015 belgium ---
+  input rows                                                                  494
+  type == 0 (vegetation fire)                                                 170   (removed 324)
+  drop low confidence                                                         144   (removed 26)
+  drop persistent spots (>= 5 dates/year)                                     119   (removed 25)
+  outside the region grid (other territories)                                 119   (removed 0)
+--- MODIS 2016 belgium ---
+  input rows                                                                  609
+  type == 0 (vegetation fire)                                                 162   (removed 447)
+  drop low confidence                                                         139   (removed 23)
+  drop persistent spots (>= 5 dates/year)                                      83   (removed 56)
+  outside the region grid (other territories)                                  83   (removed 0)
+--- MODIS 2017 belgium ---
+  input rows                                                                  527
+  type == 0 (vegetation fire)                                                 135   (removed 392)
+  drop low confidence                                                         113   (removed 22)
+  drop persistent spots (>= 5 dates/year)                                      82   (removed 31)
+  outside the region grid (other territories)                                  82   (removed 0)
+--- MODIS 2018 belgium ---
+  input rows                                                                  705
+  type == 0 (vegetation fire)                                                  43   (removed 662)
+  drop low confidence                                                          40   (removed 3)
+  drop persistent spots (>= 5 dates/year)                                      40
+  outside the region grid (other territories)                                  40   (removed 0)
+--- MODIS 2019 belgium ---
+  input rows                                                                  642
+  type == 0 (vegetation fire)                                                  52   (removed 590)
+  drop low confidence                                                          52
+  drop persistent spots (>= 5 dates/year)                                      52
+  outside the region grid (other territories)                                  52   (removed 0)
+--- MODIS 2020 belgium ---
+  input rows                                                                  576
+  type == 0 (vegetation fire)                                                  79   (removed 497)
+  drop low confidence                                                          75   (removed 4)
+  drop persistent spots (>= 5 dates/year)                                      75
+  outside the region grid (other territories)                                  75   (removed 0)
+--- MODIS 2021 belgium ---
+  input rows                                                                  599
+  type == 0 (vegetation fire)                                                  67   (removed 532)
+  drop low confidence                                                          64   (removed 3)
+  drop persistent spots (>= 5 dates/year)                                      64
+  outside the region grid (other territories)                                  64   (removed 0)
+--- MODIS 2022 belgium ---
+  input rows                                                                  678
+  type == 0 (vegetation fire)                                                  60   (removed 618)
+  drop low confidence                                                          59   (removed 1)
+  drop persistent spots (>= 5 dates/year)                                      59
+  outside the region grid (other territories)                                  59   (removed 0)
+--- MODIS 2023 belgium ---
+  input rows                                                                  472
+  type == 0 (vegetation fire)                                                  42   (removed 430)
+  drop low confidence                                                          41   (removed 1)
+  drop persistent spots (>= 5 dates/year)                                      41
+  outside the region grid (other territories)                                  41   (removed 0)
+--- MODIS 2024 belgium ---
+  input rows                                                                  460
+  type == 0 (vegetation fire)                                                  32   (removed 428)
+  drop low confidence                                                          29   (removed 3)
+  drop persistent spots (>= 5 dates/year)                                      29
+  outside the region grid (other territories)                                  29   (removed 0)
+--- MODIS 2025 belgium ---
+  input rows                                                                  747
+  type == 0 (vegetation fire)                                                  91   (removed 656)
+  drop low confidence                                                          87   (removed 4)
+  drop persistent spots (>= 5 dates/year)                                      87
+  outside the region grid (other territories)                                  87   (removed 0)
+--- SNPP 2012 belgium ---
+  input rows                                                                 3695
+  type == 0 (vegetation fire)                                                 420   (removed 3275)
+  drop low confidence                                                         411   (removed 9)
+  drop persistent spots (>= 5 dates/year)                                     258   (removed 153)
+  outside the region grid (other territories)                                 258   (removed 0)
+--- SNPP 2013 belgium ---
+  input rows                                                                 3980
+  type == 0 (vegetation fire)                                                 443   (removed 3537)
+  drop low confidence                                                         431   (removed 12)
+  drop persistent spots (>= 5 dates/year)                                     288   (removed 143)
+  outside the region grid (other territories)                                 288   (removed 0)
+--- SNPP 2014 belgium ---
+  input rows                                                                 4670
+  type == 0 (vegetation fire)                                                 438   (removed 4232)
+  drop low confidence                                                         433   (removed 5)
+  drop persistent spots (>= 5 dates/year)                                     280   (removed 153)
+  outside the region grid (other territories)                                 280   (removed 0)
+--- SNPP 2015 belgium ---
+  input rows                                                                 4485
+  type == 0 (vegetation fire)                                                 450   (removed 4035)
+  drop low confidence                                                         438   (removed 12)
+  drop persistent spots (>= 5 dates/year)                                     285   (removed 153)
+  outside the region grid (other territories)                                 285   (removed 0)
+--- SNPP 2016 belgium ---
+  input rows                                                                 4616
+  type == 0 (vegetation fire)                                                 407   (removed 4209)
+  drop low confidence                                                         401   (removed 6)
+  drop persistent spots (>= 5 dates/year)                                     285   (removed 116)
+  outside the region grid (other territories)                                 285   (removed 0)
+--- SNPP 2017 belgium ---
+  input rows                                                                 4433
+  type == 0 (vegetation fire)                                                 414   (removed 4019)
+  drop low confidence                                                         401   (removed 13)
+  drop persistent spots (>= 5 dates/year)                                     249   (removed 152)
+  outside the region grid (other territories)                                 249   (removed 0)
+--- SNPP 2018 belgium ---
+  input rows                                                                 5407
+  type == 0 (vegetation fire)                                                 516   (removed 4891)
+  drop low confidence                                                         496   (removed 20)
+  drop persistent spots (>= 5 dates/year)                                     298   (removed 198)
+  outside the region grid (other territories)                                 298   (removed 0)
+--- SNPP 2019 belgium ---
+  input rows                                                                 5203
+  type == 0 (vegetation fire)                                                 438   (removed 4765)
+  drop low confidence                                                         425   (removed 13)
+  drop persistent spots (>= 5 dates/year)                                     300   (removed 125)
+  outside the region grid (other territories)                                 300   (removed 0)
+--- SNPP 2020 belgium ---
+  input rows                                                                 4539
+  type == 0 (vegetation fire)                                                 455   (removed 4084)
+  drop low confidence                                                         441   (removed 14)
+  drop persistent spots (>= 5 dates/year)                                     351   (removed 90)
+  outside the region grid (other territories)                                 351   (removed 0)
+--- SNPP 2021 belgium ---
+  input rows                                                                 4441
+  type == 0 (vegetation fire)                                                 508   (removed 3933)
+  drop low confidence                                                         493   (removed 15)
+  drop persistent spots (>= 5 dates/year)                                     298   (removed 195)
+  outside the region grid (other territories)                                 298   (removed 0)
+--- SNPP 2022 belgium ---
+  input rows                                                                 4870
+  type == 0 (vegetation fire)                                                 434   (removed 4436)
+  drop low confidence                                                         418   (removed 16)
+  drop persistent spots (>= 5 dates/year)                                     272   (removed 146)
+  outside the region grid (other territories)                                 272   (removed 0)
+--- SNPP 2023 belgium ---
+  input rows                                                                 3819
+  type == 0 (vegetation fire)                                                 373   (removed 3446)
+  drop low confidence                                                         362   (removed 11)
+  drop persistent spots (>= 5 dates/year)                                     261   (removed 101)
+  outside the region grid (other territories)                                 261   (removed 0)
+--- SNPP 2024 belgium ---
+  input rows                                                                 3114
+  type == 0 (vegetation fire)                                                 265   (removed 2849)
+  drop low confidence                                                         257   (removed 8)
+  drop persistent spots (>= 5 dates/year)                                     154   (removed 103)
+  outside the region grid (other territories)                                 154   (removed 0)
+--- SNPP 2025 belgium ---
+  input rows                                                                 4891
+  type == 0 (vegetation fire)                                                 457   (removed 4434)
+  drop low confidence                                                         444   (removed 13)
+  drop persistent spots (>= 5 dates/year)                                     325   (removed 119)
+  outside the region grid (other territories)                                 325   (removed 0)
