@@ -75,6 +75,7 @@ REGIONS = {
     'indonesia':   dict(name='Indonesia', country='Indonesia', bbox=(-11.5, 6.5, 94.5, 141.5), tier='core',
                         regime='Peatland and forest fires; 2015 haze season'),
     'cambodia':    dict(name='Cambodia', country='Cambodia', bbox=(10.0, 15.0, 102.0, 108.0), tier='core',
+                        persist_min_dates=20,  # this part avoids the deletion of agricultural rows (was inspected using inspect_persistent.py)
                         regime='Compact, strong dry-season burning (good for calibration)'),
     'zambia':      dict(name='Zambia', country='Zambia', bbox=(-18.5, -8.0, 21.5, 34.0), tier='core',
                         regime='African savanna, very high fire activity (good for calibration)')
