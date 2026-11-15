@@ -1,9 +1,5 @@
 """
 ML/grid.py  -  the region grid: which cells exist, which detections belong, the final cell_week columns.
-
-turns scattered satellite fire dots into a clean, uniform data table (map square × week)
-
-producing the standardized table
 """
 import numpy as np
 import pandas as pd
@@ -12,23 +8,26 @@ import pandas as pd
 def cell_ranges(bbox, res):
     """Cell index ranges (cx0, cx1, cy0, cy1) covered by the bbox. Cell index = floor(coordinate / res)."""
     min_lat, max_lat, min_lon, max_lon = bbox
-    return (int(np.floor(min_lon / res)), int(np.floor(max_lon / res)),
-            int(np.floor(min_lat / res)), int(np.floor(max_lat / res)))
+    cx0, cy0 = int(np.floor(min_lon / res)), int(np.floor(min_lat / res))
+    # the max edge is exclusive: a box ending exactly on a cell edge (e.g. lat 15.0) must NOT add the cell beyond it
+    cx1, cy1 = int(np.ceil(max_lon / res)) - 1, int(np.ceil(max_lat / res)) - 1
+    return cx0, max(cx0, cx1), cy0, max(cy0, cy1)
+
+
+def full_periods(start, end, period):
+    """Start dates of the periods that lie COMPLETELY inside start..end.
+    The first/last week of a year usually straddles New Year (e.g. 2014-12-29 .. 2015-01-04). Such a week
+    would be half empty because the neighbouring year's file is missing, so it is left out."""
+    p = pd.period_range(start, end, freq=period)
+    keep = (p.start_time >= pd.Timestamp(start)) & (p.end_time < pd.Timestamp(end) + pd.Timedelta(days=1))
+    return p[keep].start_time
 
 
 def build_grid(bbox, res, start, end, period):
-    """Every cell in the region x every period (weeks start on Monday)."""
-
-    # cx0 = min_lon / res
-    # cx1 = max_lon / res
-    # cy0 = min_lat / res
-    # cy1 = max_lar / res
+    """Every cell in the region x every full period (weeks start on Monday)."""
     cx0, cx1, cy0, cy1 = cell_ranges(bbox, res)
-
     cells = pd.MultiIndex.from_product([np.arange(cx0, cx1 + 1), np.arange(cy0, cy1 + 1)], names=['cx', 'cy']).to_frame(index=False)
-
-    periods = pd.DataFrame({'period': pd.period_range(start, end, freq=period).start_time})
-    
+    periods = pd.DataFrame({'period': full_periods(start, end, period)})
     return cells.merge(periods, how='cross')
 
 

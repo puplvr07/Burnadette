@@ -4,7 +4,7 @@ ML/config.py  -  every setting lives here. Change things here, never inside the 
 HOW TO ADD A REGION
 1. Download its MODIS and S-NPP country files into raw_data/ (see folders below).
 2. Add one entry to REGIONS. 'country' must match the file name EXACTLY
-    (look at your downloaded file, e.g. modis_2018_Belgium.csv  ->  country='Belgium').
+(look at your downloaded file, e.g. modis_2018_Belgium.csv  ->  country='Belgium').
 3. Check the bbox with:   python ML/suggest_bbox.py <Country>
 4. Run:  python ML/01_clean.py <slug>   then   02_aggregate.py <slug>   then   04_export_web.py <slug>
 """
@@ -34,12 +34,18 @@ DEFAULT_SENSORS = ['MODIS', 'SNPP']      # NOAA-20 is only for gap filling and c
 # 'affects' = which instrument is hurt. Check 'terra_only' end against the first Aqua row in YOUR data.
 KNOWN_GAPS = [
     dict(id='terra_only', start='2000-11-01', end='2002-05-04', affects='modis',
-        note='Terra only. Aqua was launched 4 May 2002 and its fire data starts a little later: fewer observations.'),
+            note='Terra only. Aqua was launched 4 May 2002 and its fire data starts a little later: fewer observations.'),
     dict(id='aqua_outage', start='2020-08-16', end='2020-09-02', affects='modis',
-        note='Aqua data loss; limited direct-broadcast coverage.'),
+            note='Aqua data loss; limited direct-broadcast coverage.'),
     dict(id='snpp_outage', start='2022-07-27', end='2022-08-10', affects='viirs',
-        note='S-NPP VIIRS outage (zeros in these weeks are not real).'),
+            note='S-NPP VIIRS outage (zeros in these weeks are not real).'),
 ]
+
+# Persistence filter (01_clean.py): a ~1 km spot that fires on at least this many different dates in one year is
+# treated as a static heat source (industry) and removed. 5 suits low-fire places like Belgium. In a high-fire country
+# it may remove REAL repeated burning, so check with  python ML/inspect_persistent.py <region>  and, if needed,
+# override per region with persist_min_dates=... inside REGIONS (then run 01_clean.py <region> --force).
+PERSIST_MIN_DATES = 5
 
 # Calibration settings (03_calibrate.py)
 CAL = dict(
@@ -71,18 +77,7 @@ REGIONS = {
     'cambodia':    dict(name='Cambodia', country='Cambodia', bbox=(10.0, 15.0, 102.0, 108.0), tier='core',
                         regime='Compact, strong dry-season burning (good for calibration)'),
     'zambia':      dict(name='Zambia', country='Zambia', bbox=(-18.5, -8.0, 21.5, 34.0), tier='core',
-                        regime='African savanna, very high fire activity (good for calibration)'),
-    # ---------------- stretch ----------------
-    'portugal':    dict(name='Portugal (mainland)', country='Portugal', bbox=(36.5, 42.5, -10.0, -6.0), tier='stretch',
-                        regime='Mediterranean wildfires; islands are clipped out'),
-    'bolivia':     dict(name='Bolivia', country='Bolivia', bbox=(-23.0, -9.5, -70.0, -57.0), tier='stretch',
-                        regime='Amazon edge, forest and pasture fires; 2019 season'),
-    'australia':   dict(name='Australia', country='Australia', bbox=(-44.0, -10.0, 113.0, 154.0), tier='stretch',
-                        regime='Savanna and bushfires; 2019-20 season (large: slow to process)'),
-    'thailand':    dict(name='Thailand', country='Thailand', bbox=(5.5, 20.5, 97.0, 106.0), tier='stretch',
-                        regime='Agricultural burning and northern haze season'),
-    'greece':      dict(name='Greece', country='Greece', bbox=(34.5, 42.0, 19.0, 28.5), tier='stretch',
-                        regime='Mediterranean wildfires'),
+                        regime='African savanna, very high fire activity (good for calibration)')
 }
 
 
@@ -90,6 +85,10 @@ def sensor_years(sensor):
     """Years in which this instrument has data (within FIRST_YEAR..LAST_YEAR)."""
     first = max(FIRST_YEAR, int(SENSORS[sensor]['start'][:4]))
     return list(range(first, LAST_YEAR + 1))
+
+
+def persist_min_dates(slug):
+    return REGIONS[slug].get('persist_min_dates', PERSIST_MIN_DATES)
 
 
 def region_sensors(slug):

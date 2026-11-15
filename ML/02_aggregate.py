@@ -3,9 +3,6 @@ ML/02_aggregate.py  -  STAGE 2: cleaned files -> cell_week table (MODIS and VIIR
 
     python ML/02_aggregate.py belgium      (or: core, all, a,b)
 Writes: processed/cell_week_<region>.parquet (git-ignored)  and  processed/sample/cell_week_<region>_sample.csv
-
-It takes the dozens of separate yearly Parquet files created by 01_clean.py and combines 
-them into one master cell_week table per country with MODIS and VIIRS lined up side-by-side.
 """
 import os
 import sys
@@ -52,7 +49,13 @@ def aggregate_region(slug):
     n_cells = table[['cx', 'cy']].drop_duplicates().shape[0]
     print(f'grid: {n_cells} cells x {table.period.nunique()} periods = {len(table)} rows')
 
+    grid_periods = pd.DatetimeIndex(table.period.unique())
     for prefix, (cells, covered, sensor) in results.items():
+        inside = cells.period.isin(grid_periods)
+        if (~inside).any():
+            print(f'  {sensor}: {int((~inside).sum())} active cell-weeks lie in a partial week at the very start or end '
+                    f'of the data and are left out')
+            cells = cells[inside]
         table = fill_calendar(table, cells, prefix, covered, config.SENSORS[sensor]['start'], config.PERIOD)
         lost = len(cells) - int(table[f'{prefix}_active'].sum())
         assert lost == 0, f'{lost} {sensor} detections fell outside the grid: re-run 01_clean.py --force'
