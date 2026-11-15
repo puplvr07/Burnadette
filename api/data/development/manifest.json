@@ -1,0 +1,25 @@
+{
+  "id": "cambodia-development-2015-2018",
+  "mode": "development_sample",
+  "git_revision": "4f1eebefefccd4926d9bf35255c68b93c894a9f8",
+  "source_path": "processed/sample/cell_week_cambodia_sample.csv",
+  "sha256": "9eb98b3586b42aaa0140bd7c372919ae70a79570a4ced744ed331eb3b3dc7af2",
+  "declared_bbox": [
+    102,
+    10,
+    108,
+    15
+  ],
+  "excluded_cell_ids": [
+    "204_30",
+    "205_30"
+  ],
+  "raw_rows": 4992,
+  "raw_cells": 24,
+  "calibration_years": [
+    2015,
+    2016,
+    2017,
+    2018
+  ]
+}
