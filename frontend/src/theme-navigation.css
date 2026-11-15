@@ -441,8 +441,8 @@
 
 /* A warm, slowly shifting halo stays behind the rotating globe. */
 :root .shell .redesign-home .instrument-earth {
-  --earth-halo-near: rgba(255, 192, 120, .48);
-  --earth-halo-far: rgba(255, 192, 120, .22);
+  --earth-halo-near: rgba(255, 133, 32, .58);
+  --earth-halo-far: rgba(245, 99, 18, .30);
   box-shadow: inset 20px -10px 50px #0007, 0 0 55px 18px var(--earth-halo-near), 0 0 110px 38px var(--earth-halo-far);
   animation-name: instrument-earth-spin, earth-halo;
   animation-duration: var(--earth-orbit-period,100s), 5s;
@@ -451,8 +451,8 @@
   animation-direction: normal, alternate;
 }
 :root[data-theme="light"] .shell .redesign-home .instrument-earth {
-  --earth-halo-near: rgba(255, 192, 120, .46);
-  --earth-halo-far: rgba(255, 192, 120, .22);
+  --earth-halo-near: rgba(255, 133, 32, .53);
+  --earth-halo-far: rgba(245, 99, 18, .27);
 }
 @keyframes earth-halo {
   from { box-shadow: inset 20px -10px 50px #0007, -5px 3px 45px 10px var(--earth-halo-near), 0 0 90px 25px var(--earth-halo-far); }
@@ -460,4 +460,177 @@
 }
 @media (prefers-reduced-motion: reduce) {
   :root .shell .redesign-home .instrument-earth { animation: none; }
+}
+
+/* Decorative squares echo the heatmap, without representing observations. */
+:root .shell .redesign-home .instrument-stage::before {
+  content: ""; position: absolute; z-index: 1; pointer-events: none;
+  width: calc(var(--globe-size) * 1.8); height: calc(var(--globe-size) * 1.8);
+  right: calc(var(--globe-size) * -.83); top: 50%;
+  transform: translateY(-50%); background: url('/earth-pixel-glow.svg') center / contain no-repeat;
+  opacity: .4; animation: pixel-halo-orbit 55s linear infinite, pixel-halo-breathe 5s ease-in-out infinite alternate;
+}
+@keyframes pixel-halo-orbit { from { transform: translateY(-50%) rotate(0deg); } to { transform: translateY(-50%) rotate(360deg); } }
+@keyframes pixel-halo-breathe { from { opacity: .25; } to { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) {
+  :root .shell .redesign-home .instrument-stage::before { animation: none; opacity: .35; }
+}
+
+/* A compact, explicitly labeled glimpse of the existing sample calendar. */
+.shell .hero-sample-link {
+  display: flex; align-items: center; gap: 16px; width: min(100%, 470px);
+  margin-top: 22px; padding: 14px 16px; text-align: left; cursor: pointer;
+  border: 1px solid var(--control-edge); border-radius: 16px;
+  background: color-mix(in srgb, var(--control-bg) 82%, transparent); color: var(--control-text);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  transition: border-color .2s, background .2s;
+}
+.shell .hero-sample-link:hover { background: var(--control-hover); border-color: var(--action); }
+.shell .hero-sample-copy { display: grid; gap: 5px; flex: 1; min-width: 0; }
+.shell .hero-sample-copy strong { font: 600 14px/1.3 var(--f-body); }
+.shell .hero-sample-copy small { color: var(--sub); font: 10px/1.4 var(--f-mono); }
+.shell .hero-sample-grid { display: grid; grid-template-columns: repeat(10, 8px); gap: 3px; flex-shrink: 0; }
+.shell .hero-sample-grid i { width: 8px; height: 8px; border-radius: 2px; }
+.shell .hero-sample-arrow { font-size: 20px; }
+@media (max-width: 450px) {
+  .shell .hero-sample-link { gap: 10px; padding: 12px; }
+  .shell .hero-sample-grid { grid-template-columns: repeat(10, 6px); gap: 2px; }
+  .shell .hero-sample-grid i { width: 6px; height: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { .shell .hero-sample-link { transition: none; } }
+
+/* Explore views open downward from a centered top control. */
+:root .shell .explore-dock,
+:root .shell.map-shell .explore-dock {
+  top: max(20px, env(safe-area-inset-top)); bottom: auto;
+  left: 50%; right: auto; transform: translateX(-50%);
+  width: max-content; max-width: calc(100vw - 32px); padding: 0;
+}
+:root .shell .explore-dock-bottom { justify-content: center; }
+:root .shell .explore-dock-links {
+  top: 100%; bottom: auto; left: 50%;
+  width: min(320px, calc(100vw - 32px)); max-width: calc(100vw - 32px);
+  transform: translate(-50%, -8px) scale(.97); transform-origin: top center;
+}
+:root .shell .explore-dock.is-open .explore-dock-links { transform: translate(-50%, 0) scale(1); }
+@media (max-width: 1250px) {
+  :root .shell .explore-dock, :root .shell.map-shell .explore-dock {
+    top: max(84px, calc(env(safe-area-inset-top) + 68px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .shell .explore-dock-links { transition: none; }
+}
+
+/* Align the map's search and views controls with the main navigation row. */
+:root .shell .explore-dock { top: max(26px, calc(env(safe-area-inset-top) + 26px)); }
+:root .shell.map-shell .explore-dock { top: max(22px, calc(env(safe-area-inset-top) + 22px)); }
+:root .shell .immersive-map .map-discovery,
+:root .shell .immersive-map.settings-open .map-discovery {
+  top: max(22px, calc(env(safe-area-inset-top) + 22px));
+}
+/* On narrow screens, keep the centered views control below the header rather
+   than overlapping the navigation or the search control. */
+@media (max-width: 900px) {
+  :root .shell .explore-dock, :root .shell.map-shell .explore-dock {
+    top: max(84px, calc(env(safe-area-inset-top) + 84px));
+  }
+}
+
+/* Keep data limitations directly beneath the map zoom controls. */
+:root .shell .immersive-map .map-bottom-bar {
+  left: var(--map-action-left, 16px);
+  bottom: max(8px, calc(var(--map-zoom-bottom, 86px) - 54px));
+  max-width: calc(100% - 32px);
+}
+:root .shell .immersive-map .map-bottom-bar button { min-height: 44px; }
+
+/* Give comparison content room inside its panel. */
+:root .shell .compare-panel {
+  box-sizing: border-box; min-width: 0; padding: clamp(20px, 3vw, 40px);
+  border: 1px solid var(--edge-glass); border-radius: var(--layout-radius);
+  background: var(--surface-glass); box-shadow: var(--shadow-glass);
+}
+.shell .analytics-bottom-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); margin-top: 26px; }
+.shell .analytics-bottom-grid > section { min-width: 0; }
+.shell .analytics-bottom-grid .chart-head { margin-top: 0; }
+.shell .analytics-bottom-grid :is(p, li, button) { overflow-wrap: anywhere; }
+@media (max-width: 760px) { .shell .analytics-bottom-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* Update the selected-year profile gently; keep year-bar focus in place. */
+.shell .chart-transition { animation: chart-update .42s ease-out both; }
+.shell .analytics :is(.bar, .bar-outline, .year-dot) { transition: fill .35s ease, stroke .35s ease, opacity .35s ease; }
+@keyframes chart-update { from { opacity: .45; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .shell .chart-transition { animation: none; }
+  .shell .analytics :is(.bar, .bar-outline, .year-dot) { transition: none; }
+}
+
+/* Keep calendar labels and weekly details within their cards at every width. */
+.shell .instrument-model-orbit .instrument-photo { display: block; width: 100%; height: 100%; object-fit: contain; }
+.shell .instrument-model figcaption a { color: inherit; text-decoration: underline; }
+.shell :is(.monthly-calendar, .calendar-month-header > div, .calendar-month-controls label,
+  .calendar-week-rows li, .calendar-week-row > *, .calendar-week-detail,
+  .heatmap-month-detail, .month-detail-heading > *, .month-week-bars button) {
+  min-width: 0;
+}
+.shell :is(.calendar-month-header, .calendar-context, .calendar-week-range,
+  .calendar-week-measure, .calendar-week-detail, .calendar-legend,
+  .heatmap-month-detail, .month-detail-heading, .month-week-bars button) {
+  overflow-wrap: anywhere;
+}
+.shell .month-detail-heading { flex-wrap: wrap; }
+.shell .month-week-bars { grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); }
+.shell .month-week-bars button { max-width: 100%; white-space: normal; }
+.shell .calendar-month-controls { max-width: 100%; flex-wrap: wrap; }
+.shell .calendar-context > span { max-width: 100%; }
+@media (max-width: 600px) {
+  .shell .month-week-bars { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shell .month-detail-heading { align-items: flex-start; }
+  .shell .calendar-month-controls select { max-width: 100%; }
+}
+
+/* Mobile controls use their own wrapping layout; desktop geometry is unchanged. */
+@media (max-width: 640px) {
+  :root .shell .site-header .primary-header-row { flex-wrap: wrap; gap: 12px; padding-inline: 12px; }
+  :root .shell .site-header .header-actions { max-width: 100%; gap: 8px; flex-wrap: wrap; }
+  :root .shell .site-header .primary-header-row .nav-links { display: flex; min-width: 0; gap: 2px; }
+  :root .shell .site-header .primary-header-row .nav-links a { padding: 8px 12px; font-size: 14px; min-height: 44px; }
+  .shell .hero-actions { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+  .shell .hero-actions > * { box-sizing: border-box; max-width: 100%; white-space: normal; text-align: center; justify-content: center; }
+  .shell .controls { display: flex; flex-wrap: wrap; gap: 16px; }
+  .shell .controls > * { min-width: 0; max-width: 100%; }
+  .shell .seg { display: flex; flex-wrap: wrap; gap: 8px; }
+  .shell .seg button { flex: 1 1 100px; min-height: 44px; white-space: normal; padding: 10px; }
+  .shell .immersive-map :is(.map-settings,.region-search) { box-sizing: border-box; width: calc(100% - 24px); max-width: calc(100% - 24px); left: 12px; right: 12px; max-height: 65dvh; overflow-y: auto; }
+  .shell :is(.calendar-month-controls,.instrument-inline-actions) { flex-wrap: wrap; gap: 10px; }
+  .shell .analytics-downloads { display: flex; flex-wrap: wrap; gap: 10px; }
+  .shell :is(button,select,input) { max-width: 100%; }
+  .shell :is(.panel,.member,.calendar-state) { min-width: 0; }
+}
+
+/* Footer copy must contrast with each theme's actual surface. */
+:root[data-theme="light"] .shell .site-footer { background: #edf3fb; border-color: #b6c5da; }
+:root[data-theme="light"] .shell .site-footer p { color: #33445e; }
+:root:not([data-theme="light"]) .shell .site-footer p { color: #ded6ca; }
+
+/* Stationary illumination over the rotating surface gives the globe volume.
+   Keep the central surface clear so night lights and hotspots stay legible. */
+.shell .instrument-earth .earth-spherical-lighting {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 29% 23%, #e6f4ff30 0%, #b9dfff0d 26%, transparent 52%),
+    radial-gradient(circle at 38% 35%, transparent 40%, #02071112 62%, #01040c69 83%, #00040aa3 100%);
+  box-shadow:
+    inset 3px 3px 9px #c4e4ff52,
+    inset -12px -10px 30px #00081438;
+}
+:root[data-theme="light"] .shell .instrument-earth .earth-spherical-lighting {
+  background:
+    radial-gradient(ellipse at 29% 23%, #f0f8ff42 0%, #c8e5ff12 28%, transparent 52%),
+    radial-gradient(circle at 38% 35%, transparent 42%, #0613240d 64%, #02091659 85%, #00040a94 100%);
 }

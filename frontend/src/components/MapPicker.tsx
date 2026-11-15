@@ -372,7 +372,7 @@ export default function MapPicker({ sample, exportContext, bbox, radiusSelection
           {([['draw','Draw area'],['measure','Measure'],['location','Location']] as const).map(([group,label])=><button key={group} type="button" aria-pressed={toolGroup===group} onClick={()=>{modeRef.current=null;cancel.current();utilities.cancel();setMode(null);setToolGroup(group);}}>{label}</button>)}
         </div>
         <div className="unified-draw-group" hidden={toolGroup!=="draw"}>
-        <p className="small" role={selectionCleared ? "status" : undefined}>{selectionCleared ? "Map cleared. No analysis region selected. " : ""}Select an analysis region. Activate a shape, then draw on the map.</p>
+        <p className="small" role={selectionCleared ? "status" : undefined}>{selectionCleared ? "Map cleared. " : ""}Choose a shape, then draw on the map.</p>
         <div className="seg" role="group" aria-label="Selection shape">
           {SHAPES.map(([s, label]) => (
             <button key={s} aria-pressed={mode === s} onClick={() => {
@@ -391,7 +391,7 @@ export default function MapPicker({ sample, exportContext, bbox, radiusSelection
         <span className="small">{mode && !measuring(mode) ? HINTS[mode] : "Browsing only. Activate a tool above to select an analysis region."}</span>
         </div>
         <div className={`unified-utility-group group-${toolGroup}`} hidden={toolGroup==="draw"}>
-          <p className="small">{toolGroup==="measure"?"Measure distances or areas without changing the analysis region.":"Center the map on your location. Permission is requested only when you choose My location."}</p>
+          <p className="small">{toolGroup==="measure"?"Measurements do not change your region.":"Center on your location; permission is requested when selected."}</p>
           {utilities.controlsUI}
           {toolGroup==="measure"&&utilities.resultsUI}
           {toolGroup==="location"&&utilities.locationUI}
@@ -399,7 +399,7 @@ export default function MapPicker({ sample, exportContext, bbox, radiusSelection
         <button type="button" className="map-export-button outline-action" disabled={exporting} onClick={async()=>{if(!map.current)return;setExporting(true);setExportMessage("");try{await saveMapImage(map.current,exportContext,sample);setExportMessage("Map image saved.");}catch(error){setExportMessage(error instanceof Error?error.message:"Unable to save the map image.");}finally{setExporting(false);}}}>{exporting?"Saving map…":"Save map image ↓"}</button>
         <p className="small" role="status">{exportMessage}</p>
         <button type="button" className="clear-map-button" aria-label="Clear map" title="Remove all drawn regions, measurements, markers and related results" onClick={()=>{modeRef.current=null;cancel.current();utilities.clear();setMode(null);shapeLayer.current?.remove();centerMarker.current?.remove();shapeLayer.current=undefined;centerMarker.current=undefined;radiusCircle.current=undefined;drawnKey.current="";onClearSelection?.();}}><MapControlIcon name="clear" />Clear map</button>
-        <p className="map-clear-explanation">Clears drawn regions, measurements, location markers and analysis results. Dates and source are kept.</p>
+        <p className="map-clear-explanation">Clears shapes, measurements, location and results. Dates and source stay.</p>
       </div>
       </div>
       {coordSource === "center" && <span className="map-center-crosshair" aria-hidden="true" />}

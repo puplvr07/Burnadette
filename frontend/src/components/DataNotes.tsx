@@ -18,8 +18,9 @@ export default function DataNotes({ data, source, region }: Props) {
   if (data.cells_in_area > 0) notes.push({ key: "border", strong: "Regions follow national borders.", text: "Fires in neighbouring countries are not included, so squares along a border can look quieter than they are. Squares outside the country, or at sea, count as \"no fire\"." });
   if (!notes.length) return null;
   return (
-    <aside className="data-notes panel" aria-label="Notes about this selection">
+    <details className="data-notes panel">
+      <summary>Data notes: {notes.map((n) => n.strong.replace(/\.$/, "")).join(" · ")}</summary>
       <ul>{notes.map((n) => <li key={n.key}><strong>{n.strong}</strong> {n.text}</li>)}</ul>
-    </aside>
+    </details>
   );
 }
