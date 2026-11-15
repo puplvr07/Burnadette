@@ -198,7 +198,7 @@ export default function CalendarPage({ view, hidden }: Props) {
         </section>
       )}
       {view === "heatmap" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
-      <section className="panel explore-panel" aria-label="Calendar" hidden={view !== "calendar" || !selection}>
+      <section className="panel explore-panel calendar-results-panel" aria-label="Calendar" hidden={view !== "calendar" || !selection}>
         {meta && selection && <MonthCalendar weeks={data?.weeks ?? []} start={selection.start} end={selection.end} metric={selection.metric} source={selection.source} meta={meta} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
         <a className="view-calendar-btn" href="#heatmap">Compare years in Heatmap</a>
       </section>

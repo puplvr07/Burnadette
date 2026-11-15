@@ -119,7 +119,7 @@ export default function Analytics({ weeks, meta, bbox, start, end, source }: Pro
         col("Year", 8) + col("Weeks", 8) + col("Total activity", 17) + col("Mean weekly", 14) + col("Max weekly", 13) + col("Mean anomaly", 15) + col("vs full-year avg", 18) + "Note",
         ...years.map((s) => col(String(s.year), 8) + col(String(s.weeks), 8) + col(precise(s.total, 4), 17) + col(precise(s.mean, 4), 14)
           + col(precise(s.max, 4), 13) + col(s.meanAnomaly != null ? `${precise(s.meanAnomaly, 2)}/100` : "n/a", 15)
-          + col(fullAvg && s.weeks ? signed(((s.total - fullAvg) / fullAvg) * 100, 2) : "n/a", 18)
+          + col(fullAvg && s.weeks && !s.partial ? signed(((s.total - fullAvg) / fullAvg) * 100, 2) : "n/a", 18)
           + [s.partial ? "partial year" : "", picked.includes(s.year) ? "selected" : ""].filter(Boolean).join(", ")),
       ],
     };
@@ -249,7 +249,7 @@ interface Compared { year: number; i: number; series: (WeekRow | undefined)[]; s
 function linePath(vals: (number | null)[], x: (i: number) => number, y: (v: number) => number) {
   let d = "", pen = false;
   vals.forEach((v, i) => {
-    if (v == null) { pen = false; return; }
+    if (v == null || !Number.isFinite(v)) { pen = false; return; }
     d += `${pen ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`;
     pen = true;
   });
@@ -267,7 +267,7 @@ function bandPaths(lo: (number | null)[], hi: (number | null)[], x: (i: number) 
     }
     run = [];
   };
-  lo.forEach((v, i) => (v != null && hi[i] != null ? run.push(i) : flush()));
+  lo.forEach((v, i) => (v != null && Number.isFinite(v) && hi[i] != null && Number.isFinite(hi[i]) ? run.push(i) : flush()));
   flush();
   return out;
 }
@@ -284,7 +284,7 @@ function SeasonChart({ W, season, compared, showBand }: { W: number; season: Sea
   const band = showBand ? compared[0] : undefined;
   const bandLo = band?.series.map((w) => w?.uncertainty_low ?? null) ?? [];
   const bandHi = band?.series.map((w) => w?.uncertainty_high ?? null) ?? [];
-  const max = Math.max(1e-6, ...[...season.hi, ...vals.flat(), ...bandHi].filter((v): v is number => v != null)) * 1.12;
+  const max = Math.max(1e-6, ...[...season.hi, ...vals.flat(), ...bandHi].filter((v): v is number => v != null && Number.isFinite(v))) * 1.12;
   const x = (i: number) => L + (i * (W - L - R)) / (COLS - 1);
   const y = (v: number) => T + (1 - v / max) * (H - T - B);
   return (
@@ -334,7 +334,7 @@ function YearChart({ W, years, picked, onToggle }: { W: number; years: YearStat[
   // Exact totals (export only) turn sideways when bars are too narrow for the number.
   const vertical = slot < 48;
   return (
-    <svg id="years-svg" className="chart-svg" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Total activity per year">
+    <svg id="years-svg" className="chart-svg" viewBox={`0 0 ${W} ${H}`} role="group" aria-label="Total activity per year; select a year to compare">
       <defs>
         <pattern id="partial-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <rect width="6" height="6" fill="#ffa63d22" /><line x1="0" y1="0" x2="0" y2="6" stroke="#ffa63d" strokeWidth="2" />
@@ -353,7 +353,11 @@ function YearChart({ W, years, picked, onToggle }: { W: number; years: YearStat[
         const cls = s.partial ? "bar bar-partial" : k >= 0 ? `bar bar-pick${color}` : "bar";
         const top = y(s.total), height = Math.max(0, y(0) - top);
         return (
-          <g key={s.year} className={`bar-hit${color}`} onClick={() => s.weeks > 0 && onToggle(s.year)}>
+          <g key={s.year} className={`bar-hit${color}`} role="button" tabIndex={s.weeks > 0 ? 0 : -1}
+            aria-label={`${s.year}: total ${precise(s.total)} over ${s.weeks} weeks${s.partial ? ", partial year" : ""}`}
+            aria-pressed={k >= 0} aria-disabled={s.weeks === 0}
+            onKeyDown={(event) => { if (s.weeks > 0 && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); onToggle(s.year); } }}
+            onClick={() => s.weeks > 0 && onToggle(s.year)}>
             <title>{`${s.year}: total ${s.total.toFixed(1)} over ${s.weeks} weeks${s.partial ? " (partial year)" : ""}. ${k >= 0 ? "Click to remove" : "Click to compare"}.`}</title>
             <rect x={L + slot * i} y={T} width={slot} height={H - T - B} fill="transparent" />
             <rect x={cx - bw / 2} y={top} width={bw} height={height} rx={2} className={cls} fill={s.partial ? "url(#partial-hatch)" : undefined} />
@@ -400,7 +404,7 @@ function yearlyRows(years: YearStat[], picked: number[]): unknown[][] {
   return [
     ["year", "weeks_with_data", "total_activity", "mean_weekly_activity", "max_weekly_activity", "mean_anomaly", "vs_full_year_average_pct", "partial_year", "selected"],
     ...years.map((y) => [y.year, y.weeks, precise(y.total), precise(y.mean), precise(y.max), precise(y.meanAnomaly),
-      avg && y.weeks ? precise(((y.total - avg) / avg) * 100, 4) : "", y.partial ? 1 : 0, picked.includes(y.year) ? 1 : 0]),
+      avg && y.weeks && !y.partial ? precise(((y.total - avg) / avg) * 100, 4) : "", y.partial ? 1 : 0, picked.includes(y.year) ? 1 : 0]),
   ];
 }
 // One row per week of the year: the multi-year average and range, then each compared year.

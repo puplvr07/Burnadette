@@ -20,7 +20,14 @@ function rows(year) {
  assert.equal(api.yearStats(full.map((r,i)=>i? r:{...r,value:NaN}))[0].partial,true);
  assert.equal(api.yearStats(rows(2018))[0].partial,false); // 53 Monday starts
  assert.equal(api.toCsv([['a,b','line\nbreak','quote"']]),'"a,b","line\nbreak","quote"""\n');
- console.log('PASS: complete/partial years, duplicate and invalid records, 53-week year, CSV escaping.');
+ assert.equal(api.toCsv([['carriage\rreturn']]),'"carriage\rreturn"\n');
+ const invalid=[{...full[0],value:NaN,anomaly:Infinity},{...full[1],value:Infinity,anomaly:NaN}];
+ assert(api.seasonal(invalid,[]).avg.every(v=>v===null));
+ assert(api.monthAverages(invalid).every(v=>v===null));
+ assert.equal(api.topAnomalies(invalid,[2024]).length,0);
+ assert.equal(api.peakWeek(invalid),undefined);
+ assert.equal(api.compareToAverage(invalid,api.seasonal(invalid,[])),null);
+ console.log('PASS: complete/partial years, invalid numeric summaries, 53-week year, CSV escaping including carriage returns.');
  global.document={documentElement:{dataset:{}},createElement:()=>({getContext:()=>null})};
  global.getComputedStyle=()=>({getPropertyValue:()=>''});global.XMLSerializer=class{serializeToString(){return '<svg/>'}};
  global.Image=class{set src(value){queueMicrotask(()=>this.onload())}};
@@ -37,6 +44,10 @@ function rows(year) {
  const props={weeks:rows(2025),meta:{gaps:[],notes:[]},bbox:[0,0,1,1],start:'2025-01-01',end:'2025-12-31',source:'harmonized'};
  let tree;await act(async()=>{tree=create(React.createElement(m.exports.default,props))});
  await act(async()=>tree.update(React.createElement(m.exports.default,{...props,weeks:rows(2024),start:'2024-01-01',end:'2024-12-31'})));
- assert(JSON.stringify(tree.toJSON()).includes('2024'));await act(async()=>tree.update(React.createElement(m.exports.default,{...props,weeks:[]})));await act(async()=>tree.unmount());
+ assert(JSON.stringify(tree.toJSON()).includes('2024'));
+ const bar=tree.root.findAll(n=>n.type==='g'&&n.props.role==='button')[0];
+ assert.equal(bar.props.tabIndex,0);let prevented=false;
+ await act(async()=>bar.props.onKeyDown({key:'Enter',preventDefault(){prevented=true;}}));assert(prevented);
+ await act(async()=>tree.update(React.createElement(m.exports.default,{...props,weeks:[]})));await act(async()=>tree.unmount());
  console.log('PASS: changing to a non-overlapping year range and empty response does not crash Analytics.');
 })().catch(error=>{console.error(error);process.exitCode=1});

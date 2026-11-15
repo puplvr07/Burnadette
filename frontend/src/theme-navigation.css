@@ -629,8 +629,54 @@
     inset 3px 3px 9px #c4e4ff52,
     inset -12px -10px 30px #00081438;
 }
+.shell .bar-hit:focus-visible { outline: none; }
+.shell .bar-hit:focus-visible > rect:first-of-type {
+  stroke: var(--focus-ring);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
 :root[data-theme="light"] .shell .instrument-earth .earth-spherical-lighting {
   background:
     radial-gradient(ellipse at 29% 23%, #f0f8ff42 0%, #c8e5ff12 28%, transparent 52%),
     radial-gradient(circle at 38% 35%, transparent 42%, #0613240d 64%, #02091659 85%, #00040a94 100%);
+}
+
+/* Keep Explore tab contents inside the rounded menu, including Calendar. */
+:root .shell .explore-dock-links {
+  box-sizing: border-box;
+  gap: 4px;
+  padding: 6px;
+}
+:root .shell .explore-dock-links a {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  padding-inline: 8px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+/* Filter groups must shrink with their Calendar card rather than overflow it. */
+.shell .shared-controls > fieldset { min-width: 0; max-width: 100%; }
+.shell .shared-controls .seg { max-width: 100%; flex-wrap: wrap; }
+.shell .shared-controls .seg button { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+
+/* Inset the monthly planner from its glass card, including its footer action. */
+:root .shell .explore-page .calendar-results-panel {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: clamp(20px, 2.4vw, 36px);
+}
+.shell .calendar-results-panel .monthly-calendar { width: 100%; max-width: 100%; }
+.shell .calendar-results-panel .calendar-month-controls { min-width: 0; }
+.shell .calendar-results-panel > .view-calendar-btn {
+  display: inline-flex;
+  max-width: 100%;
+  margin-top: 20px;
+  white-space: normal;
+  text-align: center;
+}
+@media (max-width: 640px) {
+  :root .shell .explore-page .calendar-results-panel { padding: 16px; }
 }

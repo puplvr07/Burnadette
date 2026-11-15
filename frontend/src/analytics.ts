@@ -59,7 +59,7 @@ export function seasonal(weeks: WeekRow[], exclude: number[]): Season {
   const cols: number[][] = Array.from({ length: COLS }, () => []);
   const ys = new Set<number>();
   for (const w of weeks) {
-    if (w.value == null || exclude.includes(yearOf(w))) continue;
+    if (w.value == null || !Number.isFinite(w.value) || exclude.includes(yearOf(w))) continue;
     cols[colOf(w.week_start)].push(w.value);
     ys.add(yearOf(w));
   }
@@ -84,25 +84,25 @@ export function compareToAverage(series: (WeekRow | undefined)[], season: Season
   let a = 0, b = 0, n = 0;
   series.forEach((w, i) => {
     const avg = season.avg[i];
-    if (w?.value != null && avg != null) { a += w.value; b += avg; n++; }
+    if (w?.value != null && Number.isFinite(w.value) && avg != null && Number.isFinite(avg)) { a += w.value; b += avg; n++; }
   });
   return n && b > 0 ? { pct: ((a - b) / b) * 100, weeks: n } : null;
 }
 
 export function monthAverages(weeks: WeekRow[]): (number | null)[] {
   const m: number[][] = Array.from({ length: 12 }, () => []);
-  for (const w of weeks) if (w.value != null) m[+w.week_start.slice(5, 7) - 1].push(w.value);
+  for (const w of weeks) if (w.value != null && Number.isFinite(w.value)) m[+w.week_start.slice(5, 7) - 1].push(w.value);
   return m.map((xs) => (xs.length ? mean(xs) : null));
 }
 
 export function topAnomalies(weeks: WeekRow[], years: number[], n = 5): WeekRow[] {
-  return weeks.filter((w) => years.includes(yearOf(w)) && w.anomaly != null)
+  return weeks.filter((w) => years.includes(yearOf(w)) && w.anomaly != null && Number.isFinite(w.anomaly))
     .sort((a, b) => b.anomaly! - a.anomaly!).slice(0, n);
 }
 
 // Highest-activity week in a year's series.
 export const peakWeek = (series: (WeekRow | undefined)[]) =>
-  series.reduce<WeekRow | undefined>((best, w) => (w?.value != null && (best?.value == null || w.value > best.value) ? w : best), undefined);
+  series.reduce<WeekRow | undefined>((best, w) => (w?.value != null && Number.isFinite(w.value) && (best?.value == null || w.value > best.value) ? w : best), undefined);
 
 // Full precision for exports, without floating-point noise (0.30000000000000004 -> 0.3).
 export const precise = (v: number | null | undefined, d = 6) => (v == null || !Number.isFinite(v) ? "" : String(+v.toFixed(d)));
@@ -111,7 +111,7 @@ export const precise = (v: number | null | undefined, d = 6) => (v == null || !N
 
 const esc = (v: unknown) => {
   const s = v == null ? "" : String(v);
-  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 };
 export const toCsv = (rows: unknown[][]) => rows.map((r) => r.map(esc).join(",")).join("\n") + "\n";
 
