@@ -21,3 +21,10 @@ venv/
 .env
 .DS_Store
 Thumbs.db
+
+# Local Vercel state, environment files and packaging measurements
+.vercel/
+.env.*
+**/.env.*
+.packaging/
+.packaging-report.json
