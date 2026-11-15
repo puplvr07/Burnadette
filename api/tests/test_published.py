@@ -32,6 +32,7 @@ def test_complete_history(client, slug, source):
     assert body['cells_in_area'] == COUNTS[slug]
     assert body['coverage']['spatial_status'] == 'available'
     assert body['coverage']['region'] == slug
+    assert body['region'] == body['coverage']['region']
     assert len(body['weeks']) == 1313
     for i, row in enumerate(body['weeks']):
         flags = product.cal['flags'][i]
@@ -60,6 +61,7 @@ def test_subset_defaults_and_fractional_totals(client, slug):
     selected = product.select(box)
     assert 0 < len(selected) < COUNTS[slug]
     body = query(client, slug, start='2001-01-01', end='2001-12-31', bbox=box).json()
+    assert body['region'] == body['coverage']['region'] == slug
     assert any(r['active_cells'] % 1 != 0 for r in body['weeks'])
     for row in body['weeks']:
         entry = product.weeks[row['week_start']]
@@ -89,6 +91,42 @@ def test_outage_and_other_sensor_flags(client, slug):
     for wk, flag in [('2001-01-01', 'terra_only'), ('2020-08-17', 'aqua_outage')]:
         row = query(client, slug, 'modis', wk, wk).json()['weeks'][0]
         assert row['value'] is not None and flag in row['flags']
+
+
+@pytest.mark.parametrize('slug', COUNTS)
+def test_inferred_region_metadata(client, slug):
+    product = client.app.state.dataset.regions[slug]
+    # Resolve both the declared whole region and a custom area without routing input.
+    lat, lon = next((lat, lon) for lat, lon in product.cells
+                    if sum(bool(r.select((lon-.01, lat-.01, lon+.01, lat+.01)))
+                           for r in client.app.state.dataset.regions.values()) == 1)
+    for box in (product.bbox, (lon-.01, lat-.01, lon+.01, lat+.01)):
+        params = {'bbox': ','.join(map(str, box)), 'start': '2015-01-05', 'end': '2015-01-05'}
+        response = client.get('/calendar', params=params)
+        assert response.status_code == 200
+        body = response.json()
+        assert body['cells_in_area'] > 0
+        assert body['region'] == body['coverage']['region'] == slug
+        assert client.get('/calendar', params=params).json() == body  # Cached metadata too.
+
+
+@pytest.mark.parametrize('bbox,region,expected', [
+    ('117,5,118,6', 'philippines', 'philippines'),
+    ('117,5,118,6', 'indonesia', 'indonesia'),
+    ('0,0,1,1', None, None),
+    ('0,0,1,1', 'cambodia', 'cambodia'),
+])
+def test_routed_and_empty_region_metadata(client, bbox, region, expected):
+    params = {'bbox': bbox, 'start': '2015-01-05', 'end': '2015-01-05'}
+    if region is not None:
+        params['region'] = region
+    response = client.get('/calendar', params=params)
+    assert response.status_code == 200
+    body = response.json()
+    assert body['region'] == body['coverage']['region'] == expected
+    if bbox == '0,0,1,1':
+        assert body['cells_in_area'] == 0 and body['weeks'] == []
+    assert client.get('/calendar', params=params).json() == body
 
 
 def test_metadata_routing_and_boundaries(client):

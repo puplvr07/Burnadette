@@ -32,6 +32,7 @@ class CalendarResponse(BaseModel):
     cells_in_area: int
     weeks: list[Week]
     coverage: Coverage
+    region: str | None = None
 
 
 class Region(BaseModel):

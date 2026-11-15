@@ -39,6 +39,12 @@ be inferred; ambiguous selections return 422 rather than mix products. Bboxes se
 cell centers inclusively. Grid cells at sea or outside the source country remain in
 the fraction denominator. Full Indonesia history fits the published query limits.
 
+`/calendar` includes optional, nullable top-level `region`, matching the unchanged
+`coverage.region`. It identifies the actual resolved published product for both
+whole-region and custom-area requests. Explicitly routed empty selections retain
+that product; unresolved empty areas and legacy CSV profiles return null. Clients
+can use this field to look up calibration metadata from `/regions`.
+
 Configuration: FRONTEND_ORIGINS is a comma-separated exact-origin allowlist, defaulting
 to http://localhost:5173 and http://127.0.0.1:5173. BURN_PUBLISHED_PATH can select
 another local copy of the same pinned JSON artifact (including its manifest).
