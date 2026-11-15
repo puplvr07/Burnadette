@@ -1,0 +1,463 @@
+/* Shared geometry, theme-specific surfaces and interaction colors. */
+:root {
+  --control-bg:#27231f; --control-hover:#393129; --control-text:#f2eee7;
+  --control-edge:#aa947b66; --action:#ffc078; --action-text:#21180e;
+  --selected-bg:#ffa63d22; --selected-text:#ffd19a;
+  --glass-nav:#211d18c9; --focus-ring:#ffc078;
+}
+:root[data-theme="light"] {
+  --bg:#f4f6fa; --card:#fff; --border:#64799738; --text:#202b3b; --sub:#526077;
+  --teal:#174eaa; --glow:#396bc1; --control-bg:#fff; --control-hover:#eaf0f9;
+  --control-text:#24344d; --control-edge:#8395af66; --action:#174eaa; --action-text:#fff;
+  --selected-bg:#e3ecfa; --selected-text:#143f84; --glass-nav:#ffffffe0; --focus-ring:#174eaa;
+  --surface-glass:linear-gradient(135deg,#fffffff0,#edf2f9ec 70%,#fafbfded);
+  --edge-glass:#8b9db750;
+}
+:root[data-theme="light"] body { background:radial-gradient(ellipse at 90% 0%,#dce6f6,transparent 60%),#f4f6fa; }
+:root[data-theme="light"] .shell .site-header { background:#233975d9; border-color:#ffffff30; color:#fff; box-shadow:0 8px 30px #15294418; }
+:root .shell .site-footer { background:var(--card); color:var(--sub); }
+:root .shell .site-header { backdrop-filter:blur(20px) saturate(115%); -webkit-backdrop-filter:blur(20px) saturate(115%); }
+:root .shell .site-header .primary-header-row .nav-links {
+  padding:5px; gap:4px; border:1px solid #ffffff24; border-radius:999px;
+  background:#ffffff0a; box-shadow:inset 0 1px 0 #ffffff12,0 4px 16px #00000012;
+}
+:root .shell .site-header .primary-header-row .nav-links a {
+  min-height:44px; display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 20px; border:1px solid transparent; border-radius:999px; color:#d4cec4;
+  box-shadow:none; background:transparent; font-size:14px;
+}
+:root .shell .site-header .primary-header-row .nav-links a:hover { color:#fff; background:#ffffff12; }
+:root .shell .site-header .primary-header-row .nav-links a[aria-current="page"] {
+  background:var(--selected-bg); color:var(--selected-text); border-color:#e6af675c; box-shadow:inset 0 1px 0 #ffffff12;
+}
+:root[data-theme="light"] .shell .site-header .primary-header-row .nav-links a { color:#e3e9f8; }
+:root[data-theme="light"] .shell .site-header .primary-header-row .nav-links a[aria-current="page"] {
+  color:#14356c; background:#f4f7ff; border-color:#fff; box-shadow:0 2px 8px #07173124;
+}
+:root .shell .site-header .header-actions { gap:12px; }
+:root .shell .site-header .theme-toggle { border-radius:50%; background:#ffffff0a; color:#f2eee7; border-color:#ffffff30; width:44px; height:44px; }
+:root .shell .site-header .theme-toggle:hover { background:#ffffff1f; }
+:root .shell .map-nav-handle { background:var(--glass-nav); color:var(--control-text); border-color:var(--control-edge); min-height:44px; }
+
+/* One reusable control surface, without changing observation-cell colors. */
+:root .shell :is(.seg,.map-tool-groups,.shape-bar,.map-utilities,.region-search-results,.selection-coordinates,
+ .region-search-launcher .region-search,.map-measurement-panel,.map-location-message,.map-coordinate-readout,
+ .map-icon-button,.drawing-toggle,.map-settings-trigger,.map-sample-badge,.map-bottom-bar button,
+ .measurement-actions button,.measurement-coordinate-entry input,.clear-map-button,
+ .calendar-nav button,.calendar-navigation button,.calendar-month-select,.calendar-year-select,
+ .heatmap-expand-button,.profile-sound-toggle) {
+  background:var(--control-bg); color:var(--control-text); border-color:var(--control-edge);
+}
+:root .shell :is(.controls,.map-settings,.region-search,.measurement-coordinate-entry) :is(input,select,textarea) {
+  background:var(--control-bg); color:var(--control-text); border-color:var(--control-edge); color-scheme:inherit;
+}
+:root .shell :is(.seg,.map-tool-groups) button {
+  background:transparent; color:var(--sub); border-color:transparent; box-shadow:none; min-height:44px;
+}
+:root .shell :is(.seg,.map-tool-groups) button:hover,
+:root .shell :is(.map-icon-button,.drawing-toggle,.heatmap-expand-button,.profile-sound-toggle,.map-bottom-bar button):hover {
+  background:var(--control-hover); color:var(--control-text);
+}
+:root .shell :is(.seg,.map-tool-groups) button[aria-pressed="true"],
+:root .shell :is(.map-icon-button,.drawing-toggle)[aria-pressed="true"],
+:root .shell :is(.map-icon-button,.drawing-toggle)[aria-expanded="true"] {
+  background:var(--selected-bg); color:var(--selected-text); border-color:var(--action); box-shadow:inset 0 0 0 1px var(--action);
+}
+:root .shell :is(.primary-action,.apply-map-selection,.view-calendar-btn,.finish-btn,.cta) {
+  background:var(--action); color:var(--action-text); border-color:var(--action); box-shadow:0 4px 14px color-mix(in srgb,var(--action) 16%,transparent);
+}
+:root .shell .outline-action { color:var(--control-text); border-color:var(--control-edge); background:var(--control-bg); }
+:root .shell .outline-action:hover { background:var(--control-hover); }
+:root .shell .hero-compact .primary-action { background:#292620; color:#f5f1e8; border-color:#292620; }
+:root .shell .hero-compact .outline-action { color:#292620; background:#ffffff26; border-color:#29262055; }
+:root[data-theme="light"] .shell .hero-compact .redesign-hero { background:linear-gradient(100deg,#f7f9fe 0%,#f7f9fe 43%,#bcc7d6 53%,#343b44 66%,#080909 82%); }
+:root[data-theme="light"] .shell .hero-compact .primary-action { background:var(--action); border-color:var(--action); color:#fff; }
+:root[data-theme="light"] .shell .hero-compact .outline-action { background:#ffffff80; color:#24344d; border-color:#8395af66; }
+:root .shell .clear-map-button { color:#f5b5a4; border-color:#d57c6655; }
+:root[data-theme="light"] .shell .clear-map-button { color:#a12c1d; border-color:#a12c1d50; }
+:root .shell .immersive-map .leaflet-control-zoom a { background:var(--control-bg); color:var(--control-text); border-color:var(--control-edge); }
+:root .shell .immersive-map .leaflet-control-zoom a:hover { background:var(--control-hover); }
+:root .shell :is(button,input,select):disabled { opacity:.45; cursor:not-allowed; box-shadow:none; }
+:root .shell :is(a,button,input,select,textarea):focus-visible { outline:3px solid var(--focus-ring); outline-offset:3px; }
+:root[data-theme="light"] .shell .site-header :is(a,button):focus-visible { outline-color:#fff; }
+:root[data-theme="light"] .shell :is(.heatmap-primary-values > div,.calendar-primary-metric) { background:#eaf0fa; border-color:#a1b8db80; }
+:root[data-theme="light"] .shell :is(.heatmap-primary-values strong,.calendar-primary-metric strong) { color:#174eaa; }
+:root[data-theme="light"] .shell .eyebrow { color:#174eaa; }
+:root[data-theme="light"] .shell .map-settings .controls { background:none; }
+
+/* Bottom-left views dock; revealing it never depends on scrolling or zooming. */
+.explore-dock { position:fixed; z-index:10020; left:24px; bottom:max(20px,env(safe-area-inset-bottom)); width:max-content; max-width:calc(100vw - 48px); padding-top:70px; }
+.map-shell .explore-dock { left:84px; max-width:calc(100vw - 108px); }
+.explore-dock-trigger,.explore-dock-links {
+  border:1px solid var(--control-edge); background:var(--glass-nav); color:var(--control-text);
+  border-radius:999px; backdrop-filter:blur(20px) saturate(115%); -webkit-backdrop-filter:blur(20px) saturate(115%);
+  box-shadow:0 8px 26px #0000001f,inset 0 1px 0 #ffffff18;
+}
+.explore-dock-trigger { display:flex; align-items:center; gap:10px; min-height:44px; padding:10px 16px; font:500 12px var(--f-head); cursor:pointer; }
+.explore-dock-trigger:hover { background:var(--control-hover); }
+.explore-dock-links { position:absolute; bottom:54px; left:0; display:flex; gap:4px; padding:5px; width:max-content; max-width:100%; opacity:0; visibility:hidden; transform:translateY(12px) scale(.97); transform-origin:bottom left; transition:transform .28s cubic-bezier(.22,1,.36,1),opacity .2s,visibility .28s; }
+.explore-dock.is-open .explore-dock-links { opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+.explore-dock-links a { display:flex; align-items:center; justify-content:center; min-height:44px; padding:10px 18px; border:1px solid transparent; border-radius:999px; color:var(--sub); text-decoration:none; font:500 13px var(--f-head); white-space:nowrap; }
+.explore-dock-links a:hover { background:var(--control-hover); color:var(--control-text); }
+.explore-dock-links a[aria-current="page"] { color:var(--selected-text); background:var(--selected-bg); border-color:var(--action); }
+.shell:has(.explore-dock):not(.map-shell) > main { padding-bottom:92px; }
+/* Reserve two lanes above the dock for map notices and drawing controls. */
+:root .shell .immersive-map .map-bottom-bar { left:84px; bottom:156px; max-width:calc(100% - 108px); }
+:root .shell .immersive-map { --map-zoom-bottom:86px; }
+:root .shell .immersive-map .unified-tools-dock .shape-bar { bottom:0; max-height:calc(100dvh - 250px); }
+:root .shell .immersive-map .map-coordinate-readout { bottom:28px; max-width:calc(100% - 440px); }
+
+/* Readable Home typography within the existing shared grid. */
+.shell .redesign-hero h1 { max-width:15ch; text-wrap:balance; line-height:1.08; letter-spacing:-.045em; }
+.shell .hero-compact .redesign-hero h1 { font-size:clamp(38px,4.2vw,68px); margin:24px 0; }
+.shell .redesign-hero .redesign-lead { max-width:49ch; line-height:1.7; }
+.shell .hero-compact .redesign-lead { font-size:clamp(15px,1.2vw,18px); }
+.shell .redesign-hero .hero-footnote { font-size:12px; line-height:1.7; }
+.instrument-inline-actions { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0 24px; }
+@media(max-width:700px) {
+ :root .shell .site-header .primary-header-row { gap:10px; flex-wrap:wrap; }
+ :root .shell .site-header .header-actions { gap:8px; }
+ :root .shell .site-header .primary-header-row .nav-links { padding:4px; gap:0; }
+ :root .shell .site-header .primary-header-row .nav-links a { padding:10px 12px; font-size:12px; }
+ :root .shell .site-title { font-size:20px; }
+ .explore-dock { left:16px; max-width:calc(100vw - 32px); }
+ .map-shell .explore-dock { left:76px; max-width:calc(100vw - 92px); }
+ .explore-dock-links a { padding:10px 12px; font-size:12px; }
+ :root .shell .immersive-map .map-bottom-bar { bottom:146px; left:76px; max-width:calc(100% - 92px); }
+ :root .shell .immersive-map .map-coordinate-readout { bottom:82px; right:12px; max-width:calc(100% - 88px); }
+ :root .shell .immersive-map .map-settings { bottom:140px; }
+ :root[data-theme="light"] .shell .hero-compact .redesign-hero { background:linear-gradient(180deg,#f7f9fe 0%,#f7f9fe 55%,#555d68 72%,#080909 88%); }
+}
+@media(prefers-reduced-motion:reduce) { .explore-dock-links { transition:none; transform:none; } }
+.explore-dock { width:320px; }
+.explore-dock-trigger { width:max-content; max-width:100%; }
+.explore-dock-links { width:100%; box-sizing:border-box; }
+.explore-dock-links a { flex:1; padding-inline:10px; }
+@media(max-width:380px) { .explore-dock-links a { padding-inline:6px; font-size:11px; } }
+:root .shell :is(select,input[type="date"],input[type="number"],.month-navigation button,.month-navigation input,
+ .month-week,.calendar-week-row,.availability-retry,.region-search-field) {
+  background:var(--control-bg); color:var(--control-text); border-color:var(--control-edge);
+}
+:root .shell :is(.month-navigation button,.month-week,.calendar-week-row,.availability-retry):hover { background:var(--control-hover); }
+:root .shell :is(.month-week,.calendar-week-row)[aria-pressed="true"] { border-color:var(--action); box-shadow:inset 0 0 0 1px var(--action); }
+
+/* Floating navigation without a full-width header surface. */
+:root .shell > .site-header,
+:root[data-theme="light"] .shell > .site-header,
+:root:not([data-theme="light"]) .shell > .site-header,
+:root .map-shell > .site-header {
+  background:transparent; border:0; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+  pointer-events:none;
+}
+:root .shell > .site-header .primary-header-row { justify-content:flex-end; }
+:root .shell > .site-header .header-actions { pointer-events:auto; }
+:root .shell .site-header .primary-header-row .nav-links { background:#181715e8; border-color:#ffffff38; backdrop-filter:blur(16px); }
+:root[data-theme="light"] .shell .site-header .primary-header-row .nav-links { background:#25385eea; border-color:#ffffff70; }
+:root .shell .site-header .theme-toggle { background:#181715e8; color:#fff; }
+:root[data-theme="light"] .shell .site-header .theme-toggle { background:#25385eea; color:#fff; }
+
+/* Separate grouped controls with readable type and individual boundaries. */
+:root .shell :is(.seg,.map-tool-groups) { gap:6px; padding:6px; overflow:visible; background:#171513; }
+:root .shell :is(.seg,.map-tool-groups) button {
+  min-width:0; padding:10px 12px; border:1px solid #a8998770; border-radius:8px;
+  background:#292520; color:#f0eae1; font-family:var(--f-body); font-size:13px; font-weight:600; line-height:1.35;
+}
+:root .shell :is(.seg,.map-tool-groups) button:hover { background:#42382e; border-color:#f2c18a; color:#fff; }
+:root .shell :is(.seg,.map-tool-groups) button[aria-pressed="true"] { background:#59402c; color:#ffdcaf; border-color:#ffbc70; }
+:root[data-theme="light"] .shell :is(.seg,.map-tool-groups) { background:#dfe6f0; }
+:root[data-theme="light"] .shell :is(.seg,.map-tool-groups) button { background:#fff; color:#25374f; border-color:#8296b3; }
+:root[data-theme="light"] .shell :is(.seg,.map-tool-groups) button:hover { background:#e8effa; border-color:#2454a1; color:#142b51; }
+:root[data-theme="light"] .shell :is(.seg,.map-tool-groups) button[aria-pressed="true"] { background:#dce9fd; color:#143d7e; border-color:#174eaa; }
+:root .shell :is(.seg,.map-tool-groups) button:disabled { opacity:.55; }
+:root .shell > .site-header .primary-header-row.has-home-brand { justify-content:space-between; }
+:root .shell .home-brand { pointer-events:auto; color:#e8eefc; text-decoration:none; font-weight:700; }
+:root .shell .home-brand::first-letter { color:#ffa63d; }
+@media(max-width:400px) { :root .shell .home-brand { font-size:18px; } }
+/* The page header scrolls away; the immersive map retains its revealable header. */
+:root .shell:not(.map-shell) > .site-header { position:relative; top:auto; }
+.home-back-to-top {
+  position:fixed; z-index:1000; right:max(20px,env(safe-area-inset-right)); bottom:max(20px,env(safe-area-inset-bottom));
+  width:44px; height:44px; display:grid; place-items:center; padding:0; border:1px solid var(--control-edge);
+  border-radius:50%; background:var(--glass-nav); color:var(--control-text); font:600 23px/1 var(--f-head);
+  box-shadow:0 6px 20px #0003; backdrop-filter:blur(14px); cursor:pointer;
+  transition:background .2s,transform .2s;
+}
+.home-back-to-top:hover { background:var(--control-hover); transform:translateY(-2px); }
+@media(prefers-reduced-motion:reduce) { .home-back-to-top { transition:none; } .home-back-to-top:hover { transform:none; } }
+/* Use a compact oval highlight without shrinking the navigation hit targets. */
+:root .shell .site-header .primary-header-row .nav-links a { position:relative; isolation:isolate; background:transparent; border-color:transparent; box-shadow:none; }
+:root .shell .site-header .primary-header-row .nav-links a[aria-current="page"] { background:transparent; border-color:transparent; box-shadow:none; }
+:root .shell .site-header .primary-header-row .nav-links a[aria-current="page"]::before { content:""; position:absolute; z-index:-1; inset:5px 4px; border-radius:999px; background:var(--selected-bg); border:1px solid #e6af675c; }
+:root[data-theme="light"] .shell .site-header .primary-header-row .nav-links a[aria-current="page"]::before { background:#f4f7ff; border-color:#fff; }
+/* Matching oval navigation states and a softer blue light theme. */
+:root:not([data-theme="light"]) .shell .site-header .primary-header-row .nav-links a[aria-current="page"]::before {
+  background:#5a3d23; border-color:#dcac70;
+}
+:root[data-theme="light"] {
+  --bg:#e5edf8; --card:#eef3fa; --control-bg:#f3f6fb; --control-hover:#dfe9f7;
+  --surface-glass:linear-gradient(135deg,#f3f7fded,#e0eaf7ed 70%,#ebf2faed);
+}
+:root[data-theme="light"] body { background:radial-gradient(ellipse at 85% 0%,#c7d9f0,transparent 60%),#e5edf8; }
+:root[data-theme="light"] .shell .hero-compact .redesign-hero { background:linear-gradient(100deg,#e8f0fa 0%,#e8f0fa 43%,#aebed2 53%,#343b44 66%,#080909 82%); }
+:root[data-theme="light"] .shell .home-brand { display:inline-block; background:#263b61; border-radius:10px; padding:6px 10px; margin:-6px -10px; }
+@media(max-width:700px) {
+  :root[data-theme="light"] .shell .hero-compact .redesign-hero { background:linear-gradient(180deg,#e8f0fa 0%,#e8f0fa 55%,#566677 72%,#080909 88%); }
+}
+/* Warm, readable text on dark surfaces; keep dark ink on the pale Home card. */
+:root:not([data-theme="light"]) { --text:#f5f0e9; --sub:#d0c7bb; --control-text:#f5f0e9; --selected-text:#ffe0b9; }
+:root:not([data-theme="light"]) .shell .site-header .primary-header-row .nav-links a { color:#e1d9ce; }
+:root:not([data-theme="light"]) .shell .site-header .primary-header-row .nav-links a[aria-current="page"] { color:#ffe0b9; }
+:root:not([data-theme="light"]) .shell .hero-compact .redesign-hero-copy { color:#24211d; }
+:root:not([data-theme="light"]) .shell .hero-compact .redesign-hero .eyebrow,
+:root:not([data-theme="light"]) .shell .hero-compact .redesign-hero .hero-footnote { color:#51483f; }
+:root:not([data-theme="light"]) .shell .hero-compact .redesign-lead { color:#49433c; }
+:root:not([data-theme="light"]) .shell .hero-compact .redesign-hero h1 em { color:#98410f; }
+:root:not([data-theme="light"]) .shell .instrument-stage .satellite-button small { color:#f0e8dc; }
+/* Greetings occupy reserved space so hovering does not move the orbit targets. */
+.shell .instrument-stage .satellite-button .satellite-greeting {
+  display:flex; align-items:center; justify-content:center; min-height:28px; max-width:100%;
+  padding:4px 9px; border:1px solid #e7cba480; border-radius:999px;
+  background:#211c17ed; color:#fff4e5; font:600 11px/1.2 var(--f-body); letter-spacing:0;
+  white-space:nowrap; opacity:0; visibility:hidden; transition:opacity .18s ease,visibility .18s;
+  pointer-events:none;
+}
+.shell .instrument-stage .satellite-button:is(:hover,:focus-visible) .satellite-greeting { opacity:1; visibility:visible; }
+@media (prefers-reduced-motion:reduce) { .shell .instrument-stage .satellite-button .satellite-greeting { transition:none; } }
+/* Keep the greeting in a fixed, readable position within the orbit area. */
+.shell .instrument-stage .satellite-message {
+  position:absolute; top:12px; left:12px; z-index:6; max-width:calc(100% - 24px);
+  padding:10px 14px; border:1px solid #ffbc70; border-radius:14px;
+  color:#fff4e5; background:#241a12f2; box-shadow:0 6px 18px #0005;
+  font:600 13px/1.4 var(--f-body); pointer-events:none;
+}
+/* Browser-local time zone is a time reference, not a GPS city lookup. */
+.shell .home-local-clock { display:flex; flex-wrap:wrap; align-items:start; gap:12px clamp(20px,3vw,42px); margin:0 0 clamp(22px,3vw,42px); padding:0 0 16px; border-bottom:1px solid var(--control-edge); text-transform:uppercase; font-family:var(--f-mono); font-variant-numeric:tabular-nums; }
+.shell .home-local-clock > span { display:grid; gap:5px; min-width:0; }
+.shell .home-local-clock small { font:500 10px/1.4 var(--f-mono); letter-spacing:.12em; color:var(--sub); }
+.shell .home-local-clock :is(time,strong) { font:600 12px/1.4 var(--f-mono); letter-spacing:.04em; color:var(--text); overflow-wrap:anywhere; }
+:root .shell .hero-compact .home-local-clock { border-color:#29262045; }
+:root .shell .hero-compact .home-local-clock small { color:#544d43; }
+:root .shell .hero-compact .home-local-clock :is(time,strong) { color:#292620; }
+@media(max-width:600px) { .shell .home-local-clock { gap:12px 20px; margin-bottom:22px; } .shell .home-local-clock :is(time,strong) { font-size:11px; } }
+/* Full-bleed Earth overview is the landing page. */
+:root:not([data-theme="light"]) .shell .redesign-home { background:#0d0d0d; }
+.shell .redesign-home .redesign-hero { width:100%; min-height:calc(100svh - 90px); padding-top:clamp(40px,6vw,90px); }
+.shell .redesign-home .home-demonstration { width:calc(100% - clamp(32px,7vw,120px)); margin:28px auto 64px; }
+@media(max-width:1000px) { .shell .redesign-home .redesign-hero { min-height:0; } }
+/* A compact reveal handle sits alongside the top-right navigation. */
+:root .shell .map-nav-handle { left:auto; right:max(24px,env(safe-area-inset-right)); transform:none; min-width:44px; padding:8px; border-radius:0 0 14px 14px; font-size:22px; line-height:1; }
+.explore-dock { width:min(500px,calc(100vw - 48px)); }
+.map-shell .explore-dock { max-width:calc(100vw - 108px); }
+.explore-dock-bottom { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.explore-dock-bottom .map-sample-badge { padding:10px 12px; min-height:44px; display:flex; align-items:center; white-space:normal; font-size:11px; }
+.explore-dock-links { width:min(320px,100%); }
+:root .shell .immersive-map .map-bottom-bar { left:84px; bottom:150px; }
+@media(max-width:600px) { .map-shell .explore-dock { max-width:calc(100vw - 92px); } .explore-dock-bottom .map-sample-badge { font-size:10px; } :root .shell .immersive-map .map-bottom-bar { left:76px; bottom:150px; } }
+/* Make the About heading and supporting copy more legible. */
+.shell .about-page .intro { max-width:1400px; width:100%; }
+.shell .about-page .intro h2 { font-size:clamp(38px,5.8vw,82px); line-height:1.08; letter-spacing:-.035em; text-wrap:balance; }
+.shell .about-page .intro .eyebrow { font-size:clamp(13px,1.1vw,17px); letter-spacing:.12em; }
+.shell .about-page .intro .lead { max-width:80ch; font-size:clamp(17px,1.5vw,21px); line-height:1.7; }
+:root:not([data-theme="light"]) .shell .about-page :is(.lead,.member p) { color:#e0d8ce; }
+.shell .about-page .members .member p { font-size:15px; line-height:1.7; }
+/* Fade pages directly, avoiding colored transition flashes. */
+@media(prefers-reduced-motion:no-preference) {
+ ::view-transition-old(root) { animation: none; }
+ ::view-transition-new(root) { animation: nav-clean-fade .24s ease-out both; }
+ @keyframes nav-clean-fade { from { opacity:0; } to { opacity:1; } }
+}
+.explore-dock-links { bottom:calc(100% - 60px); }
+
+/* Give labels and copy room to breathe in Explore and the sample calendar. */
+.shell .compact-results-intro .hero { min-width:min(100%,260px); }
+.shell .compact-results-intro .hero h1 { font-size:clamp(32px,3vw,48px); line-height:1.14; }
+.shell .compact-results-intro .hero p { font-size:clamp(15px,1.2vw,18px); line-height:1.6; }
+.shell .compact-results-intro .selection-summary { padding:clamp(14px,1.4vw,20px); gap:10px 24px; font-size:clamp(14px,1vw,16px); line-height:1.6; border-radius:12px; }
+.shell .selection-summary > * { min-width:0; overflow-wrap:anywhere; }
+.shell .sample-tag { max-width:100%; padding:8px 12px; font-size:clamp(11px,.85vw,13px); line-height:1.5; white-space:normal; overflow-wrap:anywhere; }
+:root .shell .explore-page .calendar-state { padding:clamp(24px,3.2vw,44px); min-width:0; }
+.shell .calendar-state :is(h3,h4) { font-size:clamp(22px,2vw,30px); line-height:1.25; overflow-wrap:break-word; }
+.shell .calendar-state p { font-size:clamp(15px,1.15vw,18px); line-height:1.7; max-width:80ch; }
+.shell .calendar-state .hero-actions { gap:12px; margin-bottom:18px; }
+.shell .calendar-state .hero-actions > * { max-width:100%; white-space:normal; text-align:center; }
+:root .shell .sample-calendar { padding:clamp(24px,3vw,44px); min-width:0; }
+.shell .sample-calendar-heading > * { min-width:0; }
+.shell .sample-calendar-heading h2 { font-size:clamp(30px,3.2vw,48px); line-height:1.15; overflow-wrap:break-word; }
+.shell .sample-intro { max-width:85ch; font-size:clamp(15px,1.1vw,18px); line-height:1.75; margin:18px 0 24px; }
+.shell .sample-month-detail h3 { font-size:clamp(23px,2vw,30px); line-height:1.2; }
+.shell .sample-month-detail p { font-size:15px; line-height:1.7; max-width:45ch; }
+.shell .sample-week-list button { font-size:13px; line-height:1.5; flex-wrap:wrap; overflow-wrap:anywhere; }
+.shell :is(.sample-calendar,.calendar-state,.region-context-card,.reading-guide,.heatmap-detail,.calendar-week-detail,.caveats) :is(h2,h3,h4,p,li,dd) { overflow-wrap:break-word; }
+.shell :is(.region-context-card,.reading-guide,.heatmap-detail,.calendar-week-detail,.caveats) { min-width:0; }
+.shell :is(.region-context-card,.reading-guide,.heatmap-detail,.calendar-week-detail,.caveats) p { line-height:1.7; }
+.shell .region-context-card .small,.shell .initial-week-note { font-size:12px; }
+.shell .instrument-facts dt,.shell .instrument-model figcaption { font-size:12px; line-height:1.6; }
+@media(max-width:700px) {
+  .shell .compact-results-intro .selection-summary { padding:14px 16px; }
+  .shell .sample-calendar-heading { gap:12px; }
+  .shell .sample-month-detail { grid-template-columns:minmax(0,1fr); gap:16px; }
+  .shell .calendar-state .hero-actions > * { width:100%; }
+}
+
+/* Use the width of the empty-state screen without filling it with invented data. */
+@media(min-width:1000px) {
+  .shell .heatmap-empty { grid-template-columns:minmax(0,1fr); gap:18px; }
+  .shell .heatmap-empty > .compact-results-intro,
+  .shell .heatmap-empty > .calendar-state,
+  .shell .heatmap-empty > .explore-caveats { grid-column:1 / -1; }
+  .shell .heatmap-empty:not(.sample-expanded) > .calendar-state {
+    display:grid; grid-template-columns:minmax(0,1fr) minmax(260px,auto); gap:10px 32px; align-items:center;
+  }
+  .shell .heatmap-empty:not(.sample-expanded) > .calendar-state h3,
+  .shell .heatmap-empty:not(.sample-expanded) > .calendar-state p { grid-column:1; margin:0; }
+  .shell .heatmap-empty:not(.sample-expanded) > .calendar-state .hero-actions {
+    grid-column:2; grid-row:1 / span 3; display:flex; flex-wrap:wrap; justify-content:flex-end; margin:0; max-width:580px;
+  }
+  .shell .heatmap-empty .explore-caveats .caveats ul { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 40px; }
+  .shell .heatmap-empty .explore-caveats .caveats li { margin:0; line-height:1.65; }
+}
+.shell .heatmap-empty > .compact-results-intro { margin-bottom:0; }
+.shell .heatmap-empty .explore-caveats .caveats summary { margin-bottom:14px; }
+@media(max-width:999px) { .shell .heatmap-empty .explore-caveats { margin-top:16px; } }
+/* Decorative wordmark fire and illustrative city lights. */
+.interactive-brand { display:inline-flex; position:relative; align-items:center; gap:6px; pointer-events:auto; isolation:isolate; }
+.brand-flames { position:absolute; z-index:-1; left:-8px; bottom:0; width:calc(100% - 22px); height:56px; opacity:0; pointer-events:none; transform-origin:bottom; }
+.brand-flames svg { width:100%; height:100%; }
+.interactive-brand.is-burning .brand-flames { animation:brand-fire 1.3s ease-out both; }
+@keyframes brand-fire { 0% {opacity:0;transform:scaleY(.2);} 25% {opacity:.8;transform:scaleY(1);} 100% {opacity:0;transform:scaleY(1.15);} }
+.brand-spark { display:grid; place-items:center; min-width:44px; min-height:44px; padding:0; border:1px solid var(--control-edge); border-radius:50%; background:var(--control-bg); color:var(--control-text); cursor:pointer; }
+.brand-spark:hover { background:var(--control-hover); }
+:root:not([data-theme="light"]) .shell .instrument-earth { background-image:url('/hero-hotspots.svg'),url('/earth-night-2016.jpg'); }
+@media(prefers-reduced-motion:reduce) { .interactive-brand.is-burning .brand-flames { animation:none; opacity:.55; transform:none; } }
+.historical-insights { padding:clamp(24px,3vw,40px); margin:24px 0; border:1px solid var(--border); border-radius:18px; background:var(--surface-glass); color:var(--text); }
+.historical-insights h2 { font-size:clamp(23px,2vw,32px); line-height:1.2; margin:8px 0; }
+.historical-insights p { max-width:90ch; color:var(--sub); font:15px/1.7 var(--f-body); overflow-wrap:anywhere; }
+.historical-insights strong { color:var(--text); }
+.insight-bars { display:grid; gap:7px; max-width:850px; margin:20px 0; }
+.insight-row { display:grid; grid-template-columns:52px minmax(0,1fr) minmax(48px,auto); gap:12px; align-items:center; font:13px var(--f-mono); }
+.insight-track { height:12px; background:var(--control-bg); border-radius:999px; overflow:hidden; }
+.insight-track > span { display:block; height:100%; background:var(--action); border-radius:inherit; }
+.map-export-button { width:100%; margin-top:16px; }
+:root:not([data-theme="light"]) .shell .instrument-earth {
+  filter:brightness(1.3);
+  box-shadow:inset 20px -10px 50px #0007;
+}
+/* A restrained call-to-action glow and a lighter nighttime globe. */
+:root:not([data-theme="light"]) .shell .redesign-hero .hero-actions .primary-action {
+  box-shadow:0 0 18px #ffb76770,0 0 38px #ff9e3d35;
+  animation:explore-radiance 3.2s ease-in-out infinite alternate;
+}
+@keyframes explore-radiance {
+  from { box-shadow:0 0 12px #ffb76760,0 0 28px #ff9e3d25; }
+  to { box-shadow:0 0 24px #ffb76790,0 0 50px #ff9e3d50; }
+}
+@media(prefers-reduced-motion:reduce) {
+  :root:not([data-theme="light"]) .shell .redesign-hero .hero-actions .primary-action { animation:none; }
+}
+/* A faint daytime surface reveals land beneath the night lights. */
+:root:not([data-theme="light"]) .shell .instrument-earth::before,
+:root:not([data-theme="light"]) .shell .instrument-earth::after {
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background-repeat:repeat-x; background-position:0 0;
+  background-size:calc(var(--globe-size) * 2.4) calc(var(--globe-size) * 1.2);
+  animation:instrument-earth-spin 100s linear infinite;
+}
+:root:not([data-theme="light"]) .shell .instrument-earth::before { background-image:url('/earth.jpg'); opacity:.24; }
+:root:not([data-theme="light"]) .shell .instrument-earth::after { background-image:url('/hero-hotspots.svg'); }
+:root:not([data-theme="light"]) .shell .instrument-stage.is-paused .instrument-earth::before,
+:root:not([data-theme="light"]) .shell .instrument-stage.is-paused .instrument-earth::after { animation-play-state:paused; }
+@media(prefers-reduced-motion:reduce) {
+  :root:not([data-theme="light"]) .shell .instrument-earth::before,
+  :root:not([data-theme="light"]) .shell .instrument-earth::after { animation:none; }
+}
+/* The active fill is drawn by the oval pseudo-element in both themes. */
+:root[data-theme="light"] .shell .site-header .primary-header-row .nav-links a[aria-current="page"],
+:root[data-theme="light"] .shell .site-header .primary-header-row .nav-links a[aria-current="page"]:hover {
+  background:transparent; border-color:transparent; box-shadow:none; border-radius:999px;
+}
+
+/* Place the search focus indicator around the whole rounded field. */
+:root .shell .region-search-field:focus-within {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+:root .shell .region-search-field input:focus-visible { outline: none; }
+.shell .selection-summary[hidden] { display: none; }
+
+/* Light-mode glass surfaces: translucent enough to reveal the backdrop, but
+   opaque enough for legible text over satellite imagery. */
+:root[data-theme="light"] {
+  --surface-glass: linear-gradient(135deg, #ffffffd9, #e6effbe6 70%, #f6f9fdeb);
+  --edge-glass: #8299b970;
+  --shadow-glass: 0 12px 32px #2643671c, inset 0 1px 0 #ffffffeb;
+  --control-bg: #f3f7fdeb;
+  --control-hover: #e0ecfbeF;
+}
+:root[data-theme="light"] .shell :is(
+  .sample-calendar, .member, .calendar-state, .caveats, .region-context-card,
+  .reading-guide, .heatmap-month-detail, .heatmap-detail, .calendar-week-detail,
+  .historical-insights, .controls, .selection-summary, .availability-notice,
+  .map-settings, .map-caveats, .shape-bar, .region-search-launcher .region-search,
+  .map-measurement-panel, .map-location-message, .map-coordinate-readout,
+  .explore-dock-trigger, .explore-dock-links, .map-sample-badge, .map-bottom-bar button
+) {
+  background: var(--surface-glass);
+  border-color: var(--edge-glass);
+  box-shadow: var(--shadow-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+  backdrop-filter: blur(16px) saturate(120%);
+}
+/* Keep the header dark enough to contrast with its white labels. */
+:root[data-theme="light"] .shell .site-header .primary-header-row .nav-links,
+:root[data-theme="light"] .shell .site-header .theme-toggle {
+  background: #253b62db;
+  -webkit-backdrop-filter: blur(18px) saturate(120%);
+  backdrop-filter: blur(18px) saturate(120%);
+  box-shadow: 0 8px 24px #17365b26, inset 0 1px 0 #ffffff55;
+}
+:root[data-theme="light"] .shell :is(.seg, .map-tool-groups) {
+  background: #dce8f6d9;
+  border-color: var(--edge-glass);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+:root[data-theme="light"] .shell :is(.seg, .map-tool-groups) button {
+  background: #ffffffc9;
+}
+:root[data-theme="light"] .shell :is(.seg, .map-tool-groups) button:hover {
+  background: #eef5ffed;
+}
+:root[data-theme="light"] .shell :is(.seg, .map-tool-groups) button[aria-pressed="true"] {
+  background: #d4e5fcf5;
+}
+/* Map settings have an inner controls wrapper; avoid stacking two glass cards. */
+:root[data-theme="light"] .shell .map-settings .controls {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* A warm, slowly shifting halo stays behind the rotating globe. */
+:root .shell .redesign-home .instrument-earth {
+  --earth-halo-near: rgba(255, 192, 120, .48);
+  --earth-halo-far: rgba(255, 192, 120, .22);
+  box-shadow: inset 20px -10px 50px #0007, 0 0 55px 18px var(--earth-halo-near), 0 0 110px 38px var(--earth-halo-far);
+  animation-name: instrument-earth-spin, earth-halo;
+  animation-duration: var(--earth-orbit-period,100s), 5s;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+  animation-direction: normal, alternate;
+}
+:root[data-theme="light"] .shell .redesign-home .instrument-earth {
+  --earth-halo-near: rgba(255, 192, 120, .46);
+  --earth-halo-far: rgba(255, 192, 120, .22);
+}
+@keyframes earth-halo {
+  from { box-shadow: inset 20px -10px 50px #0007, -5px 3px 45px 10px var(--earth-halo-near), 0 0 90px 25px var(--earth-halo-far); }
+  to { box-shadow: inset 20px -10px 50px #0007, 5px -3px 60px 16px var(--earth-halo-near), 0 0 115px 35px var(--earth-halo-far); }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .shell .redesign-home .instrument-earth { animation: none; }
+}

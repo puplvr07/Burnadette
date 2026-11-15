@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
+import { saveMapImage } from "../mapExport";
+import type { ExportContext } from "../mapExport";
 import MapControlIcon from "./MapControlIcon";
 import { measuring, useMapUtilities } from "./MapUtilities";
 import type { MeasurementKind } from "../measurements";
@@ -7,7 +9,7 @@ import type { Bbox } from "../types";
 import { DEFAULT_RADIUS_KM } from "../pointRadius";
 import type { RadiusSelection } from "../pointRadius";
 
-interface Props { selectionCleared?: boolean; onClearSelection?: () => void; onOpenSettings?: () => void; bbox: Bbox; radiusSelection: RadiusSelection | null; onRadiusSelect: (point: RadiusSelection) => boolean; onChange: (b: Bbox) => void; onBrowse?: () => void; settingsOpen?: boolean }
+interface Props { sample: boolean; exportContext: ExportContext | null; selectionCleared?: boolean; onClearSelection?: () => void; onOpenSettings?: () => void; bbox: Bbox; radiusSelection: RadiusSelection | null; onRadiusSelect: (point: RadiusSelection) => boolean; onChange: (b: Bbox) => void; onBrowse?: () => void; settingsOpen?: boolean }
 
 type Shape = "rectangle" | "polygon" | "point";
 type MapTool = Shape | MeasurementKind;
@@ -24,7 +26,7 @@ const toBounds = (b: Bbox) => L.latLngBounds([b[1], b[0]], [b[3], b[2]]);
 // The square web-map world (Web Mercator stops at about 85 degrees north and south).
 const WORLD = L.latLngBounds([-85.0511, -180], [85.0511, 180]);
 
-export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onChange, onBrowse, settingsOpen = false, selectionCleared = false, onClearSelection, onOpenSettings }: Props) {
+export default function MapPicker({ sample, exportContext, bbox, radiusSelection, onRadiusSelect, onChange, onBrowse, settingsOpen = false, selectionCleared = false, onClearSelection, onOpenSettings }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map>();
   const shapeLayer = useRef<L.Layer>();
@@ -47,6 +49,8 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
   onChangeRef.current = onChange;
   const onBrowseRef = useRef(onBrowse);
   onBrowseRef.current = onBrowse;
+  const [exportMessage,setExportMessage]=useState("");
+  const [exporting,setExporting]=useState(false);
   const [drawingOpen, setDrawingOpen] = useState(false);
   const [toolGroup, setToolGroup] = useState<"draw" | "measure" | "location">("draw");
   const drawingOpenRef = useRef(false);
@@ -74,13 +78,13 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
       markerZoomAnimation: !reducedMotion,
     }).setView([12, 121.5], 7);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-      maxZoom: 17,
+      maxZoom: 17, crossOrigin: true,
       noWrap: true,
       bounds: WORLD,
       attribution: "Tiles &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community",
     }).addTo(m);
     L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
-      maxZoom: 17, noWrap: true, bounds: WORLD,
+      maxZoom: 17, crossOrigin: true, noWrap: true, bounds: WORLD,
     }).addTo(m);
     map.current = m;
 
@@ -339,6 +343,8 @@ export default function MapPicker({ bbox, radiusSelection, onRadiusSelect, onCha
           {toolGroup==="measure"&&utilities.resultsUI}
           {toolGroup==="location"&&utilities.locationUI}
         </div>
+        <button type="button" className="map-export-button outline-action" disabled={exporting} onClick={async()=>{if(!map.current)return;setExporting(true);setExportMessage("");try{await saveMapImage(map.current,exportContext,sample);setExportMessage("Map image saved.");}catch(error){setExportMessage(error instanceof Error?error.message:"Unable to save the map image.");}finally{setExporting(false);}}}>{exporting?"Saving map…":"Save map image ↓"}</button>
+        <p className="small" role="status">{exportMessage}</p>
         <button type="button" className="clear-map-button" aria-label="Clear map" title="Remove all drawn regions, measurements, markers and related results" onClick={()=>{modeRef.current=null;cancel.current();utilities.clear();setMode(null);shapeLayer.current?.remove();centerMarker.current?.remove();shapeLayer.current=undefined;centerMarker.current=undefined;radiusCircle.current=undefined;drawnKey.current="";onClearSelection?.();}}><MapControlIcon name="clear" />Clear map</button>
         <p className="map-clear-explanation">Clears drawn regions, measurements, location markers and analysis results. Dates and source are kept.</p>
       </div>
