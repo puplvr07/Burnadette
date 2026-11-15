@@ -51,6 +51,20 @@ def test_golden(client, source, count):
     assert row['low_sensitivity_share'] == (0 if source == 'harmonized' else None)
 
 
+@pytest.mark.parametrize('explicit_region', [False, True])
+@pytest.mark.parametrize('bbox', ['102,10,103.5,15', '0,0,1,1'])
+def test_legacy_region_metadata(client, explicit_region, bbox):
+    params = {'bbox': bbox, 'start': '2015-01-05', 'end': '2015-01-05'}
+    if explicit_region:
+        params['region'] = client.get('/regions').json()[0]['id']
+    response = client.get('/calendar', params=params)
+    assert response.status_code == 200
+    body = response.json()
+    # The legacy fixture has no published-product region metadata, even when routed.
+    assert body['region'] is None and body['coverage']['region'] is None
+    assert client.get('/calendar', params=params).json() == body
+
+
 def test_meta_regions(client):
     m = client.get('/meta').json()
     assert m['is_fake'] is False

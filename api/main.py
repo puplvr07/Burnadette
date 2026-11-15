@@ -137,6 +137,8 @@ def create_app(dataset_path=None, manifest_path=None, *, data_mode=None, publish
             result = product.calendar(box, start, end, source) if product else empty_calendar(box, source)
         else:
             result = calendar(ds, box, start, end, source)
+        # Expose the resolved product for clients; never echo unverified routing input.
+        result['region'] = result['coverage'].get('region')
         with lock:
             cache[key] = (clock(), result)
             cache.move_to_end(key)

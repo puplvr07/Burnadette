@@ -49,6 +49,16 @@ Coverage now adds region and clipped_to_region. A bbox extending beyond an expli
 product is clipped to its cells. Complete grids are available, not sampled partial
 coverage. Empty selections return no_cells and no weekly rows.
 
+Calendar responses also expose optional, nullable top-level `region`, copied from
+the resolved `coverage.region`; the existing coverage field is unchanged. For
+example, a custom Belgium selection returns `"region": "belgium"`, allowing clients
+to find its `/regions` calibration metadata. Explicit routing preserves that product
+even for empty selections; an empty area without a resolved product returns null.
+Overlapping products still require routing and never mix. Legacy CSV responses keep
+both region fields null, including when their development-subset ID is supplied.
+This is a backward-compatible metadata addition, including on cached responses;
+activity, availability, provenance and scientific calculations are unchanged.
+
 The normal ASGI app uses published_json. create_app() without a mode retains the
 legacy regression profile; explicit data_mode or BURN_DATA_MODE selects a profile.
 Published limits: 1,000 square degrees; 5,000 cells; 1,600 requested weeks;
