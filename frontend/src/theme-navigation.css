@@ -680,3 +680,12 @@
 @media (max-width: 640px) {
   :root .shell .explore-page .calendar-results-panel { padding: 16px; }
 }
+
+/* Team portraits and accessible LinkedIn links retain the existing card layout. */
+.shell .member-profile-row { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px; }
+.shell .member-profile-row .member-photo { display:block; width:96px; height:96px; flex-shrink:0; object-fit:cover; object-position:center 30%; margin:0; border:2px solid var(--control-edge); background:var(--control-bg); }
+.shell .member-linkedin { position:relative; display:inline-flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; border:1px solid var(--control-edge); border-radius:50%; color:var(--control-text); background:var(--control-bg); }
+.shell .member-linkedin:hover { color:var(--action); background:var(--control-hover); }
+.shell .member-linkedin:focus-visible { outline:2px solid var(--focus-ring); outline-offset:4px; }
+.shell .member-linkedin-tooltip { position:absolute; top:calc(100% + 8px); right:0; width:max-content; max-width:min(260px,65vw); padding:10px 12px; border:1px solid var(--control-edge); border-radius:10px; background:var(--control-bg); color:var(--control-text); font:12px/1.5 var(--f-body); overflow-wrap:anywhere; pointer-events:none; opacity:0; visibility:hidden; z-index:5; }
+.shell .member-linkedin:is(:hover,:focus-visible) .member-linkedin-tooltip { opacity:1; visibility:visible; }

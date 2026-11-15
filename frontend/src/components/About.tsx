@@ -3,15 +3,14 @@ import { getRegions } from "../api";
 import type { Region } from "../types";
 // Names, order and affiliations as set in minazaki-ui. Roles follow the project brief (Frontend / Backend / ML).
 // TODO: replace each "from" placeholder with the real details if they change.
-// No photos: Space Apps rules forbid likenesses of anyone under 18, and initials avoid the question.
-const MEMBERS: { name: string; role: string; from: string }[] = [
+const MEMBERS: { name: string; role: string; from: string; photo: string; linkedin?: string }[] = [
   // Frontend (A to Z by first name), then Backend, then Machine learning. On desktop each team fills its own row.
-  { name: "Alkhaidir Radjail", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
-  { name: "Sean Chester Dy", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
-  { name: "Yllakhem M. Aleria", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
-  { name: "Joemar Bayabas", role: "Backend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
-  { name: "Ram Rohen Arcenas", role: "Backend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
-  { name: "Hans Xavier A. Lao", role: "Machine learning", from: "University of The Philippines Manila, 2nd Year CS Student" },
+  { name: "Alkhaidir Radjail", photo: "alkhaidir-radjail.jpg", linkedin: "alkhaidir-radjail-96b550431", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
+  { name: "Sean Chester Dy", photo: "sean-dy.jpg", linkedin: "sean-chester-dy-6994b5380", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
+  { name: "Yllakhem M. Aleria", photo: "yllakhem-aleria.jpg", linkedin: "yllakhem-aleria-130493440", role: "Frontend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
+  { name: "Joemar Bayabas", photo: "joemar-bayabas.jpg", linkedin: "joemarbayabas", role: "Backend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
+  { name: "Ram Rohen Arcenas", photo: "ram-rohen-arcenas.jpg", linkedin: "ram-arcenas-165261431", role: "Backend", from: "Pamantasan ng Lungsod ng Maynila, 2nd Year CS Student" },
+  { name: "Hans Xavier A. Lao", photo: "hans-xavier-lao.jpg", linkedin: "hans-xavier-lao-b23b313a1", role: "Machine learning", from: "University of The Philippines Manila, 2nd Year CS Student" },
 ];
 
 // Space Apps asks teams to credit all borrowed data, code, images and tools.
@@ -92,7 +91,13 @@ export default function About() {
       <section className="cards members">
         {MEMBERS.map((m) => (
           <article key={m.name} className="panel member" tabIndex={0} aria-label={m.name} onPointerEnter={event => { if (event.pointerType === "mouse") playSound(); }} onFocus={playSound}>
-            <div className="avatar" aria-hidden="true">{m.name.charAt(0)}</div>
+            <div className="member-profile-row">
+              <img className="avatar member-photo" src={`${import.meta.env.BASE_URL}team/${m.photo}`} alt={`${m.name} portrait`} width="96" height="96" loading="lazy" decoding="async" />
+              {m.linkedin && <a className="member-linkedin" href={`https://www.linkedin.com/in/${m.linkedin}/`} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on LinkedIn (opens in a new tab)`}>
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M20.45 2H3.55C2.69 2 2 2.68 2 3.52v16.96C2 21.32 2.69 22 3.55 22h16.9c.86 0 1.55-.68 1.55-1.52V3.52C22 2.68 21.31 2 20.45 2ZM7.93 18.75H4.98V9.2h2.95v9.55ZM6.45 7.9a1.71 1.71 0 1 1 0-3.42 1.71 1.71 0 0 1 0 3.42Zm12.3 10.85H15.8V14.1c0-1.1-.02-2.52-1.54-2.52-1.54 0-1.78 1.2-1.78 2.44v4.73H9.53V9.2h2.83v1.3h.04c.4-.75 1.36-1.54 2.79-1.54 2.98 0 3.56 1.96 3.56 4.5v5.29Z"/></svg>
+                <span className="member-linkedin-tooltip">linkedin.com/in/{m.linkedin}</span>
+              </a>}
+            </div>
             <h3>{m.name}</h3>
             {m.role && <span className="chip">{m.role}</span>}
             {m.from && <p className="small">{m.from}</p>}
