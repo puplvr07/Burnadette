@@ -1,18 +1,18 @@
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from "react";
 import { activeSquaresText, provenanceLabel, sensitivityText } from "../display";
-import type { Meta, Metric, Source, WeekRow } from "../types";
+import type { Bbox, Meta, Metric, Source, WeekRow } from "../types";
 import { colorFor } from "../colors";
 import { formatCalendarDate, formatCalendarValue } from "../calendarModel";
 import { heatmapLayout, heatmapScale } from "../heatmapModel";
 import type { HeatmapSlot } from "../heatmapModel";
 
-interface Props { source?: Source; weeks: WeekRow[]; metric: Metric; meta: Meta; start: string; end: string; loading?: boolean; error?: string; onRetry?: () => void }
+interface Props { regionLabel?: string; bbox?: Bbox; source?: Source; weeks: WeekRow[]; metric: Metric; meta: Meta; start: string; end: string; loading?: boolean; error?: string; onRetry?: () => void }
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_COLUMNS = [0, 4, 8, 12, 17, 21, 25, 30, 34, 39, 43, 47];
 const isSelectable = (slot: HeatmapSlot) => slot.kind === "record" || slot.kind === "missing";
 const rangeText = (slot: HeatmapSlot) => `${formatCalendarDate(slot.start)} – ${formatCalendarDate(slot.end)}`;
 
-export default function Heatmap({ weeks, metric, meta, start, end, source = "harmonized", loading = false, error = "", onRetry }: Props) {
+export default function Heatmap({ regionLabel = "Selected analysis region", bbox, weeks, metric, meta, start, end, source = "harmonized", loading = false, error = "", onRetry }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(false);
@@ -20,11 +20,15 @@ export default function Heatmap({ weeks, metric, meta, start, end, source = "har
   const workspace = useRef<HTMLDivElement>(null);
   const expandTrigger = useRef<HTMLButtonElement>(null);
   const closeTrigger = useRef<HTMLButtonElement>(null);
+  const normalScroll = useRef({left:0,top:0});
+  const restoreScroll = useRef(false);
   const closeExpanded = () => {
     setExpanded(false);
     if (document.fullscreenElement && document.fullscreenElement === workspace.current) void document.exitFullscreen().catch(() => {});
   };
   const openExpanded = () => {
+    if(scroller.current) normalScroll.current={left:scroller.current.scrollLeft,top:scroller.current.scrollTop};
+    restoreScroll.current=true;
     setExpanded(true);
     setDetailsOpen(false); setLegendOpen(false); setFitAll(true);
     // A viewport-filling fallback also works where the Fullscreen API is unavailable.
@@ -47,13 +51,24 @@ export default function Heatmap({ weeks, metric, meta, start, end, source = "har
   const [hovered, setHovered] = useState("");
   const [focused, setFocused] = useState("");
   const scroller = useRef<HTMLDivElement>(null);
+  useEffect(()=>{
+    if(expanded || !restoreScroll.current)return;
+    const frame=requestAnimationFrame(()=>{
+      scroller.current?.scrollTo(normalScroll.current);
+      restoreScroll.current=false;
+    });
+    return ()=>cancelAnimationFrame(frame);
+  },[expanded]);
   const [scroll, setScroll] = useState({ pos: 0, max: 0 });
   const prefix = useId();
   const layout = useMemo(() => heatmapLayout(weeks, start, end, meta, source), [weeks, start, end, meta, source]);
   const scale = useMemo(() => heatmapScale(weeks, metric), [weeks, metric]);
   const slots = layout.rows.flat();
   const available = slots.filter(isSelectable);
-  const selected = available.find((slot) => slot.key === picked) ?? available.find((slot) => slot.record) ?? available[0];
+  const latest = [...available].reverse().find(slot=>{const value=metric==="activity"?slot.record?.value:slot.record?.anomaly;return value!=null&&Number.isFinite(value);}) ?? [...available].reverse().find(slot=>slot.record) ?? available[0];
+  const selected = available.find((slot) => slot.key === picked) ?? latest;
+  const monthSlots=available.filter(slot=>slot.start.slice(0,7)===selected?.start.slice(0,7));
+  const monthMaximum=Math.max(...monthSlots.map(slot=>(metric==="activity"?slot.record?.value:slot.record?.anomaly)??0),0);
   const shown = available.find((slot) => slot.key === hovered) ?? selected;
   const focusKey = available.some((slot) => slot.key === focused) ? focused : selected?.key;
   const metricName = metric === "anomaly" ? "Anomaly percentile" : "Activity";
@@ -107,6 +122,13 @@ export default function Heatmap({ weeks, metric, meta, start, end, source = "har
     }
   };
 
+  const legend = (          <section className="heatmap-scale" id={`${prefix}-legend`} hidden={expanded && !legendOpen} aria-label="Heatmap legend">
+            {expanded && <button type="button" className="heatmap-panel-close heatmap-expand-button" aria-label="Close legend" onClick={() => setLegendOpen(false)}>×</button>}
+            <div className="heatmap-scale-heading"><strong>{metricName} scale</strong>{scale.values.length && scale.maximum > 0 ? <div className="calendar-legend-ramp"><span>0</span><span className="ramp">{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ background: colorFor(i / 8) }} />)}</span><span>{formatCalendarValue(scale.maximum)}{metric === "anomaly" ? " / 100" : ""}</span></div> : <span className="small">{scale.values.length ? "Recorded values are zero" : "No numeric values returned"}</span>}</div>
+            <p>{metric === "anomaly" ? "Fixed 0–100 percentile scale, not a probability of future fire." : `Activity colors saturate at the returned data's 98th-percentile value. ${scale.clipped} ${scale.clipped === 1 ? "value is" : "values are"} above this endpoint; the exact values remain available in week details. The scale changes with filters. Units are not supplied by the API contract.`}</p>
+            <div className="heatmap-keys"><span><i className="calendar-value-swatch zero" />Recorded zero</span><span><i className="calendar-value-swatch unavailable" />Unavailable value</span><span><i className="calendar-value-swatch absent" />No record returned</span><span><i className="heatmap-key-gap" />Known gap</span><span><i className="k-dot" />Low sensitivity ≥30%</span><span>Faint cells: outside dates/coverage, or no week starts here.</span></div>
+          </section>);
+
   if (loading) return <div className="calendar-state" role="status"><h3>Loading weekly observations…</h3><p>Your filters and selected week are preserved while the request completes.</p></div>;
   if (error) return <div className="calendar-state calendar-request-error" role="alert"><h3>Could not load observations</h3><p>{error}</p><p>A request error is not a zero-activity result.</p>{onRetry && <button type="button" className="view-calendar-btn" onClick={onRetry}>Retry request</button>}</div>;
 
@@ -139,10 +161,18 @@ export default function Heatmap({ weeks, metric, meta, start, end, source = "har
       {!weeks.length && <p className="availability-inline" role="status">No weekly records returned for this area and date range. This does not establish zero burning activity.</p>}
       {!!weeks.length && !scale.values.length && <p className="availability-inline" role="status">Weekly records were returned, but {metric === "activity" ? "activity" : "anomaly"} values are unavailable. Missing values are not zero.</p>}
       {!!scale.values.length && scale.values.every((value) => value === 0) && <p className="availability-inline" role="status">Available {metric === "activity" ? "activity" : "anomaly"} values are all recorded as zero ({scale.values.length} numeric {scale.values.length === 1 ? "record" : "records"}).{scale.values.length < weeks.length ? ` ${weeks.length - scale.values.length} other ${weeks.length - scale.values.length === 1 ? "value is" : "values are"} unavailable.` : ""} A recorded zero does not prove no burning occurred.</p>}
+      {expanded&&legend}
       <div className="heatmap-workspace">
+        <aside className="heatmap-context-sidebar">
+          <section className="region-context-card"><p className="eyebrow">SELECTED REGION</p><h3>{regionLabel}</h3>
+            {bbox&&<><svg className="bbox-overview" viewBox="0 0 200 110" role="img" aria-label="Bounding-box overview, not a map of detections"><path d="M0 27.5h200M0 55h200M0 82.5h200M50 0v110M100 0v110M150 0v110" stroke="currentColor" opacity=".15"/><rect x={(bbox[0]+180)/360*200} y={(90-bbox[3])/180*110} width={Math.max((bbox[2]-bbox[0])/360*200,2)} height={Math.max((bbox[3]-bbox[1])/180*110,2)} fill="none" stroke="var(--teal)" strokeWidth="2"/></svg><p className="small">{bbox.map(n=>n.toFixed(2)).join(", ")}<br/>West · south · east · north</p></>}
+            <a className="outline-action" href="#map">Edit on Map ↗</a>
+          </section>
+          <section className="reading-guide"><p className="eyebrow">HOW TO READ THIS</p>{!expanded&&legend}<p className="small">Known instrument gaps are metadata warnings. A record may still contain observations from another source. Lower activity is not proof of no fire.</p></section>
+        </aside>
         <div className="heatmap-visual">
-          <div className="heatmap-chart-heading"><div><h3>Year-by-week overview</h3><p>Years down · weekly positions across</p></div><span>{sourceName} · {metricName}</span></div>
-          <div className="heat-scroll heatmap-matrix-scroll" ref={scroller} onScroll={syncScroll} role="region" aria-label="Scrollable weekly heatmap">
+          <div className="heatmap-chart-heading"><div><h3>Year × Week</h3><p>Select a week to inspect its month below.</p></div><span>{sourceName} · {metricName}</span></div>
+          <div className="heat-scroll heatmap-matrix-scroll" ref={scroller} onScroll={syncScroll} role="region" tabIndex={0} aria-label="Scrollable weekly heatmap">
             <div className="heatmap-matrix" role="table" aria-label="Burning activity by calendar year and weekly position" aria-colcount={54} aria-rowcount={layout.years.length + 1}>
               <div className="heatmap-grid-head" role="row"><div className="heatmap-year" role="columnheader">Year</div>{MONTHS.map((month, i) => <div className="heatmap-month-label" role="columnheader" key={month} style={{ gridColumn: `${MONTH_COLUMNS[i] + 2} / span ${i === 11 ? 6 : MONTH_COLUMNS[i + 1] - MONTH_COLUMNS[i]}` }}>{month}</div>)}</div>
               {layout.rows.map((row, index) => <Fragment key={layout.years[index]}>
@@ -156,7 +186,7 @@ export default function Heatmap({ weeks, metric, meta, start, end, source = "har
                     <button type="button" id={`${prefix}-${slot.year}-${slot.col}`} className={`heatmap-week state-${state}${selected?.key === slot.key && isSelectable(slot) ? " is-selected" : ""}${hovered === slot.key ? " is-preview" : ""}${gaps(slot).length ? " has-gap" : ""}`}
                       disabled={!isSelectable(slot)} tabIndex={slot.key === focusKey && isSelectable(slot) ? 0 : -1} aria-pressed={selected?.key === slot.key && isSelectable(slot)}
                       title={`${rangeText(slot)} · ${describe(slot)}`} aria-label={`${rangeText(slot)}. ${describe(slot)}${gaps(slot).length ? ". Known instrument gap" : ""}`} aria-controls={`${prefix}-details`}
-                      style={numeric ? { backgroundColor: colorFor(value / (scale.maximum || 1)) } : undefined}
+                      style={numeric && value !== 0 ? { backgroundColor: colorFor(value / (scale.maximum || 1)) } : undefined}
                       onClick={() => { setPicked(slot.key); setFocused(slot.key); setHovered(""); }}
                       onFocus={() => { setPicked(slot.key); setFocused(slot.key); setHovered(""); }}
                       onPointerEnter={(event) => { if (event.pointerType === "mouse") setHovered(slot.key); }} onPointerLeave={() => setHovered("")}
@@ -171,15 +201,14 @@ export default function Heatmap({ weeks, metric, meta, start, end, source = "har
           </div>
           {scroll.max > 0 && <input type="range" className="heat-slider" min={0} max={scroll.max} step={1} value={Math.min(scroll.pos, scroll.max)} aria-label="Scroll the heatmap sideways" onChange={(event) => { if (scroller.current) { scroller.current.scrollLeft = +event.target.value; syncScroll(); } }} />}
           <p className="heatmap-reading-note">Week columns group Monday start dates within each calendar year. Month labels are approximate guides. Year labels stay visible as you scroll. Use arrow keys to inspect weeks; Home/End move within a year.</p>
-          <section className="heatmap-scale" id={`${prefix}-legend`} hidden={expanded && !legendOpen} aria-label="Heatmap legend">
-            {expanded && <button type="button" className="heatmap-panel-close heatmap-expand-button" aria-label="Close legend" onClick={() => setLegendOpen(false)}>×</button>}
-            <div className="heatmap-scale-heading"><strong>{metricName} scale</strong>{scale.values.length && scale.maximum > 0 ? <div className="calendar-legend-ramp"><span>0</span><span className="ramp">{Array.from({ length: 9 }, (_, i) => <i key={i} style={{ background: colorFor(i / 8) }} />)}</span><span>{formatCalendarValue(scale.maximum)}{metric === "anomaly" ? " / 100" : ""}</span></div> : <span className="small">{scale.values.length ? "Recorded values are zero" : "No numeric values returned"}</span>}</div>
-            <p>{metric === "anomaly" ? "Fixed 0–100 percentile scale, not a probability of future fire." : `Activity colors saturate at the returned data's 98th-percentile value. ${scale.clipped} ${scale.clipped === 1 ? "value is" : "values are"} above this endpoint; the exact values remain available in week details. The scale changes with filters. Units are not supplied by the API contract.`}</p>
-            <div className="heatmap-keys"><span><i className="calendar-value-swatch zero" />Recorded zero</span><span><i className="calendar-value-swatch unavailable" />Unavailable value</span><span><i className="calendar-value-swatch absent" />No record returned</span><span><i className="heatmap-key-gap" />Known gap</span><span><i className="k-dot" />Low sensitivity ≥30%</span><span>Faint cells: outside dates/coverage, or no week starts here.</span></div>
-          </section>
+
         </div>
+        {selected&&<section className="heatmap-month-detail" aria-label="Selected month weekly observations"><div className="month-detail-heading"><div><p className="eyebrow">MONTH DETAIL</p><h3>{new Date(`${selected.start.slice(0,7)}-01T00:00:00Z`).toLocaleDateString(undefined,{month:"long",year:"numeric",timeZone:"UTC"})}</h3></div><span className="small">Weekly start dates · {metricName}</span></div><div className="month-week-bars">{monthSlots.map(slot=>{
+          const value=valueFor(slot),numeric=value!=null&&Number.isFinite(value);return <button type="button" key={slot.key} aria-pressed={selected.key===slot.key} onClick={()=>{setPicked(slot.key);setFocused(slot.key);setHovered("");}} title={`${rangeText(slot)} · ${describe(slot)}`}><span className={`month-observation-bar state-${stateFor(slot)}`} style={numeric?{height:Math.max(3,value/(monthMaximum||1)*100),background:value===0?undefined:colorFor(value/(scale.maximum||1))}:undefined}/><strong>{numeric?formatCalendarValue(value):slot.record?"Unavailable":"No record"}</strong><span>{formatCalendarDate(slot.start)}</span>{gaps(slot).length>0&&<small>Instrument gap</small>}</button>;
+        })}</div><p className="small">Bar heights use this month's maximum; colors use the overview legend. Each observation covers seven days from its start date. Missing records are not zero.</p></section>}
         <aside className="heatmap-detail" id={`${prefix}-details`} aria-label="Selected week details" aria-live="polite" hidden={expanded && !detailsOpen}>
           {expanded && <button type="button" className="heatmap-panel-close heatmap-expand-button" aria-label="Close week details" onClick={() => setDetailsOpen(false)}>×</button>}
+          <p className="small initial-week-note">{!picked ? "Initially showing the latest available numeric week, or latest returned record when values are unavailable." : "Your selected week"}</p>
           <p className="eyebrow">{hovered && shown?.key !== selected?.key ? "HOVER PREVIEW" : "SELECTED WEEK"}</p>
           {shown ? <>
             <h4>{rangeText(shown)}</h4>

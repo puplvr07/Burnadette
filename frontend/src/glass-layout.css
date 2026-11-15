@@ -1,0 +1,197 @@
+/* Rounded, varied dashboard composition inspired by the supplied reference. */
+:root {
+  --surface-glass: linear-gradient(135deg,#39342cdd,#211e1ae8 65%,#302d27e0);
+  --edge-glass: #e8d4b338;
+  --shadow-glass: 0 16px 42px #00000024,inset 0 1px 0 #ffffff20;
+  --layout-gap: clamp(12px,1.4vw,22px);
+  --layout-radius: 20px;
+}
+:root[data-theme="light"] {
+  --surface-glass: linear-gradient(135deg,#fffffff0,#eaf0f9e8 65%,#fff9f0ed);
+  --edge-glass: #aabddc88;
+  --shadow-glass: 0 16px 42px #263b6015,inset 0 1px 0 #fff;
+}
+:root .shell :is(.sample-calendar,.member,.calendar-state,.caveats,.region-context-card,.reading-guide,.heatmap-month-detail,.heatmap-detail,.calendar-week-detail,.map-settings,.map-caveats,.instrument-model-orbit) {
+  background: var(--surface-glass);
+  border: 1px solid var(--edge-glass);
+  border-radius: var(--layout-radius);
+  box-shadow: var(--shadow-glass);
+  -webkit-backdrop-filter: blur(16px) saturate(115%);
+  backdrop-filter: blur(16px) saturate(115%);
+}
+.shell:not(.map-shell) > .site-header { margin: 12px 24px 0; top: 12px; border: 1px solid var(--edge-glass); border-radius: 24px; padding: 14px 24px; }
+.shell .nav-links a,.shell .primary-action,.shell .outline-action,.shell .profile-sound-toggle { border-radius: 999px; }
+.shell:not(.map-shell) main { padding-top: 12px; }
+.shell .home-demonstration { width: calc(100% - clamp(32px,6vw,96px)); max-width: none; margin-top: var(--layout-gap); }
+.shell .sample-calendar { padding: clamp(24px,3vw,44px); }
+.shell .sample-calendar-heading h2 { font-size: clamp(28px,3vw,44px); max-width: 28ch; }
+.shell .harmonization-story { margin-block: 48px; gap: 18px 40px; }
+.shell .about-page { max-width: 1480px; justify-content: flex-start; padding: 24px clamp(16px,3vw,40px) 48px; }
+.shell .about-page .intro { text-align: left; max-width: 900px; margin: 12px 0 24px; }
+.shell .about-page .intro h2 { font-size: clamp(32px,4vw,54px); line-height: 1.12; }
+.shell .about-page .lead { font-size: 16px; line-height: 1.7; }
+.shell .members { gap: var(--layout-gap); grid-template-columns: repeat(3,minmax(0,1fr)); }
+.shell .members .member { padding: 24px; min-width: 0; }
+.shell .members .member:first-child,.shell .members .member:last-child { grid-column: auto; }
+.shell .members h3 { overflow-wrap: anywhere; }
+.shell .explore-page:not(.immersive-map-page) { padding: 24px clamp(16px,3vw,40px) 48px; max-width: 1600px; }
+.shell .compact-results-intro { gap: 12px 20px; margin-bottom: 16px; }
+.shell .compact-results-intro .controls { border-radius: 20px; padding: 16px; }
+.shell .heatmap-workspace { gap: var(--layout-gap); }
+.shell .region-context-card,.shell .reading-guide { padding: 18px; margin-bottom: var(--layout-gap); }
+.shell .heatmap-month-detail,.shell .heatmap-detail { padding: 22px; }
+.shell .calendar-workspace { gap: var(--layout-gap); }
+.shell .calendar-week-row { border-radius: 16px; }
+.shell .map-settings { padding: 20px; }
+.shell .instrument-view { padding: 24px clamp(20px,4vw,64px) 48px; gap: 32px; }
+.shell .instrument-model-orbit { border-radius: 32px; }
+@media (hover:hover) {
+  .shell .outline-action:hover { box-shadow: inset 0 1px 0 #ffffff44,0 5px 16px #00000018; }
+}
+@media (max-width:1100px) {
+  .shell .members { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .shell .members .member:first-child,.shell .members .member:last-child { grid-column: auto; }
+}
+@media (max-width:1000px) {
+}
+@media (max-width:600px) {
+  :root { --layout-radius: 20px; }
+  .shell:not(.map-shell) > .site-header { margin: 8px 8px 0; top: 8px; padding: 12px; }
+  .shell .members { grid-template-columns: 1fr; }
+  .shell .sample-calendar { padding: 20px; }
+}
+
+/* A single dark frame, a pale editorial card and a dominant visual panel. */
+.shell .home-demonstration { width: 100%; margin-top: 10px; }
+.shell .home-demonstration::before { display: none; }
+:root .shell .home-demonstration .sample-calendar { border: 0; border-radius: 26px; box-shadow: inset 0 1px 0 #ffffff14; padding: clamp(22px,3vw,42px); }
+.shell .sample-calendar-heading { align-items: start; padding-bottom: 16px; gap: 12px; }
+.shell .sample-calendar-heading h2 { font-size: clamp(26px,2.7vw,40px); max-width: 24ch; margin-block: 8px; }
+.shell .sample-intro { max-width: 90ch; font-size: 13px; }
+.shell .harmonization-story { width: calc(100% - 40px); margin: 32px auto 20px; padding-top: 24px; }
+.shell .harmonization-story h2 { font-size: clamp(28px,3vw,44px); }
+.shell .harmonization-story p:not(.eyebrow) { font-size: 14px; }
+:root .shell .members .member { box-shadow: inset 0 1px 0 #ffffff18; padding: 24px; }
+.shell .members .member h3 { margin-top: 16px; font-size: 20px; }
+.shell .members .member p { font-size: 13px; line-height: 1.6; }
+.shell .members .avatar { width: 52px; height: 52px; font-size: 23px; }
+:root .shell .explore-panel { box-shadow: none; background: transparent; border: 0; padding: 0; }
+.shell .heatmap-context-sidebar { padding: 0; }
+.shell .calendar-workspace { align-items: start; }
+@media (max-width:1000px) {
+}
+@media (max-width:600px) {
+  .shell .harmonization-story { width: calc(100% - 24px); }
+}
+
+/* Keep the Home hero open and editorial, as in the approved reference. */
+.shell .redesign-hero-copy { background: transparent; border: 0; box-shadow: none; backdrop-filter: none; }
+.shell .instrument-stage { background: transparent; border: 0; border-radius: 0; box-shadow: none; backdrop-filter: none; }
+.shell .redesign-hero h1 { max-width: 16ch; }
+.shell .redesign-hero .primary-action,.shell .redesign-hero .outline-action { border-radius: 12px; }
+
+/* Earth card opens into the same continuous, full-width Home hero. */
+.shell .hero-compact .home-overview { max-width:1480px; width:calc(100% - 48px); margin:16px auto 32px; padding:12px; border:1px solid var(--edge-glass); border-radius:34px; background:color-mix(in srgb,var(--card) 80%,transparent); }
+.shell .hero-compact .redesign-hero { grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr); padding:0; gap:0; min-height:0; align-items:stretch; border-radius:26px; overflow:hidden; background:linear-gradient(100deg,#e9e5dc 0%,#e9e5dc 43%,#bab5aa 53%,#34332f 66%,#080909 82%); }
+.shell .hero-compact .redesign-hero-copy { background:transparent; color:#24221f; border-radius:0; padding:clamp(24px,3vw,46px); min-height:540px; display:flex; flex-direction:column; justify-content:center; }
+.shell .hero-compact .redesign-hero h1 { font-size:clamp(40px,4.6vw,72px); line-height:1.03; letter-spacing:-.06em; margin:26px 0; }
+.shell .hero-compact .redesign-hero h1 em { color:#a94b16; }
+.shell .hero-compact .redesign-hero .eyebrow,.shell .hero-compact .hero-footnote { color:#61594f; font-size:10px; }
+.shell .hero-compact .redesign-lead { color:#534d44; font-size:16px; }
+.shell .hero-compact .hero-actions { gap:8px; }
+.shell .hero-compact .primary-action { background:#292620; color:#f5f1e8; border-color:#292620; font-size:12px; padding:12px 16px; }
+.shell .hero-compact .outline-action { background:transparent; color:#292620; border-color:#29262040; font-size:12px; padding:12px 16px; }
+.shell .hero-compact .instrument-stage { min-height:540px; height:100%; margin:0; border-radius:0; background:transparent; overflow:hidden; }
+.shell .hero-compact .instrument-earth { --globe-size:clamp(360px,40vw,640px); right:-22%; }
+.shell .hero-compact .satellite-button { color:#f5f1e8; z-index:4; }
+.shell .hero-compact .satellite-button small { color:#ded6c8; }
+.earth-card-open { position:absolute; inset:0; width:100%; height:100%; border:0; border-radius:inherit; background:transparent; cursor:pointer; z-index:3; }
+.earth-card-open:focus-visible { outline:3px solid #ffa63d; outline-offset:-5px; }
+.hero-back { position:absolute; left:max(32px,4.5vw); top:12px; z-index:5; width:48px; height:48px; min-height:44px; padding:0; display:grid; place-items:center; font-size:26px; border-radius:50%; }
+.shell .hero-expanded .redesign-hero { padding-top:80px; }
+.hero-compact .instrument-stage,.hero-expanded .instrument-stage { view-transition-name:earth-scene; }
+.hero-compact .redesign-hero-copy,.hero-expanded .redesign-hero-copy { view-transition-name:earth-copy; }
+::view-transition-group(earth-scene),::view-transition-group(earth-copy) { animation-duration:850ms; animation-timing-function:cubic-bezier(.22,1,.36,1); }
+::view-transition-old(earth-scene),::view-transition-new(earth-scene),::view-transition-old(earth-copy),::view-transition-new(earth-copy) { animation-duration:650ms; }
+@media(max-width:1000px) {
+ .shell .hero-compact .redesign-hero { grid-template-columns:1fr; background:linear-gradient(180deg,#e9e5dc 0%,#e9e5dc 55%,#55534c 72%,#080909 88%); }
+ .shell .hero-compact .redesign-hero-copy { min-height:0; }
+ .shell .hero-compact .instrument-stage { height:380px; min-height:0; }
+}
+@media(max-width:600px) {
+ .shell .hero-compact .home-overview { width:calc(100% - 16px); padding:8px; }
+ .shell .hero-compact .redesign-hero h1 { font-size:clamp(34px,8vw,48px); }
+ .shell .hero-compact .instrument-stage { height:300px; }
+}
+@media(prefers-reduced-motion:reduce) {
+ ::view-transition-group(earth-scene),::view-transition-group(earth-copy) { animation-duration:0s; }
+}
+
+/* Native-sized fire-observation cursor: no lag, trails or moving overlays. */
+@media (hover:hover) and (pointer:fine) {
+  .shell:not(.map-shell) { cursor:url('/fire-cursor.svg') 16 16, default; }
+  .shell:not(.map-shell) :is(a,button,summary,[role="button"],select),
+  .shell:not(.map-shell) :is(a,button,summary,[role="button"]) * { cursor:url('/fire-pointer.svg') 5 3, pointer; }
+  .shell:not(.map-shell) :is(p,h1,h2,h3,dt,dd,li,input,textarea,[contenteditable="true"]) { cursor:text; }
+  .shell:not(.map-shell) :is(button,input,select):disabled { cursor:not-allowed; }
+}
+@media (forced-colors:active) {
+  .shell:not(.map-shell) { cursor:auto; }
+  .shell:not(.map-shell) :is(a,button,summary,[role="button"],select),
+  .shell:not(.map-shell) :is(a,button,summary,[role="button"]) * { cursor:pointer; }
+}
+
+/* Bounded orbital scene with opaque Earth occluding the rear half. */
+.shell .instrument-stage { isolation:isolate; }
+.shell .instrument-earth { z-index:2; opacity:1; pointer-events:none; animation-duration:var(--earth-orbit-period,100s); animation-play-state:running; }
+.shell .instrument-stage:focus-within .instrument-earth { animation-play-state:running; }
+.shell .instrument-stage.is-paused .instrument-earth { animation-play-state:paused; }
+.shell .instrument-stage .floating-satellite { transition:background .2s,border-color .2s,opacity .35s; }
+.shell .instrument-stage .floating-satellite:focus-visible { z-index:5 !important; opacity:1 !important; }
+.shell .home-demonstration[hidden] { display:none; }
+.shell .hero-compact .redesign-hero-copy { min-width:0; }
+.shell .redesign-hero :is(h1,p) { overflow-wrap:break-word; }
+.shell .hero-compact .hero-actions { flex-wrap:wrap; }
+.shell .hero-compact .hero-actions > * { max-width:100%; box-sizing:border-box; }
+
+/* Use the available width without letting headings touch the card edge. */
+.shell .refined-heatmap:not(.heatmap-expanded) { box-sizing:border-box; padding:clamp(16px,2vw,28px); min-width:0; }
+.shell .heatmap-expand-bar { flex-wrap:wrap; gap:12px 20px; }
+.shell .heatmap-expand-bar > span { min-width:0; overflow-wrap:anywhere; }
+.shell .heatmap-chart-heading { flex-wrap:wrap; align-items:flex-start; gap:12px 24px; }
+.shell .heatmap-chart-heading > span { text-align:left; }
+.shell .heatmap-context-sidebar,.shell .heatmap-visual { min-width:0; }
+.shell .heatmap-workspace :is(p,h3,h4,dd) { overflow-wrap:anywhere; }
+.shell .refined-heatmap:not(.heatmap-fit-all) .heatmap-matrix-scroll {
+  max-height:clamp(260px,62svh,640px); overflow:auto; padding:12px 0;
+  overscroll-behavior:contain; scrollbar-gutter:stable; scroll-padding:40px 80px 16px;
+}
+.shell .refined-heatmap:not(.heatmap-fit-all) .heatmap-matrix { min-width:1980px; padding-right:16px; }
+.shell .refined-heatmap:not(.heatmap-fit-all) :is(.heatmap-grid-head,.heatmap-grid-row) { grid-template-columns:64px repeat(53,minmax(32px,1fr)); gap:4px; }
+.shell .refined-heatmap:not(.heatmap-fit-all) .heatmap-slot { height:32px; }
+.shell .heatmap-grid-head { position:sticky; top:-12px; z-index:3; background:var(--bg); }
+.shell .heatmap-year { background:var(--bg); box-shadow:4px 0 8px var(--bg); }
+.shell .heatmap-matrix-scroll:focus-visible { outline:2px solid var(--teal); outline-offset:3px; }
+.shell .heatmap-expanded:not(.heatmap-fit-all) .heatmap-matrix-scroll { max-height:none; }
+.shell .heatmap-expanded.heatmap-fit-all .heatmap-matrix-scroll { overflow:auto; }
+.shell .heatmap-expanded.heatmap-fit-all .heatmap-matrix { min-height:280px; }
+.shell:not(.map-shell) .explore-section-nav { width:fit-content; max-width:100%; box-sizing:border-box; gap:14px; padding:8px 0 0; margin-top:8px; border-top:0; }
+.shell:not(.map-shell) .explore-view-links { flex:0 1 auto; flex-wrap:wrap; gap:4px; }
+.shell .explore-view-links a { min-height:44px; box-sizing:border-box; }
+@media (pointer:coarse) {
+ .shell .refined-heatmap:not(.heatmap-fit-all) .heatmap-matrix { min-width:2630px; }
+ .shell .refined-heatmap:not(.heatmap-fit-all) :is(.heatmap-grid-head,.heatmap-grid-row) { grid-template-columns:64px repeat(53,minmax(44px,1fr)); }
+ .shell .refined-heatmap:not(.heatmap-fit-all) .heatmap-slot { height:44px; }
+}
+@media(max-width:600px) {
+ .shell .heatmap-chart-heading h3 { font-size:20px; }
+ .shell .refined-heatmap:not(.heatmap-expanded) { padding:16px; }
+ .shell:not(.map-shell) .explore-section-nav { width:100%; }
+ .shell:not(.map-shell) .explore-view-links { flex:1; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .shell .instrument-earth { animation:none; }
+ .shell .instrument-stage .floating-satellite { transition:none; }
+}
+.shell .instrument-stage .floating-satellite[data-depth="back"] { pointer-events:none; }
+.shell .instrument-stage .floating-satellite:focus-visible { pointer-events:auto; }
