@@ -1220,3 +1220,24 @@ html.theme-transition body, html.theme-transition :is(.site-header, .site-footer
 /* Year colors must win over the general (and light-theme) axis text color */
 :root .chart-svg .yr-label { fill: var(--c); }
 :root .chart-svg .yr-dot { fill: var(--c); }
+:root[data-theme="dark"] body:has(.home-page) {
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(5, 9, 20, 0.45) 0%,
+      rgba(5, 9, 20, 0.58) 40%,
+      rgba(5, 9, 20, 0.82) 85%,
+      #060a14 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(5, 10, 20, 0.63),
+      rgba(5, 10, 20, 0.14) 70%
+    ),
+    url("/imgs/s26-46-048~large.jpg");
+
+  background-size: cover;
+  background-position: center, center, center 58%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
