@@ -2,21 +2,22 @@ import { FireBackdrop } from "./Fire";
 
 export default function Home() {
   return (
-    <div className="page page-fill">
+    <div className="page page-fill home-page">
       <FireBackdrop />
-      <section className="hero-split">
+      <section className="home-hero">
+      <div className="hero-split">
         <div className="hero-text">
           <p className="kicker">NASA FIRE DATA, 2000 TO NOW</p>
-          <h1 className="display">What does a year of <em>fire</em> look like?</h1>
-          <span className="rule" />
+          <h1 className="display"><span className="hero-title-line">What does a year</span> <span className="hero-title-line">of <em>fire</em> look like?</span></h1>
           <p className="hero-sub">
             Burnadette turns two decades of NASA satellite fire detections into one calendar you can read at a glance.
           </p>
-          <a className="cta" href="#calendar">Open the calendar</a>
+          <a className="cta home-explore-cta" href="#map">Explore <span className="cta-arrow" aria-hidden="true">→</span></a>
         </div>
         <div className="planet-wrap" aria-hidden="true">
-          <div className="system"><div className="earth" /><div className="orbit"><div className="moon" /></div></div>
+          <div className="system" aria-hidden="true"><div className="earth" /><div className="orbit"><div className="moon" /></div></div>
         </div>
+      </div>
       </section>
 
       <section className="intro">
