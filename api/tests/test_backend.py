@@ -98,7 +98,7 @@ def test_missing_partial_and_provenance(ds):
     def get(source='harmonized'):
         return calendar(ds, (102,10,103.5,15), date(2015,1,5), date(2015,1,5),source)['weeks'][0]
     row = get()
-    assert row['value'] == .7 and row['active_cells'] == 1
+    assert row['value'] == .7 and row['active_cells'] == 1.4
     assert row['harmonized_source'] == 'mixed'
     assert row['uncertainty_low'] == .6 and row['uncertainty_high'] == .8
     assert row['low_sensitivity_share'] == .5
@@ -175,7 +175,7 @@ def test_missing_sensor_bounds_sensitivity_and_flags(ds):
     row.update(viirs_active=None, low_sensitivity=None, uncertainty_low=None, flags='nrt;nrt;custom')
     args = (ds,(102,10,103.5,15),date(2015,1,5),date(2015,1,5))
     h = calendar(*args,'harmonized')['weeks'][0]
-    assert h['active_cells'] is None and h['value'] == 0
+    assert h['active_cells'] == 0 and h['value'] == 0
     assert h['uncertainty_low'] is None and h['uncertainty_high'] is None
     assert h['low_sensitivity_share'] is None and h['flags'] == ['custom','nrt']
     v = calendar(*args,'viirs')['weeks'][0]

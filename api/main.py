@@ -16,17 +16,25 @@ from fastapi.responses import JSONResponse
 from .dataset import Dataset
 from .models import CalendarResponse, Meta, Region, Source
 from .service import calendar
+from .published import PublishedRepository, LIMITS as PUBLISHED_LIMITS, empty_calendar
 
 DATA = Path(__file__).parent / 'data' / 'development'
+PUBLISHED_DATA = Path(__file__).parent / 'data' / 'published'
 LIMITS = {'max_area_square_degrees': 100, 'max_weeks': 1600, 'max_cells': 400, 'max_cell_weeks': 250000}
 
 
-def create_app(dataset_path=None, manifest_path=None, *, cache_ttl=60, clock=time.monotonic):
+def create_app(dataset_path=None, manifest_path=None, *, data_mode=None, published_path=None,
+               cache_ttl=60, clock=time.monotonic):
     @asynccontextmanager
     async def lifespan(app):
-        mode = os.getenv('BURN_DATA_MODE', 'development_sample')
-        if mode not in ('development_sample', 'production'):
+        mode = os.getenv('BURN_DATA_MODE', data_mode or 'development_sample')
+        if mode not in ('development_sample', 'production', 'published_json'):
             raise ValueError('Unknown BURN_DATA_MODE')
+        if mode == 'published_json':
+            root = Path(published_path or os.getenv('BURN_PUBLISHED_PATH', str(PUBLISHED_DATA)))
+            app.state.dataset = PublishedRepository(root)
+            yield
+            return
         path = dataset_path or os.getenv('BURN_DATA_PATH')
         manifest = manifest_path or os.getenv('BURN_MANIFEST_PATH')
         if mode == 'production' and (not path or not manifest):
@@ -56,6 +64,8 @@ def create_app(dataset_path=None, manifest_path=None, *, cache_ttl=60, clock=tim
     @app.get('/meta', response_model=Meta)
     def meta(request: Request):
         ds = request.app.state.dataset
+        if isinstance(ds, PublishedRepository):
+            return ds.metadata()
         xs, ys = zip(*ds.cells.values())
         return {'date_start': ds.dates[0], 'date_end': ds.dates[-1],
                 'viirs_start': ds.source_range('viirs')['date_start'], 'is_fake': False,
@@ -67,7 +77,7 @@ def create_app(dataset_path=None, manifest_path=None, *, cache_ttl=60, clock=tim
                 'metrics': {'activity': {'aggregation': 'mean', 'units': 'active_cell_fraction', 'status': 'provisional'},
                             'anomaly': {'available': False, 'reason': 'Awaiting Hans: bbox aggregation is not approved'},
                             'uncertainty': {'method': 'mean supplied cell bounds', 'status': 'provisional; not a validated regional confidence interval'},
-                            'active_cells': {'basis': 'contributing sensor observations', 'status': 'provisional'}},
+                            'active_cells': {'basis': 'harmonized sum or observed source count'}},
                 'limits': LIMITS,
                 'gaps': [{'label': 'Terra only (reduced MODIS observations)', 'start': '2000-11-01', 'end': '2002-05-04'},
                          {'label': 'Aqua outage', 'start': '2020-08-16', 'end': '2020-09-02'},
@@ -83,12 +93,14 @@ def create_app(dataset_path=None, manifest_path=None, *, cache_ttl=60, clock=tim
     @app.get('/regions', response_model=list[Region])
     def regions(request: Request):
         ds = request.app.state.dataset
+        if isinstance(ds, PublishedRepository):
+            return ds.region_list()
         xs, ys = zip(*ds.cells.values())
         return [{'id': ds.manifest['id'], 'name': f'Cambodia development subset — {len(ds.cells)} cells',
                  'bbox': [min(xs)-.25, min(ys)-.25, max(xs)+.25, max(ys)+.25]}]
 
     @app.get('/calendar', response_model=CalendarResponse, response_model_exclude_none=False)
-    def get_calendar(request: Request, bbox: str, start: date, end: date, source: Source = 'harmonized'):
+    def get_calendar(request: Request, bbox: str, start: date, end: date, source: Source = 'harmonized', region: str | None = None):
         def error(status, code, message):
             raise HTTPException(status_code=status, detail={'code': code, 'message': message})
         try:
@@ -104,16 +116,27 @@ def create_app(dataset_path=None, manifest_path=None, *, cache_ttl=60, clock=tim
             error(422, 'invalid_query', 'Dates must use YYYY-MM-DD.')
         weeks = (end-start).days//7+1
         ds = request.app.state.dataset
-        count = sum(w <= x <= e and s <= y <= n for x, y in ds.cells.values())
-        if (e-w)*(n-s) > LIMITS['max_area_square_degrees'] or weeks > LIMITS['max_weeks'] or count > LIMITS['max_cells'] or count*weeks > LIMITS['max_cell_weeks']:
+        published = isinstance(ds, PublishedRepository)
+        limits = PUBLISHED_LIMITS if published else LIMITS
+        if (e-w)*(n-s) > limits['max_area_square_degrees'] or weeks > limits['max_weeks']:
             error(413, 'query_too_large', 'Reduce area or date range; see /meta limits.')
-        key = (ds.manifest['sha256'], box, start, end, source)
+        product = ds.resolve(box, region) if published else None
+        if not published and region is not None and region != ds.manifest['id']:
+            error(422, 'invalid_region', 'Choose a region from /regions.')
+        count = (len(product.select(box)) if product else 0) if published else sum(w <= x <= e and s <= y <= n for x, y in ds.cells.values())
+        if count > limits['max_cells'] or count*weeks > limits['max_cell_weeks']:
+            error(413, 'query_too_large', 'Reduce area or date range; see /meta limits.')
+        key = (ds.revision if published else ds.manifest['sha256'],
+               product.slug if product else region, box, start, end, source)
         with lock:
             now = clock()
             if key in cache and now-cache[key][0] < cache_ttl:
                 cache.move_to_end(key)
                 return cache[key][1]
-        result = calendar(ds, box, start, end, source)
+        if published:
+            result = product.calendar(box, start, end, source) if product else empty_calendar(box, source)
+        else:
+            result = calendar(ds, box, start, end, source)
         with lock:
             cache[key] = (clock(), result)
             cache.move_to_end(key)
@@ -124,4 +147,5 @@ def create_app(dataset_path=None, manifest_path=None, *, cache_ttl=60, clock=tim
     return app
 
 
-app = create_app()
+# The normal server uses final data; create_app() keeps the explicit legacy test profile.
+app = create_app(data_mode='published_json')
