@@ -1,0 +1,400 @@
+===== 2026-11-15 11:07 =====
+--- MODIS 2015 cambodia ---
+  input rows                                                                44023
+  type == 0 (vegetation fire)                                               41086   (removed 2937)
+  drop low confidence                                                       39143   (removed 1943)
+  drop persistent spots (>= 5 dates/year)                                   35797   (removed 3346)
+  outside the region grid (other territories)                               35797   (removed 0)
+--- MODIS 2016 cambodia ---
+  input rows                                                                37153
+  type == 0 (vegetation fire)                                               36726   (removed 427)
+  drop low confidence                                                       34783   (removed 1943)
+  drop persistent spots (>= 5 dates/year)                                   31572   (removed 3211)
+  outside the region grid (other territories)                               31572   (removed 0)
+--- MODIS 2017 cambodia ---
+  input rows                                                                22426
+  type == 0 (vegetation fire)                                               22353   (removed 73)
+  drop low confidence                                                       21287   (removed 1066)
+  drop persistent spots (>= 5 dates/year)                                   20234   (removed 1053)
+  outside the region grid (other territories)                               20234   (removed 0)
+--- MODIS 2018 cambodia ---
+  input rows                                                                28815
+  type == 0 (vegetation fire)                                               28249   (removed 566)
+  drop low confidence                                                       26953   (removed 1296)
+  drop persistent spots (>= 5 dates/year)                                   26226   (removed 727)
+  outside the region grid (other territories)                               26226   (removed 0)
+--- SNPP 2015 cambodia ---
+  input rows                                                               234705
+  type == 0 (vegetation fire)                                              234613   (removed 92)
+  drop low confidence                                                      208478   (removed 26135)
+  drop persistent spots (>= 5 dates/year)                                  139417   (removed 69061)
+  outside the region grid (other territories)                              139417   (removed 0)
+--- SNPP 2016 cambodia ---
+  input rows                                                               236923
+  type == 0 (vegetation fire)                                              236628   (removed 295)
+  drop low confidence                                                      212675   (removed 23953)
+  drop persistent spots (>= 5 dates/year)                                  144127   (removed 68548)
+  outside the region grid (other territories)                              144127   (removed 0)
+--- SNPP 2017 cambodia ---
+  input rows                                                               127110
+  type == 0 (vegetation fire)                                              126904   (removed 206)
+  drop low confidence                                                      112642   (removed 14262)
+  drop persistent spots (>= 5 dates/year)                                   95848   (removed 16794)
+  outside the region grid (other territories)                               95848   (removed 0)
+--- SNPP 2018 cambodia ---
+  input rows                                                               151443
+  type == 0 (vegetation fire)                                              151346   (removed 97)
+  drop low confidence                                                      137714   (removed 13632)
+  drop persistent spots (>= 5 dates/year)                                  109450   (removed 28264)
+  outside the region grid (other territories)                              109450   (removed 0)
+===== 2026-11-15 12:48 =====
+--- MODIS 2000 cambodia ---
+  input rows                                                                  402
+  type == 0 (vegetation fire)                                                 402
+  drop low confidence                                                         394   (removed 8)
+  drop persistent spots (>= 5 dates/year)                                     394
+  outside the region grid (other territories)                                 394   (removed 0)
+--- MODIS 2001 cambodia ---
+  input rows                                                                 5973
+  type == 0 (vegetation fire)                                                5973
+  drop low confidence                                                        5728   (removed 245)
+  drop persistent spots (>= 5 dates/year)                                    5728
+  outside the region grid (other territories)                                5728   (removed 0)
+--- MODIS 2002 cambodia ---
+  input rows                                                                 8678
+  type == 0 (vegetation fire)                                                8678
+  drop low confidence                                                        8307   (removed 371)
+  drop persistent spots (>= 5 dates/year)                                    8285   (removed 22)
+  outside the region grid (other territories)                                8285   (removed 0)
+--- MODIS 2003 cambodia ---
+  input rows                                                                25782
+  type == 0 (vegetation fire)                                               25639   (removed 143)
+  drop low confidence                                                       24465   (removed 1174)
+  drop persistent spots (>= 5 dates/year)                                   24167   (removed 298)
+  outside the region grid (other territories)                               24167   (removed 0)
+--- MODIS 2004 cambodia ---
+  input rows                                                                38149
+  type == 0 (vegetation fire)                                               38149
+  drop low confidence                                                       36393   (removed 1756)
+  drop persistent spots (>= 5 dates/year)                                   35691   (removed 702)
+  outside the region grid (other territories)                               35691   (removed 0)
+--- MODIS 2005 cambodia ---
+  input rows                                                                27264
+  type == 0 (vegetation fire)                                               27264
+  drop low confidence                                                       25923   (removed 1341)
+  drop persistent spots (>= 5 dates/year)                                   25533   (removed 390)
+  outside the region grid (other territories)                               25533   (removed 0)
+--- MODIS 2006 cambodia ---
+  input rows                                                                22467
+  type == 0 (vegetation fire)                                               22467
+  drop low confidence                                                       21411   (removed 1056)
+  drop persistent spots (>= 5 dates/year)                                   21207   (removed 204)
+  outside the region grid (other territories)                               21207   (removed 0)
+--- MODIS 2007 cambodia ---
+  input rows                                                                27683
+  type == 0 (vegetation fire)                                               27482   (removed 201)
+  drop low confidence                                                       26177   (removed 1305)
+  drop persistent spots (>= 5 dates/year)                                   25817   (removed 360)
+  outside the region grid (other territories)                               25817   (removed 0)
+--- MODIS 2008 cambodia ---
+  input rows                                                                26577
+  type == 0 (vegetation fire)                                               26270   (removed 307)
+  drop low confidence                                                       25000   (removed 1270)
+  drop persistent spots (>= 5 dates/year)                                   24420   (removed 580)
+  outside the region grid (other territories)                               24420   (removed 0)
+--- MODIS 2009 cambodia ---
+  input rows                                                                26863
+  type == 0 (vegetation fire)                                               25961   (removed 902)
+  drop low confidence                                                       24782   (removed 1179)
+  drop persistent spots (>= 5 dates/year)                                   23648   (removed 1134)
+  outside the region grid (other territories)                               23648   (removed 0)
+--- MODIS 2010 cambodia ---
+  input rows                                                                33395
+  type == 0 (vegetation fire)                                               30071   (removed 3324)
+  drop low confidence                                                       28499   (removed 1572)
+  drop persistent spots (>= 5 dates/year)                                   26815   (removed 1684)
+  outside the region grid (other territories)                               26815   (removed 0)
+--- MODIS 2011 cambodia ---
+  input rows                                                                34538
+  type == 0 (vegetation fire)                                               30694   (removed 3844)
+  drop low confidence                                                       29221   (removed 1473)
+  drop persistent spots (>= 5 dates/year)                                   27549   (removed 1672)
+  outside the region grid (other territories)                               27549   (removed 0)
+--- MODIS 2012 cambodia ---
+  input rows                                                                30514
+  type == 0 (vegetation fire)                                               27200   (removed 3314)
+  drop low confidence                                                       25888   (removed 1312)
+  drop persistent spots (>= 5 dates/year)                                   22710   (removed 3178)
+  outside the region grid (other territories)                               22710   (removed 0)
+--- MODIS 2013 cambodia ---
+  input rows                                                                44938
+  type == 0 (vegetation fire)                                               35441   (removed 9497)
+  drop low confidence                                                       33723   (removed 1718)
+  drop persistent spots (>= 5 dates/year)                                   30211   (removed 3512)
+  outside the region grid (other territories)                               30211   (removed 0)
+--- MODIS 2014 cambodia ---
+  input rows                                                                39916
+  type == 0 (vegetation fire)                                               35493   (removed 4423)
+  drop low confidence                                                       33855   (removed 1638)
+  drop persistent spots (>= 5 dates/year)                                   29188   (removed 4667)
+  outside the region grid (other territories)                               29188   (removed 0)
+--- SNPP 2012 cambodia ---
+  input rows                                                               119310
+  type == 0 (vegetation fire)                                              119190   (removed 120)
+  drop low confidence                                                      111395   (removed 7795)
+  drop persistent spots (>= 5 dates/year)                                   77413   (removed 33982)
+  outside the region grid (other territories)                               77413   (removed 0)
+--- SNPP 2013 cambodia ---
+  input rows                                                               219614
+  type == 0 (vegetation fire)                                              219513   (removed 101)
+  drop low confidence                                                      201703   (removed 17810)
+  drop persistent spots (>= 5 dates/year)                                  116523   (removed 85180)
+  outside the region grid (other territories)                              116523   (removed 0)
+--- SNPP 2014 cambodia ---
+  input rows                                                               205217
+  type == 0 (vegetation fire)                                              205133   (removed 84)
+  drop low confidence                                                      182988   (removed 22145)
+  drop persistent spots (>= 5 dates/year)                                  111726   (removed 71262)
+  outside the region grid (other territories)                              111726   (removed 0)
+===== 2026-11-15 13:10 =====
+--- MODIS 2000 cambodia ---
+  input rows                                                                  402
+  type == 0 (vegetation fire)                                                 402
+  drop low confidence                                                         394   (removed 8)
+  drop persistent spots (>= 20 dates/year)                                    394
+  outside the region grid (other territories)                                 394   (removed 0)
+--- MODIS 2001 cambodia ---
+  input rows                                                                 5973
+  type == 0 (vegetation fire)                                                5973
+  drop low confidence                                                        5728   (removed 245)
+  drop persistent spots (>= 20 dates/year)                                   5728
+  outside the region grid (other territories)                                5728   (removed 0)
+--- MODIS 2002 cambodia ---
+  input rows                                                                 8678
+  type == 0 (vegetation fire)                                                8678
+  drop low confidence                                                        8307   (removed 371)
+  drop persistent spots (>= 20 dates/year)                                   8307
+  outside the region grid (other territories)                                8307   (removed 0)
+--- MODIS 2003 cambodia ---
+  input rows                                                                25782
+  type == 0 (vegetation fire)                                               25639   (removed 143)
+  drop low confidence                                                       24465   (removed 1174)
+  drop persistent spots (>= 20 dates/year)                                  24465
+  outside the region grid (other territories)                               24465   (removed 0)
+--- MODIS 2004 cambodia ---
+  input rows                                                                38149
+  type == 0 (vegetation fire)                                               38149
+  drop low confidence                                                       36393   (removed 1756)
+  drop persistent spots (>= 20 dates/year)                                  36393
+  outside the region grid (other territories)                               36393   (removed 0)
+--- MODIS 2005 cambodia ---
+  input rows                                                                27264
+  type == 0 (vegetation fire)                                               27264
+  drop low confidence                                                       25923   (removed 1341)
+  drop persistent spots (>= 20 dates/year)                                  25923
+  outside the region grid (other territories)                               25923   (removed 0)
+--- MODIS 2006 cambodia ---
+  input rows                                                                22467
+  type == 0 (vegetation fire)                                               22467
+  drop low confidence                                                       21411   (removed 1056)
+  drop persistent spots (>= 20 dates/year)                                  21411
+  outside the region grid (other territories)                               21411   (removed 0)
+--- MODIS 2007 cambodia ---
+  input rows                                                                27683
+  type == 0 (vegetation fire)                                               27482   (removed 201)
+  drop low confidence                                                       26177   (removed 1305)
+  drop persistent spots (>= 20 dates/year)                                  26177
+  outside the region grid (other territories)                               26177   (removed 0)
+--- MODIS 2008 cambodia ---
+  input rows                                                                26577
+  type == 0 (vegetation fire)                                               26270   (removed 307)
+  drop low confidence                                                       25000   (removed 1270)
+  drop persistent spots (>= 20 dates/year)                                  25000
+  outside the region grid (other territories)                               25000   (removed 0)
+--- MODIS 2009 cambodia ---
+  input rows                                                                26863
+  type == 0 (vegetation fire)                                               25961   (removed 902)
+  drop low confidence                                                       24782   (removed 1179)
+  drop persistent spots (>= 20 dates/year)                                  24782
+  outside the region grid (other territories)                               24782   (removed 0)
+--- MODIS 2010 cambodia ---
+  input rows                                                                33395
+  type == 0 (vegetation fire)                                               30071   (removed 3324)
+  drop low confidence                                                       28499   (removed 1572)
+  drop persistent spots (>= 20 dates/year)                                  28499
+  outside the region grid (other territories)                               28499   (removed 0)
+--- MODIS 2011 cambodia ---
+  input rows                                                                34538
+  type == 0 (vegetation fire)                                               30694   (removed 3844)
+  drop low confidence                                                       29221   (removed 1473)
+  drop persistent spots (>= 20 dates/year)                                  29221
+  outside the region grid (other territories)                               29221   (removed 0)
+--- MODIS 2012 cambodia ---
+  input rows                                                                30514
+  type == 0 (vegetation fire)                                               27200   (removed 3314)
+  drop low confidence                                                       25888   (removed 1312)
+  drop persistent spots (>= 20 dates/year)                                  25888
+  outside the region grid (other territories)                               25888   (removed 0)
+--- MODIS 2013 cambodia ---
+  input rows                                                                44938
+  type == 0 (vegetation fire)                                               35441   (removed 9497)
+  drop low confidence                                                       33723   (removed 1718)
+  drop persistent spots (>= 20 dates/year)                                  33723
+  outside the region grid (other territories)                               33723   (removed 0)
+--- MODIS 2014 cambodia ---
+  input rows                                                                39916
+  type == 0 (vegetation fire)                                               35493   (removed 4423)
+  drop low confidence                                                       33855   (removed 1638)
+  drop persistent spots (>= 20 dates/year)                                  33831   (removed 24)
+  outside the region grid (other territories)                               33831   (removed 0)
+--- MODIS 2015 cambodia ---
+  input rows                                                                44023
+  type == 0 (vegetation fire)                                               41086   (removed 2937)
+  drop low confidence                                                       39143   (removed 1943)
+  drop persistent spots (>= 20 dates/year)                                  39118   (removed 25)
+  outside the region grid (other territories)                               39118   (removed 0)
+--- MODIS 2016 cambodia ---
+  input rows                                                                37153
+  type == 0 (vegetation fire)                                               36726   (removed 427)
+  drop low confidence                                                       34783   (removed 1943)
+  drop persistent spots (>= 20 dates/year)                                  34757   (removed 26)
+  outside the region grid (other territories)                               34757   (removed 0)
+--- MODIS 2017 cambodia ---
+  input rows                                                                22426
+  type == 0 (vegetation fire)                                               22353   (removed 73)
+  drop low confidence                                                       21287   (removed 1066)
+  drop persistent spots (>= 20 dates/year)                                  21287
+  outside the region grid (other territories)                               21287   (removed 0)
+--- MODIS 2018 cambodia ---
+  input rows                                                                28815
+  type == 0 (vegetation fire)                                               28249   (removed 566)
+  drop low confidence                                                       26953   (removed 1296)
+  drop persistent spots (>= 20 dates/year)                                  26953
+  outside the region grid (other territories)                               26953   (removed 0)
+--- SNPP 2012 cambodia ---
+  input rows                                                               119310
+  type == 0 (vegetation fire)                                              119190   (removed 120)
+  drop low confidence                                                      111395   (removed 7795)
+  drop persistent spots (>= 20 dates/year)                                 102547   (removed 8848)
+  outside the region grid (other territories)                              102547   (removed 0)
+--- SNPP 2013 cambodia ---
+  input rows                                                               219614
+  type == 0 (vegetation fire)                                              219513   (removed 101)
+  drop low confidence                                                      201703   (removed 17810)
+  drop persistent spots (>= 20 dates/year)                                 173198   (removed 28505)
+  outside the region grid (other territories)                              173198   (removed 0)
+--- SNPP 2014 cambodia ---
+  input rows                                                               205217
+  type == 0 (vegetation fire)                                              205133   (removed 84)
+  drop low confidence                                                      182988   (removed 22145)
+  drop persistent spots (>= 20 dates/year)                                 161886   (removed 21102)
+  outside the region grid (other territories)                              161886   (removed 0)
+--- SNPP 2015 cambodia ---
+  input rows                                                               234705
+  type == 0 (vegetation fire)                                              234613   (removed 92)
+  drop low confidence                                                      208478   (removed 26135)
+  drop persistent spots (>= 20 dates/year)                                 196570   (removed 11908)
+  outside the region grid (other territories)                              196570   (removed 0)
+--- SNPP 2016 cambodia ---
+  input rows                                                               236923
+  type == 0 (vegetation fire)                                              236628   (removed 295)
+  drop low confidence                                                      212675   (removed 23953)
+  drop persistent spots (>= 20 dates/year)                                 206029   (removed 6646)
+  outside the region grid (other territories)                              206029   (removed 0)
+--- SNPP 2017 cambodia ---
+  input rows                                                               127110
+  type == 0 (vegetation fire)                                              126904   (removed 206)
+  drop low confidence                                                      112642   (removed 14262)
+  drop persistent spots (>= 20 dates/year)                                 110869   (removed 1773)
+  outside the region grid (other territories)                              110869   (removed 0)
+--- SNPP 2018 cambodia ---
+  input rows                                                               151443
+  type == 0 (vegetation fire)                                              151346   (removed 97)
+  drop low confidence                                                      137714   (removed 13632)
+  drop persistent spots (>= 20 dates/year)                                 136115   (removed 1599)
+  outside the region grid (other territories)                              136115   (removed 0)
+===== 2026-11-15 13:39 =====
+--- MODIS 2019 cambodia ---
+  input rows                                                                32822
+  type == 0 (vegetation fire)                                               32757   (removed 65)
+  drop low confidence                                                       31313   (removed 1444)
+  drop persistent spots (>= 20 dates/year)                                  31289   (removed 24)
+  outside the region grid (other territories)                               31289   (removed 0)
+--- MODIS 2020 cambodia ---
+  input rows                                                                32926
+  type == 0 (vegetation fire)                                               32812   (removed 114)
+  drop low confidence                                                       31332   (removed 1480)
+  drop persistent spots (>= 20 dates/year)                                  31244   (removed 88)
+  outside the region grid (other territories)                               31244   (removed 0)
+--- MODIS 2021 cambodia ---
+  input rows                                                                29418
+  type == 0 (vegetation fire)                                               29103   (removed 315)
+  drop low confidence                                                       27837   (removed 1266)
+  drop persistent spots (>= 20 dates/year)                                  27837
+  outside the region grid (other territories)                               27837   (removed 0)
+--- MODIS 2022 cambodia ---
+  input rows                                                                17073
+  type == 0 (vegetation fire)                                               17013   (removed 60)
+  drop low confidence                                                       16257   (removed 756)
+  drop persistent spots (>= 20 dates/year)                                  16257
+  outside the region grid (other territories)                               16257   (removed 0)
+--- MODIS 2023 cambodia ---
+  input rows                                                                20609
+  type == 0 (vegetation fire)                                               20524   (removed 85)
+  drop low confidence                                                       19458   (removed 1066)
+  drop persistent spots (>= 20 dates/year)                                  19458
+  outside the region grid (other territories)                               19458   (removed 0)
+--- MODIS 2024 cambodia ---
+  input rows                                                                26283
+  type == 0 (vegetation fire)                                               26257   (removed 26)
+  drop low confidence                                                       25111   (removed 1146)
+  drop persistent spots (>= 20 dates/year)                                  25111
+  outside the region grid (other territories)                               25111   (removed 0)
+--- MODIS 2025 cambodia ---
+  input rows                                                                20788
+  type == 0 (vegetation fire)                                               20729   (removed 59)
+  drop low confidence                                                       19876   (removed 853)
+  drop persistent spots (>= 20 dates/year)                                  19876
+  outside the region grid (other territories)                               19876   (removed 0)
+--- SNPP 2019 cambodia ---
+  input rows                                                               183469
+  type == 0 (vegetation fire)                                              183307   (removed 162)
+  drop low confidence                                                      163511   (removed 19796)
+  drop persistent spots (>= 20 dates/year)                                 162407   (removed 1104)
+  outside the region grid (other territories)                              162407   (removed 0)
+--- SNPP 2020 cambodia ---
+  input rows                                                               206572
+  type == 0 (vegetation fire)                                              206306   (removed 266)
+  drop low confidence                                                      181487   (removed 24819)
+  drop persistent spots (>= 20 dates/year)                                 180222   (removed 1265)
+  outside the region grid (other territories)                              180222   (removed 0)
+--- SNPP 2021 cambodia ---
+  input rows                                                               166300
+  type == 0 (vegetation fire)                                              166099   (removed 201)
+  drop low confidence                                                      147821   (removed 18278)
+  drop persistent spots (>= 20 dates/year)                                 145193   (removed 2628)
+  outside the region grid (other territories)                              145193   (removed 0)
+--- SNPP 2022 cambodia ---
+  input rows                                                                92425
+  type == 0 (vegetation fire)                                               92292   (removed 133)
+  drop low confidence                                                       86226   (removed 6066)
+  drop persistent spots (>= 20 dates/year)                                  86068   (removed 158)
+  outside the region grid (other territories)                               86068   (removed 0)
+--- SNPP 2023 cambodia ---
+  input rows                                                               121297
+  type == 0 (vegetation fire)                                              121121   (removed 176)
+  drop low confidence                                                      109632   (removed 11489)
+  drop persistent spots (>= 20 dates/year)                                 108848   (removed 784)
+  outside the region grid (other territories)                              108848   (removed 0)
+--- SNPP 2024 cambodia ---
+  input rows                                                               154570
+  type == 0 (vegetation fire)                                              154337   (removed 233)
+  drop low confidence                                                      138854   (removed 15483)
+  drop persistent spots (>= 20 dates/year)                                 138066   (removed 788)
+  outside the region grid (other territories)                              138066   (removed 0)
+--- SNPP 2025 cambodia ---
+  input rows                                                               109649
+  type == 0 (vegetation fire)                                              109454   (removed 195)
+  drop low confidence                                                       99233   (removed 10221)
+  drop persistent spots (>= 20 dates/year)                                  98810   (removed 423)
+  outside the region grid (other territories)                               98810   (removed 0)

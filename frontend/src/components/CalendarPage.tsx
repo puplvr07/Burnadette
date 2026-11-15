@@ -10,6 +10,8 @@ import Heatmap from "./Heatmap";
 import MonthCalendar from "./MonthCalendar";
 import Caveats from "./Caveats";
 import AvailabilityNotice from "./AvailabilityNotice";
+import Analytics from "./Analytics";
+import DataNotes from "./DataNotes";
 import { sourceDateRange } from "../availability";
 import HomeCalendarPreview from "./HomeCalendarPreview";
 import HistoricalInsights from "./HistoricalInsights";
@@ -36,6 +38,13 @@ export default function CalendarPage({ view, hidden }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const toolsHeading = useRef<HTMLHeadingElement>(null);
+  // "More below" cue for the Region & dates panel, shown while it can still scroll down.
+  const settingsPanel = useRef<HTMLElement>(null);
+  const [settingsMoreBelow, setSettingsMoreBelow] = useState(false);
+  const checkSettingsScroll = () => {
+    const el = settingsPanel.current;
+    setSettingsMoreBelow(!!el && el.scrollTop + el.clientHeight < el.scrollHeight - 8);
+  };
 
   useEffect(() => {
     let stale = false;
@@ -43,7 +52,7 @@ export default function CalendarPage({ view, hidden }: Props) {
       if (stale) return;
       setMeta(m); setRegions(r);
       // Metadata supplies viewport defaults only. A region is not selected or queried until Apply.
-      const initial: Selection = { bbox: r[0]?.bbox ?? [116, 4, 127, 21], regionId: "", source: "harmonized", metric: "activity", start: m.date_start, end: m.date_end };
+      const initial: Selection = { bbox: (r.find((x) => x.id === "philippines") ?? r[0])?.bbox ?? [116, 4, 127, 21], regionId: "", source: "harmonized", metric: "activity", start: m.date_start, end: m.date_end };
       setDraft(initial);
     }).catch((e) => { if (!stale) setError(String(e.message ?? e)); });
     return () => { stale = true; };
@@ -53,20 +62,27 @@ export default function CalendarPage({ view, hidden }: Props) {
   const start = selection?.start;
   const end = selection?.end;
   const source = selection?.source;
+  const regionId = selection?.regionId;
   useEffect(() => {
     if (!bbox || !start || !end || !source) return;
     let stale = false;
     setLoading(true); setError(""); setData(null);
-    getCalendar(bbox, start, end, source)
+    getCalendar(bbox, start, end, source, regionId || undefined)
       .then((d) => { if (!stale) setData(d); })
       .catch((e) => { if (!stale) setError(String(e.message ?? e)); })
       .finally(() => { if (!stale) setLoading(false); });
     return () => { stale = true; };
-  }, [bbox, start, end, source, retryVersion]);
+  }, [bbox, start, end, source, regionId, retryVersion]);
 
   useEffect(() => {
     if (toolsOpen && view === "map" && !hidden) toolsHeading.current?.focus();
   }, [toolsOpen, view, hidden]);
+  // Re-check the cue when the panel opens, its content changes, or the window resizes.
+  useEffect(() => {
+    const id = requestAnimationFrame(checkSettingsScroll);
+    window.addEventListener("resize", checkSettingsScroll);
+    return () => { cancelAnimationFrame(id); window.removeEventListener("resize", checkSettingsScroll); };
+  }, [toolsOpen, view, hidden, draft, areaCleared, pointFeedback, pointInputError]);
 
   const regionName = (s: Selection | null) => !s ? "Choose an area" : s.radius ? `Point ${s.radius.lat.toFixed(4)}, ${s.radius.lon.toFixed(4)} · ${s.radius.radiusKm} km radius` : regions.find((r) => r.id === s.regionId)?.name ?? "Custom area";
   const updateRadius = (point: RadiusSelection) => {
@@ -91,8 +107,10 @@ export default function CalendarPage({ view, hidden }: Props) {
     <div className={`page page-wide explore-page${view === "map" ? " immersive-map-page" : view === "heatmap" ? " heatmap-view" : ""}${view !== "map" && !selection ? " heatmap-empty" : ""}${showSample ? " sample-expanded" : ""}`} hidden={hidden}>
       <div className="results-intro compact-results-intro" hidden={view === "map"}>
         <header className="hero">
-          <h1>{view === "heatmap" ? "Heatmap" : "Calendar"}</h1>
-          <p>{view === "heatmap" ? "Weekly patterns, across the years." : "A month at a time, one observation per week."}</p>
+          <p className="eyebrow">BURNING ACTIVITY EXPLORER</p>
+          <h1>{view === "heatmap" ? "The bigger picture" : "One month, week by week"}</h1>
+          <p>{view === "heatmap" ? "Compare weekly burning patterns across years." : "Inspect weekly observations in a selected month."}</p>
+          {meta && !usingFakeData && <p className="data-scope">Weekly fire activity, {monthYear(meta.date_start)} to {monthYear(meta.date_end)}. Each square is about 55 km wide.</p>}
         </header>
         {usingFakeData && <span className="sample-tag">SAMPLE DATA · Not satellite findings</span>}
         <div className="selection-summary" hidden={!selection}>
@@ -104,7 +122,8 @@ export default function CalendarPage({ view, hidden }: Props) {
         </div>
         {selection && meta && <FilterControls value={selection} meta={meta} onChange={(patch) => { const next = { ...selection, ...patch }; setSelection(next); setDraft(next); setPointInputError(""); setRadiusEditorKey((n) => n + 1); }} />}
       </div>
-
+      {view !== "map" && selection && data && !loading && !error && <DataNotes data={data} source={selection.source} region={regions.find((r) => r.id === (data.region ?? selection.regionId))} />}
+      {view === "calendar" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
       {error && (view === "map" || !meta || !selection) && <div className={`error${view === "map" ? " map-error" : ""}`} role="alert">{error}</div>}
 
       <section className={`immersive-map${toolsOpen ? " settings-open" : ""}`} aria-label="Map" hidden={view !== "map"}>
@@ -130,7 +149,7 @@ export default function CalendarPage({ view, hidden }: Props) {
         <div className="map-bottom-bar">
           <button type="button" aria-expanded={caveatsOpen} aria-controls="map-caveats" onClick={() => { setCaveatsOpen((open) => !open); setToolsOpen(false); setSearchDismiss((n) => n + 1); }}>Data limitations</button>
         </div>
-        <aside className="map-settings" id="map-settings" aria-labelledby="map-settings-heading" hidden={!toolsOpen}
+        <aside ref={settingsPanel} onScroll={checkSettingsScroll} className="map-settings" id="map-settings" aria-labelledby="map-settings-heading" hidden={!toolsOpen}
           onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); closeTools(); } }}>
           <div className="map-settings-header">
             <div><p className="eyebrow">YOUR SELECTION</p><h2 ref={toolsHeading} tabIndex={-1} id="map-settings-heading">Region & dates</h2></div>
@@ -160,6 +179,10 @@ export default function CalendarPage({ view, hidden }: Props) {
           {draft && !validDraft && <p className="small" role="status">{areaCleared ? "Choose an analysis region first." : pointInputError || "Choose valid dates within the available coverage."}</p>}
           <button className="apply-map-selection" type="button" disabled={!validDraft} onClick={applySelection}>Apply & view {resultView === "heatmap" ? "Heatmap" : "Calendar"} →</button>
           {selection && <button type="button" className="reset-map-draft" onClick={() => { setAreaCleared(false); setDraft(selection); setPointInputError(""); setPointFeedback(""); setRadiusEditorKey((n) => n + 1); }}>Reset to applied selection</button>}
+          <button type="button" className="scroll-cue" hidden={!settingsMoreBelow} aria-label="Scroll down for more settings"
+            onClick={() => settingsPanel.current?.scrollBy({ top: settingsPanel.current.clientHeight * 0.7, behavior: "smooth" })}>
+            More below <span aria-hidden="true">↓</span>
+          </button>
         </aside>
         <aside className="map-caveats" id="map-caveats" hidden={!caveatsOpen}>
           <button type="button" className="close-map-tools map-icon-button" aria-label="Close data limitations" title="Close data limitations" onClick={() => setCaveatsOpen(false)}><span className="close-symbol" aria-hidden="true">×</span></button>
@@ -171,6 +194,12 @@ export default function CalendarPage({ view, hidden }: Props) {
       <section className="panel panel-fire explore-panel" aria-label="Heatmap" hidden={view !== "heatmap" || !selection}>
         {meta && selection && <Heatmap regionLabel={regionName(selection)} bbox={selection.bbox} weeks={data?.weeks ?? []} source={selection.source} metric={selection.metric} meta={meta} start={selection.start} end={selection.end} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
       </section>
+      {meta && selection && data && !loading && !error && (
+        <section className="panel explore-panel compare-panel" aria-label="Compare and download" hidden={view !== "heatmap"}>
+          <h2>Compare and download</h2>
+          <Analytics weeks={data.weeks} meta={meta} bbox={selection.bbox} start={selection.start} end={selection.end} source={selection.source} />
+        </section>
+      )}
       {view === "heatmap" && selection && meta && <AvailabilityNotice meta={meta} source={selection.source} metric={selection.metric} start={selection.start} end={selection.end} weeks={data?.weeks ?? []} loading={loading || (!data && !error)} error={error} sample={usingFakeData || !!meta.is_fake} onRetry={() => setRetryVersion((v) => v + 1)} />}
       <section className="panel explore-panel" aria-label="Calendar" hidden={view !== "calendar" || !selection}>
         {meta && selection && <MonthCalendar weeks={data?.weeks ?? []} start={selection.start} end={selection.end} metric={selection.metric} source={selection.source} meta={meta} loading={loading || (!data && !error)} error={error} onRetry={() => setRetryVersion((v) => v + 1)} />}
@@ -182,6 +211,8 @@ export default function CalendarPage({ view, hidden }: Props) {
     </div>
   );
 }
+
+const monthYear = (iso: string) => new Date(iso + "T00:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 function FilterControls({ value, meta, onChange }: { value: Selection; meta: Meta; onChange: (patch: Partial<Selection>) => void }) {
   const available = sourceDateRange(meta, value.source);

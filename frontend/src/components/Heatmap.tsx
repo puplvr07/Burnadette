@@ -1,4 +1,5 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useId, useMemo, useRef, useState } from "react";
+import { activeSquaresText, provenanceLabel, sensitivityText } from "../display";
 import type { Bbox, Meta, Metric, Source, WeekRow } from "../types";
 import { colorFor } from "../colors";
 import { formatCalendarDate, formatCalendarValue } from "../calendarModel";
@@ -174,7 +175,9 @@ export default function Heatmap({ regionLabel = "Selected analysis region", bbox
           <div className="heat-scroll heatmap-matrix-scroll" ref={scroller} onScroll={syncScroll} role="region" tabIndex={0} aria-label="Scrollable weekly heatmap">
             <div className="heatmap-matrix" role="table" aria-label="Burning activity by calendar year and weekly position" aria-colcount={54} aria-rowcount={layout.years.length + 1}>
               <div className="heatmap-grid-head" role="row"><div className="heatmap-year" role="columnheader">Year</div>{MONTHS.map((month, i) => <div className="heatmap-month-label" role="columnheader" key={month} style={{ gridColumn: `${MONTH_COLUMNS[i] + 2} / span ${i === 11 ? 6 : MONTH_COLUMNS[i + 1] - MONTH_COLUMNS[i]}` }}>{month}</div>)}</div>
-              {layout.rows.map((row, index) => <div className="heatmap-grid-row" role="row" key={layout.years[index]}>
+              {layout.rows.map((row, index) => <Fragment key={layout.years[index]}>
+                {source === "harmonized" && layout.years[index] === 2012 && index > 0 && <div className="heatmap-era" role="presentation"><span>From 20 Jan 2012 values are observed by VIIRS. Earlier rows are estimated from MODIS.</span></div>}
+                <div className="heatmap-grid-row" role="row">
                 <div className="heatmap-year" role="rowheader">{layout.years[index]}</div>
                 {row.map((slot) => {
                   const state = stateFor(slot), value = valueFor(slot);
@@ -188,11 +191,12 @@ export default function Heatmap({ regionLabel = "Selected analysis region", bbox
                       onFocus={() => { setPicked(slot.key); setFocused(slot.key); setHovered(""); }}
                       onPointerEnter={(event) => { if (event.pointerType === "mouse") setHovered(slot.key); }} onPointerLeave={() => setHovered("")}
                       onKeyDown={(event) => { if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) { event.preventDefault(); moveFocus(slot, event.key); } }}>
-                      {slot.record && slot.record.low_sensitivity_share >= .3 && <span className="heatmap-sensitivity-dot" aria-hidden="true" />}
+                      {slot.record && (slot.record.low_sensitivity_share ?? 0) >= .3 && <span className="heatmap-sensitivity-dot" aria-hidden="true" />}
                     </button>
                   </div>;
                 })}
-              </div>)}
+              </div>
+              </Fragment>)}
             </div>
           </div>
           {scroll.max > 0 && <input type="range" className="heat-slider" min={0} max={scroll.max} step={1} value={Math.min(scroll.pos, scroll.max)} aria-label="Scroll the heatmap sideways" onChange={(event) => { if (scroller.current) { scroller.current.scrollLeft = +event.target.value; syncScroll(); } }} />}
@@ -211,7 +215,7 @@ export default function Heatmap({ regionLabel = "Selected analysis region", bbox
             <p className="heatmap-detail-status">{describe(shown)}</p>
             {shown.record ? <>
               <div className="heatmap-primary-values"><div><span>Activity</span><strong>{formatCalendarValue(shown.record.value)}</strong></div><div><span>Anomaly</span><strong>{formatCalendarValue(shown.record.anomaly)}{shown.record.anomaly != null && Number.isFinite(shown.record.anomaly) ? <small> /100</small> : null}</strong></div></div>
-              <dl className="heatmap-detail-fields"><div><dt>Source view</dt><dd>{sourceName}</dd></div><div><dt>Observation provenance</dt><dd>{source !== "harmonized" ? sourceName : shown.record.harmonized_source === "modis_scaled" ? "MODIS scaled to VIIRS" : shown.record.harmonized_source === "modis_fill" ? "MODIS fill" : shown.record.harmonized_source === "viirs" ? "VIIRS" : shown.record.harmonized_source ?? "Not supplied"}</dd></div><div><dt>Uncertainty range</dt><dd>{shown.record.uncertainty_low != null && shown.record.uncertainty_high != null ? `${formatCalendarValue(shown.record.uncertainty_low)} – ${formatCalendarValue(shown.record.uncertainty_high)}` : "Not supplied"}</dd></div><div><dt>Low-sensitivity share</dt><dd>{Number.isFinite(shown.record.low_sensitivity_share) ? `${(shown.record.low_sensitivity_share * 100).toFixed(1)}%` : "Not supplied"}</dd></div><div><dt>Active cells (reported)</dt><dd>{shown.record.active_cells}</dd></div></dl>
+              <dl className="heatmap-detail-fields"><div><dt>Source view</dt><dd>{sourceName}</dd></div><div><dt>Observation provenance</dt><dd>{source !== "harmonized" ? sourceName : provenanceLabel(shown.record.harmonized_source)}</dd></div><div><dt>Uncertainty range</dt><dd>{shown.record.uncertainty_low != null && shown.record.uncertainty_high != null ? `${formatCalendarValue(shown.record.uncertainty_low)} – ${formatCalendarValue(shown.record.uncertainty_high)}` : "Not supplied"}</dd></div><div><dt>Low-sensitivity share</dt><dd>{sensitivityText(shown.record.low_sensitivity_share)}</dd></div><div><dt>Active squares</dt><dd>{activeSquaresText(shown.record)}</dd></div></dl>
               {shown.record.value === 0 && <p className="calendar-detail-warning">A recorded zero does not prove no burning occurred.</p>}
             </> : <p>No weekly record was returned. Activity, anomaly and uncertainty are unknown, not zero.</p>}
             <div className="heatmap-detail-notes"><strong>Flags & observation notes</strong>{shown.record?.flags.length || gaps(shown).length ? <ul>{[...new Set([...(shown.record?.flags ?? []), ...gaps(shown)])].map((flag) => <li key={flag}>{flag}</li>)}</ul> : <p>No flags supplied. This does not guarantee complete observation coverage.</p>}{(shown.record?.low_sensitivity_share ?? 0) > 0 && <p>Low-sensitivity cells are present. Review the uncertainty and data limitations.</p>}</div>
